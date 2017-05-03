@@ -30,15 +30,9 @@ namespace ScriptEditor.EditorScripts {
             instance = GetWindow<ScriptEditorWindow>();
             instance.titleContent = new GUIContent("Script Editor");
         }
-        
-        private static void OpenScriptEditor(Script sc) {
-            EditorWindow.GetWindow(typeof(ScriptEditorWindow));
-            //loadFromScript(sc);
-        }
 
         List<NodeBase> nodes;
         Vector2 pan;
-        Script srcScript;
 
         void OnEnable() {
             nodes = new List<NodeBase>();
@@ -51,7 +45,7 @@ namespace ScriptEditor.EditorScripts {
             if (graph != null) graph.UpdateGraph(e);
         }
 
-        Vector3 vanishingPoint = new Vector2(0, 19.12f); public float zoomScale = 1;
+        //Vector3 vanishingPoint = new Vector2(0, 19.12f); public float zoomScale = 1;
 
         void OnGUI() {
             if (workView == null || headerView == null || statusView == null) {
@@ -62,18 +56,18 @@ namespace ScriptEditor.EditorScripts {
             Event e = Event.current;
             Rect headerBox = new Rect(0, 0, position.width, 17.5f);Matrix4x4 oldMatrix = GUI.matrix;
 
-            //Scale my gui matrix
-            Matrix4x4 Translation = Matrix4x4.TRS(vanishingPoint, Quaternion.identity, Vector3.one);
-            Matrix4x4 Scale = Matrix4x4.Scale(new Vector3(zoomScale, zoomScale, 1.0f));
-            GUI.matrix = Translation * Scale * Translation.inverse;
+            //Scale  gui matrix
+            //Matrix4x4 Translation = Matrix4x4.TRS(vanishingPoint, Quaternion.identity, Vector3.one);
+            //Matrix4x4 Scale = Matrix4x4.Scale(new Vector3(zoomScale, zoomScale, 1.0f));
+            //GUI.matrix = Translation * Scale * Translation.inverse;
             workView.DrawView(new Rect(0,headerBox.height, position.width, position.height-2*headerBox.height), 
-                            new Rect(zoomScale, zoomScale,  1/zoomScale, 1/zoomScale),
+                            new Rect(/*zoomScale, zoomScale,  1/zoomScale, 1/zoomScale*/ 1,1,1,1),
                             e, graph);
             //reset the matrix
-            GUI.matrix = oldMatrix;
+            //GUI.matrix = oldMatrix;
 
             // Just for testing (unscaled controls at the bottom)
-            GUILayout.FlexibleSpace();
+            //GUILayout.FlexibleSpace();
             //vanishingPoint = EditorGUILayout.Vector2Field("vanishing point", vanishingPoint);
 
             headerView.DrawView(headerBox,
@@ -156,7 +150,7 @@ namespace ScriptEditor.EditorScripts {
         }
         List<string> posInp;
 
-        public static void Init(NodeType nT, object sT, Vector2 pos) {
+        public static void Init(NodeType nT, object sT, Vector2 pos, int count=2) {
             Instance = GetWindow<NodeCreatePopup>(true);
             Instance.maxSize = new Vector2(200, 100);
             Instance.minSize = Instance.maxSize;
@@ -164,9 +158,15 @@ namespace ScriptEditor.EditorScripts {
             Instance.subType = sT;
             Instance.pos = pos;
             Instance.posInp = new List<string>();
+            Instance.nodeCount = count;
 
             switch (nT) {
                 case NodeType.Function:
+                    FunctionNode.FunctionType f = (FunctionNode.FunctionType)sT;
+                    Instance.titleContent = new GUIContent("Create " + (f).ToString() + " Node");
+                    Instance.posInp = FunctionNode.validCombos[f];
+                    break;
+                case NodeType.Math:
                     MathNode.OpType t = (MathNode.OpType)sT;
                     Instance.titleContent = new GUIContent("Create "+ (t).ToString() + " Node");
                     Instance.posInp = MathNode.validCombos[t];
@@ -181,24 +181,32 @@ namespace ScriptEditor.EditorScripts {
                     // input from list of variables in database
                     break;
             }
+
+            if(Instance.nodeCount<0 && Instance.posInp.Count == 1) {
+                Instance.CreateNode();
+            }
         }
+
         public void OnGUI() {
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
             {
                 GUILayout.Space(20);
                 switch (nodeType) {
+                    case NodeType.Math:
                     case NodeType.Fetch:
                     case NodeType.Function:
                         EditorGUILayout.LabelField("Type: ", EditorStyles.boldLabel, GUILayout.Width(80));
                         selectedIndex.x = EditorGUILayout.Popup((int)selectedIndex.x, posInp.ToArray(), GUILayout.Width(80));
 
-                        GUILayout.EndHorizontal();
-                        GUILayout.Space(6);
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Space(20);
-                        EditorGUILayout.LabelField("Num Pins:", EditorStyles.boldLabel, GUILayout.Width(80));
-                        nodeCount = StaticMethods.Clamp(EditorGUILayout.IntField(nodeCount, GUILayout.Width(80)), 2, 16);
+                        if (nodeCount > 0) {
+                            GUILayout.EndHorizontal();
+                            GUILayout.Space(6);
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Space(20);
+                            EditorGUILayout.LabelField("Num Pins:", EditorStyles.boldLabel, GUILayout.Width(80));
+                            nodeCount = StaticMethods.Clamp(EditorGUILayout.IntField(nodeCount, GUILayout.Width(80)), 2, 16);
+                        }
                         break;
                     case NodeType.Control:
                         EditorGUILayout.LabelField("From: ", EditorStyles.boldLabel/*, GUILayout.Width(80)*/);
@@ -217,27 +225,7 @@ namespace ScriptEditor.EditorScripts {
             {
                 GUILayout.Space(20);
                 if (GUILayout.Button("Create")) {
-                    NodeBase node = null;
-                    switch (nodeType) {
-                        case NodeType.Function:
-                            PinType pT = (PinType)Enum.Parse(typeof(PinType), posInp[(int)selectedIndex.x]);
-                            Debug.Log(GraphObj+","+subType +", "+pT);
-                            node = NodeUtilities.CreateNode(GraphObj, (MathNode.OpType)subType,
-                                pos, pT, nodeCount);
-                            break;
-                        case NodeType.Fetch:
-
-                            break;
-                        case NodeType.Control:
-                            if ((ControlNode.ControlType)subType != ControlNode.ControlType.Cast)
-                                node = NodeUtilities.CreateNode(GraphObj, nodeType, subType, pos);
-                            else node = NodeUtilities.CreateNode(GraphObj,
-                                (PinType)Enum.Parse(typeof(PinType), posInp[(int)selectedIndex.x]),
-                                (PinType)Enum.Parse(typeof(PinType), ControlNode.castables[posInp[(int)selectedIndex.x]][(int)selectedIndex.y]),
-                                pos);
-                            break;
-                    }
-                    Instance.Close();
+                    CreateNode();
                 }
                 GUILayout.Space(10);
                 if (GUILayout.Button("Cancel")) {
@@ -249,6 +237,33 @@ namespace ScriptEditor.EditorScripts {
             GUILayout.Space(20);
             Repaint();
 
+        }
+
+        /// <summary>
+        /// Create the node using NodeUtilities
+        /// </summary>
+        public void CreateNode() {
+            NodeBase node = null;
+            switch (nodeType) {
+                case NodeType.Math:
+                    PinType pT = (PinType)Enum.Parse(typeof(PinType), posInp[(int)selectedIndex.x]);
+                    //Debug.Log(GraphObj + "," + subType + ", " + pT);
+                    node = NodeUtilities.CreateNode(GraphObj, (MathNode.OpType)subType,
+                        pos, pT, nodeCount);
+                    break;
+                case NodeType.Fetch:
+
+                    break;
+                case NodeType.Control:
+                    if ((ControlNode.ControlType)subType != ControlNode.ControlType.Cast)
+                        node = NodeUtilities.CreateNode(GraphObj, nodeType, subType, pos);
+                    else node = NodeUtilities.CreateNode(GraphObj,
+                        (PinType)Enum.Parse(typeof(PinType), posInp[(int)selectedIndex.x]),
+                        (PinType)Enum.Parse(typeof(PinType), ControlNode.castables[posInp[(int)selectedIndex.x]][(int)selectedIndex.y]),
+                        pos);
+                    break;
+            }
+            Instance.Close();
         }
     }
 
@@ -342,6 +357,3 @@ namespace ScriptEditor.EditorScripts {
         }
     }
 }
-
-
-

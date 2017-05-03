@@ -10,7 +10,7 @@ namespace ScriptEditor.EditorScripts {
     public class WorkView : ViewBase{
 
         Texture2D backgroundTexture;
-        Vector2 pan;
+        public Vector2 pan;
 
         public WorkView() : base(getTitle()) {
 
@@ -42,7 +42,7 @@ namespace ScriptEditor.EditorScripts {
             }
 
 
-            GUI.DrawTextureWithTexCoords(body, backgroundTexture, new Rect(0, 0, body.width / backgroundTexture.width,
+            GUI.DrawTextureWithTexCoords(body, backgroundTexture, new Rect(pan.x, pan.y, body.width / backgroundTexture.width,
                 body.height / backgroundTexture.height));
             GUI.Box(body, title, skin.GetStyle("WorkViewBackground"));
             if (graph!=null) graph.DrawGraph(e, body);
@@ -61,14 +61,22 @@ namespace ScriptEditor.EditorScripts {
         public override void ProcessEvents(Event e) {
             base.ProcessEvents(e);
 
-            //if (e.button == 1 && e.type == EventType.MouseDrag) {
-            //    panX += Event.current.delta.x;
-            //    panY += Event.current.delta.y;
-            //}
-
-            if (e.type == EventType.ScrollWheel) {
-                 window.zoomScale = StaticMethods.Clamp(window.zoomScale + e.delta.y, 1.0f / 25.0f, 2.0f);
+            // pan
+            if (body.Contains(e.mousePosition)) {
+                //pan += e.delta;
+                if (e.type == EventType.MouseDrag && e.button == 2) {
+                    foreach (var node in graph.nodes) {
+                        node.Pan(e.delta);
+                    }
+                }
             }
+
+            //if (e.type == EventType.ScrollWheel) {
+            //    Debug.Log(e.delta);
+            //     float tmp = StaticMethods.Clamp(window.zoomScale + e.delta.y, 1.0f / 25.0f, 2.0f, true);
+            //    Debug.Log(tmp);
+            //    window.zoomScale = tmp;
+            //}
 
             if (e.type == EventType.ContextClick) {
                 Vector2 mousePos = e.mousePosition;
@@ -77,10 +85,11 @@ namespace ScriptEditor.EditorScripts {
                     //Debug.Log("HasNodeS: \"" + graph.nodes + "'");
                     NodeBase node = insideNode(mousePos);
                     if (node != null) {
-                        Debug.Log("Right Clicked a node");
+                        //Debug.Log("Right Clicked a node");
                         //test if connected to pin
                         NodePin pin = node.InsidePin(mousePos);
                         if (pin != null) {
+                            //Debug.Log("Right Clicked a PIN");
                             //node connection menu
                             bool isOutput = pin.GetType().Equals(typeof(OutputPin));
 
@@ -88,23 +97,24 @@ namespace ScriptEditor.EditorScripts {
                             //menu.AddItem(new GUIContent("Break All Connections"), false, NodeBase.RemoveAllPins, pin);
 
                             //break individualConections
-                            if (isOutput && pin.isConnected) {
-                                //foreach (InputPin n in pin.node.inPins) {
+                            if (pin.isConnected)
+                                if (isOutput) {
+                                    //foreach (InputPin n in pin.node.inPins) {
                                     menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
-                                //}
-                            } else {
-                                //foreach (OutputPin n in pin.node.outPins) {
+                                    //}
+                                } else {
+                                    //foreach (OutputPin n in pin.node.outPins) {
                                     menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
-                                //}
+                                    //}
 
-                            }
+                                }
 
                             //add separator
                             menu.AddSeparator("");
                         }
-
+                        
                         // cut, copy, duplicate, delete
-                        if (node.GetType().Equals(typeof(StartNode))) {
+                        if (!node.GetType().Equals(typeof(StartNode))) {
                             menu.AddItem(new GUIContent("Cut Node"), false, CutNode, node);
                             menu.AddItem(new GUIContent("Copy Node"), false, CopyNode, node);
                             menu.AddItem(new GUIContent("Duplicate Node"), false, DupeNode, node);

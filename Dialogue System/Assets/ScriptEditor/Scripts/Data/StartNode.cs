@@ -10,24 +10,33 @@ namespace ScriptEditor.Graph {
     /// Node that begins the logic execution of a script. Cannot be removed from script.
     /// </summary>
     public class StartNode : NodeBase {
+
+        protected static Vector2 baseBox = new Vector2 ();
+        protected static Vector2 margin = new Vector2(10, 10);
+
         public virtual void Construct() {
-            base.Construct("Start");
+            base.SetName("Start");
             outPins.Add(new OutputPin(this, PinType.Logic));
+            Resize();
         }
 
         public override void Initialize() {
             base.Initialize();
             nodeType = NodeType.Event;
+        }
+        
+        /// <summary>
+        /// Resize the body of node. Necessary when number of pins changes or the width of text to be displayed changes.
+        /// </summary>
+        protected override void Resize() {
             body = new Rect(0, 0, 170, 80);
-        }
+            baseBox = body.size - margin;
 
-#if UNITY_EDITOR
-        public override void DrawNode(Event e, Rect viewRect) {
-            base.DrawNode(e, viewRect);
-            
-            DrawPins();
+            // reposition output node
+            float y = body.height / 2f;
+            float x = body.width - NodePin.margin.x - NodePin.pinSize.x;
+            outPins[0].bounds.position = new Vector2(x, y);
         }
-#endif
     }
     
     /// <summary>
@@ -35,17 +44,10 @@ namespace ScriptEditor.Graph {
     /// </summary>
     public class SubStartNode : StartNode {
         public override void Construct() {
-            base.Construct("Sub Start");
+            base.SetName("Sub Start");
             outPins.Add(new OutputPin(this, PinType.Logic));
+            Resize();
         }
-
-#if UNITY_EDITOR
-        public override void DrawNode(Event e, Rect viewRect) {
-            base.DrawNode(e, viewRect);
-
-            GUI.Box(body, "", skin.GetStyle("NodeEventBackground"));
-        }
-#endif
     }
 
 

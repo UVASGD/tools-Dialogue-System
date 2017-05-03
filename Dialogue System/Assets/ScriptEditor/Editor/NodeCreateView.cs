@@ -54,7 +54,10 @@ namespace ScriptEditor.EditorScripts {
                         if (GUILayout.Button(op.ToString(), skin.GetStyle("NodeCreationButton"))) {
                             // create math FunctionNode
                             Destroy();
-                            NodeCreatePopup.Init(NodeType.Function, op, mouseLoc);
+
+                            MathNode mn = new MathNode();
+                            mn.Initialize(); mn.Construct(op, PinType.Float, 2);
+                            NodeCreatePopup.Init(NodeType.Math, op, mouseLoc, mn.multiplePins?-1:2);
                         }
                     }
                 } if (showControls = EditorGUILayout.Foldout(showControls, "Functions")) {

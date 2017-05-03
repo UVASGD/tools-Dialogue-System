@@ -30,7 +30,7 @@ namespace ScriptEditor.EditorScripts {
 
                 ScriptEditorWindow sc = EditorWindow.GetWindow<ScriptEditorWindow>();
                 if (sc != null) {
-                    CreateNode(graph, NodeType.Event, false, new Vector2(sc.workView.center.x-170/2f, 
+                    CreateNode(graph, NodeType.Event, false, new Vector2(sc.workView.center.x-170/4f, 
                         sc.workView.center.y-90/2f));
                     sc.graph = graph;
                 }
@@ -75,7 +75,7 @@ namespace ScriptEditor.EditorScripts {
         public static NodeBase CreateNode(NodeGraph graph, NodeType type, object var, Vector2 pos) {
             NodeBase res = null;
             if (graph != null) {
-                Debug.Log("var: " + var);
+                //Debug.Log("var: " + var);
                 switch (type) {
                     case NodeType.Control:
                         res = ScriptableObject.CreateInstance<ControlNode>();

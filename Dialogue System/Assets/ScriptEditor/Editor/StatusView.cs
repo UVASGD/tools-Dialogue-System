@@ -16,7 +16,7 @@ namespace ScriptEditor.EditorScripts {
         }
 
         public void resetStatus() {
-            if (graph != null) statusTxt = graph.path;
+            if (graph != null) statusTxt = graph.Path;
             else statusTxt = "No script loaded.";
             //statusTxt += "  " + graph;
         }

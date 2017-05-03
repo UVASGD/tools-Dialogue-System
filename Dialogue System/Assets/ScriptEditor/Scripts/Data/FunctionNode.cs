@@ -10,7 +10,7 @@ namespace ScriptEditor.Graph {
     public class FunctionNode : NodeBase {
 
         private FunctionType funcType;
-        private static Dictionary<FunctionType, List<string>> validCombos;
+        public static Dictionary<FunctionType, List<string>> validCombos;
 
         public enum FunctionType {
             Magnitude, SplitVector2, SplitVector3, SplitVector4, BuildVector2, BuildVector3, BuildVector4,
@@ -22,7 +22,7 @@ namespace ScriptEditor.Graph {
         /// </summary>
         /// <param name="funcType"></param>
         public void Construct(FunctionType funcType, PinType nT) {
-            base.Construct(Enum.GetName(typeof(FunctionType), funcType));
+            base.SetName(Enum.GetName(typeof(FunctionType), funcType));
             this.funcType = funcType;
 
             // set name and description

@@ -31,7 +31,7 @@ namespace ScriptEditor.Graph {
         /// <param name="input"></param>
         /// <param name="output"></param>
         public void Construct(PinType input, PinType output) {
-            base.Construct("Cast");
+            base.SetName("Cast");
             conType = ControlType.Cast;
             name = "Cast Node";
             description = "Cast " + input.ToString() + " to " + output.ToString() + ".";
@@ -46,7 +46,7 @@ namespace ScriptEditor.Graph {
         /// </summary>
         /// <param name="type"></param>
         public void Construct(ControlType type) {
-            base.Construct(type.ToString());
+            base.SetName(type.ToString());
             conType = type;
             nodeType = NodeType.Control;
 

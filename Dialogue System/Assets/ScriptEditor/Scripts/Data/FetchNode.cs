@@ -11,7 +11,7 @@ namespace ScriptEditor.Graph {
         public object OutVal { get { return outPins[0].Value; } }
 
         public void Construct(object variable) {
-            base.Construct(GetVarName(variable));
+            base.SetName(GetVarName(variable));
             outPins.Add(new OutputPin(this, variable));
             Resize();
         }
