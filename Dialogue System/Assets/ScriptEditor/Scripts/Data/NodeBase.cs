@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+//using ScriptEditor.EditorScripts;
 #endif
 using System;
 
@@ -21,21 +22,17 @@ namespace ScriptEditor.Graph {
         
         public string  description;
         public bool isSelected;
+        public bool multiplePins = false;
         public OutputPin ActiveOutput;
         public InputPin ActiveInput;
         public NodeGraph parentGraph;
-
+        // visual constants
         public const float Top = 56;
-        public const float Bottom = 23 + NodePin.padding;
-        public const float Width = 175;
+        private const float Bottom = 23 + NodePin.padding;
+        private const float Width = 175;
 
         public List<OutputPin> outPins;
         public List<InputPin> inPins;
-        public List<NodePin> AllPins { get {
-                List<NodePin> pins = new List<NodePin>(outPins.ToArray());
-                pins.AddRange(inPins.ToArray());
-                return pins;
-            } }
         public int MaxNodes { get { return Mathf.Max(inPins.Count, outPins.Count); } }
         public NodeType TypeNode { get { return nodeType; } }
         public string LongestInName {
@@ -56,22 +53,29 @@ namespace ScriptEditor.Graph {
                 return res;
             }
         }
+        public List<NodePin> AllPins { get {
+                List<NodePin> pins = new List<NodePin>(outPins.ToArray());
+                pins.AddRange(inPins.ToArray());
+                return pins;
+            } }
 
         public string NTName { get { return Enum.GetName(typeof(NodeType), nodeType); } }
 
+
+        /// <summary> whether or not more input pins can be added to node </summary>
         protected NodeType nodeType;
         protected Rect body, viewRect;
         protected GUISkin skin;
 
-        /// <summary> whether or not more input pins can be added to node </summary>
-        protected bool multiplePins = false;
-
-        public Rect getBody() { return body; }
+        public Rect GetBody() { return body; }
+        public void SetPos(Vector2 pos) { body.position = pos; }
+        public void Pan(Vector2 pan) { body.position += pan; this.pan += pan; }
+        protected Vector2 pan=Vector2.zero;
 
         public void OnEnable() {
             GetEditorSkin();
         }
-        protected void Construct (string title) {
+        protected void SetName (string title) {
             this.name = title;
         }
 
@@ -85,9 +89,17 @@ namespace ScriptEditor.Graph {
             float pinWidth = 2 * 50;
             float w = pinWidth + nameWidth + 20;
             body = new Rect(0, 0, w > Width ? w : Width, Top + NodePin.Top * MaxNodes + Bottom);
-        }
 
-        public void SetPos(Vector2 pos) { body.position = pos; }
+            // set pin visual information
+            foreach(NodePin pin in AllPins) {
+                bool isOutput = pin.GetType().Equals(typeof(OutputPin));
+                float x = isOutput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
+                float y = isOutput ? outPins.IndexOf((OutputPin)pin) :
+                    inPins.IndexOf((InputPin)pin);
+
+                pin.bounds.position = new Vector2(x, Top + NodePin.margin.y + y * Top);
+            }
+        }
 
         /// <summary> makes the node ready for display and value storage </summary>
         public virtual void Initialize() {
@@ -110,14 +122,17 @@ namespace ScriptEditor.Graph {
 
         /// <summary> add new pin with base variable type</summary>
         public void AddInputPin() {
-            if (multiplePins && inPins.Count < 16)
+            if (multiplePins && inPins.Count < 16) {
                 inPins.Add(new InputPin(this, inPins[0].varType));
+                Resize();
+            }
         }
 
         /// <summary> remove last input pin</summary>
         public void RemovePin() {
-            if (multiplePins && outPins.Count > 2) {
-                outPins.RemoveAt(outPins.Count - 1);
+            if (multiplePins && inPins.Count > 2) {
+                inPins.RemoveAt(inPins.Count - 1);
+                Resize();
             }
         }
 
@@ -142,8 +157,8 @@ namespace ScriptEditor.Graph {
         /// <param name="mousePos"></param>
         /// <returns></returns>
         public NodePin InsidePin(Vector2 mousePos) {
-            foreach(NodePin con in AllPins) {
-                if (con.Contains(mousePos)) return con;
+            foreach(NodePin pin in AllPins) {
+                if (pin.Contains(mousePos)) return pin;
             }
             return null;
         }
@@ -154,10 +169,6 @@ namespace ScriptEditor.Graph {
         /// <param name="o"></param>
         public void RemovePin(object o) {
             
-        }
-
-        public virtual void ProccessEvents(Event e, Rect viewRect) {
-
         }
 
         /// <summary>
@@ -193,33 +204,35 @@ namespace ScriptEditor.Graph {
         public virtual void DrawNode(Event e, Rect viewRect) {
             DrawConnections();
             this.viewRect = viewRect;
+            ProcessEvents(e, viewRect);
 
             GUI.Box(body, name,
                 isSelected ? skin.GetStyle("Node" + NTName + "Selected") :
                 skin.GetStyle("Node" + NTName + "Background"));
+            DrawPins();
         }
 
         public virtual void DrawPins() {
-            string color = "";
 
             GUILayout.BeginArea(body);
             foreach(NodePin pin in AllPins) {
-                switch (pin.varType) {
-                    case PinType.Bool: color = "Red"; break;
-                    case PinType.Actor: color = "Orange"; break;
-                    case PinType.Vector2:
-                    case PinType.Vector3:
-                    case PinType.Vector4: color = "Yellow"; break;
-                    case PinType.Float: color = "Green"; break;
-                    case PinType.Integer: color = "Cyan"; break;
-                    case PinType.Object: color = "Blue"; break;
-                    case PinType.String: color = "Purple"; break;
-                    case PinType.Logic: color = "White"; break;
-                }
-                GUI.Box(new Rect(pin.Position, NodePin.pinSize), "", skin.GetStyle("Pin"+color+
-                    (pin.isConnected?"Closed":"Open")));
+                GUI.Box(pin.bounds, "", skin.GetStyle(pin.StyleName));
             }
             GUILayout.EndArea();
+        }
+
+        /// <summary>
+        /// handle events and input
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="viewRect"></param>
+        public virtual void ProcessEvents(Event e, Rect viewRect) {
+            if (isSelected && e.button == 0) {
+                if (e.type == EventType.MouseDrag) {
+                    body.position += e.delta;
+                }
+                
+            }
         }
 
         /// <summary>
@@ -232,7 +245,7 @@ namespace ScriptEditor.Graph {
             n.inPins = new List<InputPin>();
         }
 
-        private void DrawConnections() {
+        protected void DrawConnections() {
 
         }
 
@@ -250,23 +263,13 @@ namespace ScriptEditor.Graph {
         public bool isConnected = false;
         public NodeBase node;
         public PinType varType;
-        public Vector2 Position {
-            get {
-                bool isOutput = GetType().Equals(typeof(OutputPin));
-                float x = isOutput ? node.getBody().width - margin.x - pinSize.x : margin.x;
-                float y = isOutput ? node.outPins.IndexOf((OutputPin)this) :
-                    node.inPins.IndexOf((InputPin)this);
-
-                return new Vector2(x, NodeBase.Top + margin.y + y * Top);
-            }
-            }
+        public Rect bounds;
         public Vector2 Center {
             get {
-                Vector2 pos = Position;
-                pos.y += pinSize.y / 2f;
-                pos.x += 8;
 
-                return pos;
+                if (bounds != null)
+                    return new Vector2(bounds.y + pinSize.y / 2f, bounds.x + 8);
+                return Vector2.zero;
             }
         }
         public object Value { get { return val; }
@@ -283,9 +286,28 @@ namespace ScriptEditor.Graph {
             }
         }
 
+        public string StyleName {
+            get {
+                string color = "";
+                switch (varType) {
+                    case PinType.Bool: color = "Red"; break;
+                    case PinType.Actor: color = "Orange"; break;
+                    case PinType.Vector2:
+                    case PinType.Vector3:
+                    case PinType.Vector4: color = "Yellow"; break;
+                    case PinType.Float: color = "Green"; break;
+                    case PinType.Integer: color = "Cyan"; break;
+                    case PinType.Object: color = "Blue"; break;
+                    case PinType.String: color = "Purple"; break;
+                    case PinType.Logic: color = "White"; break;
+                }
+                return "Pin" + color + (isConnected ? "Closed" : "Open");
+            }
+        }
+
         public static Vector2 margin = new Vector2(25, 13);
         public static Vector2 pinSize = new Vector2(23, 17);
-        public const float padding = 9;
+        public const float padding = 16;
         public static float Top { get { return margin.y+padding; } }
 
         private object val;
@@ -299,6 +321,7 @@ namespace ScriptEditor.Graph {
         public NodePin(NodeBase n, PinType varType) {
             this.varType = varType;
             node = n;
+            bounds = new Rect(Vector2.zero, pinSize);
         }
 
         /// <summary>
@@ -338,7 +361,9 @@ namespace ScriptEditor.Graph {
         }
 
         public bool Contains(Vector2 pos) {
-            return body.Contains(pos);
+            Rect b = new Rect(bounds);
+            b.position += node.GetBody().position;
+            return b.Contains(pos);
         }
 #endif  
     }
