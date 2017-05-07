@@ -173,7 +173,8 @@ namespace ScriptEditor.EditorScripts {
                     Instance.nodeCount = 2;
                     break;
                 case NodeType.Control:
-                    Instance.titleContent = new GUIContent("Create " + ((ControlNode.ControlType)sT).ToString() + " Node");
+                    //Instance.titleContent = new GUIContent("Create " + ((ControlNode.ControlType)sT).ToString() + " Node");
+                    Instance.titleContent = new GUIContent("Create Cast Node");
                     Instance.posInp = new List<string>(ControlNode.castables.Keys);
                     break;
                 case NodeType.Fetch:
@@ -182,7 +183,7 @@ namespace ScriptEditor.EditorScripts {
                     break;
             }
 
-            if(Instance.nodeCount<0 && Instance.posInp.Count == 1) {
+            if(Instance.nodeCount<0 || Instance.posInp.Count == 1) {
                 Instance.CreateNode();
             }
         }

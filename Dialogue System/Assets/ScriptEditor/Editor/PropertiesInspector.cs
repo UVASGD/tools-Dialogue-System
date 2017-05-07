@@ -15,7 +15,7 @@ namespace ScriptEditor.EditorScripts {
         void OnGUI() {
             FetchNode node = (FetchNode)target;
             EditorGUILayout.LabelField(node.name, EditorStyles.boldLabel);
-            object retVal;
+            object retVal=null;
             switch (node.VarType) {
                 case PinType.Actor:
                     retVal = EditorGUILayout.ObjectField("Actor: ", (Actor)node.OutVal,
@@ -45,6 +45,11 @@ namespace ScriptEditor.EditorScripts {
                     retVal = EditorGUILayout.Vector2Field("Value: ", (Vector4)node.OutVal);
                     break;
             }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Value: ");
+            EditorGUILayout.LabelField(retVal!=null? retVal.ToString():"null");
+            EditorGUILayout.EndHorizontal();
         }
     }
 

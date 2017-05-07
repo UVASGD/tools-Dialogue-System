@@ -139,6 +139,12 @@ namespace ScriptEditor.EditorScripts {
             return res;
         }
 
+        /// <summary>
+        /// initializes certain things about the node ands saves it to asset database
+        /// </summary>
+        /// <param name="res"></param>
+        /// <param name="graph"></param>
+        /// <param name="pos"></param>
         private static void InitNode(NodeBase res, NodeGraph graph, Vector2 pos) {
             res.SetPos(pos);
             res.parentGraph = graph;

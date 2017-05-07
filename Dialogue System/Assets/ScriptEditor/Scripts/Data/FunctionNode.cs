@@ -17,6 +17,8 @@ namespace ScriptEditor.Graph {
             GetLocation
         }
 
+        public FunctionType SubType() { return funcType; }
+
         /// <summary>
         /// Create input and output pins depending on function type
         /// </summary>

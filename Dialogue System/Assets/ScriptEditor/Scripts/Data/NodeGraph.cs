@@ -12,7 +12,8 @@ namespace ScriptEditor.Graph {
         public string Name = "New Script";
         public List<NodeBase> nodes;
         [HideInInspector]public NodeBase SelectedNode;
-        [HideInInspector]public NodeBase ConnectionNode;
+        //[HideInInspector]public NodeBase ConnectionNode;
+        //[HideInInspector] public NodePin SelectedPin;
         [HideInInspector]public bool wantsConnection;
         [HideInInspector]public bool showProperties;
         public string Path { get { return AssetDatabase.GetAssetPath(this); } }
@@ -32,16 +33,22 @@ namespace ScriptEditor.Graph {
         }
 
         public void UpdateGraph(Event e) {
-
+            //if (nodes.Any()) {
+            //    foreach (NodeBase node in nodes)
+            //        node.UpdateNode(e);
+            //}
         }
+
 #if UNITY_EDITOR
         public void DrawGraph(Event e, Rect viewRect) {
             if (nodes.Any()) {
                 ProcessEvents(e, viewRect);
                 
-                foreach (NodeBase n in nodes) {
+                foreach (NodeBase n in nodes)
+                    n.DrawConnections();
+                foreach (NodeBase n in nodes) 
                     n.DrawNode(e, viewRect);
-                }
+
             }
         }
 
@@ -53,10 +60,12 @@ namespace ScriptEditor.Graph {
                         bool setNode = false;
                         foreach(var node in nodes) {
                             if (node.Contains(e.mousePosition)) {
-                                SelectedNode = node;
-                                node.isSelected = true;
-                                setNode = true;
-                                break;
+                                if (node.InsidePin(e.mousePosition)== null) {
+                                    SelectedNode = node;
+                                    node.isSelected = true;
+                                    setNode = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -69,19 +78,24 @@ namespace ScriptEditor.Graph {
                     }
                 }
             }
-                if(e.keyCode==KeyCode.Delete && SelectedNode!=null) {
-                    DeleteNode(SelectedNode);
-                    SelectedNode = null;
-                }
+            if (e.keyCode == KeyCode.Delete && SelectedNode != null) {
+                DeleteNode(SelectedNode);
+                SelectedNode = null;
+            }
         }
 
-        private void DrawConnectionToMouse(Vector2 pos) {
-
-        }
-
-        public void DeleteNode(NodeBase node) {
+        public void DeleteNode(object n) {
             // remove node connections
-            nodes.Remove(node);
+            NodeBase node = (NodeBase)n;
+            foreach (InputPin ip in node.inPins) {
+                ip.ConnectedOutput.isConnected = false;
+                ip.ConnectedOutput = null;
+            } foreach(OutputPin op in node.outPins) {
+                op.ConnectedInput.isConnected = false;
+                op.ConnectedInput = null;
+            }
+
+            nodes.Remove((NodeBase)node);
 
         }
 

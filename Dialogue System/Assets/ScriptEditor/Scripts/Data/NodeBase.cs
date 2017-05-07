@@ -60,7 +60,23 @@ namespace ScriptEditor.Graph {
             } }
 
         public string NTName { get { return Enum.GetName(typeof(NodeType), nodeType); } }
+        public string STName {
+            get {
+                switch (nodeType) {
+                    case NodeType.Control:
+                        return Enum.GetName(typeof(ControlNode.ControlType),
+                            ((ControlNode)this).SubType());
+                    case NodeType.Function:
+                        return Enum.GetName(typeof(FunctionNode.FunctionType),
+                            ((FunctionNode)this).SubType());
+                    case NodeType.Math:
+                        return Enum.GetName(typeof(MathNode.OpType),
+                            ((MathNode)this).SubType());
+                }
 
+                return "none";
+            }
+        }
 
         /// <summary> whether or not more input pins can be added to node </summary>
         protected NodeType nodeType;
@@ -106,7 +122,7 @@ namespace ScriptEditor.Graph {
             GetEditorSkin();
             inPins = new List<InputPin>();
             outPins = new List<OutputPin>();
-            hideFlags = HideFlags.HideInHierarchy;
+            //hideFlags = HideFlags.HideInHierarchy;
         }
 
         /// <summary> begin logical execution of node </summary>
@@ -202,7 +218,6 @@ namespace ScriptEditor.Graph {
 
 #if UNITY_EDITOR
         public virtual void DrawNode(Event e, Rect viewRect) {
-            DrawConnections();
             this.viewRect = viewRect;
             ProcessEvents(e, viewRect);
 
@@ -213,12 +228,16 @@ namespace ScriptEditor.Graph {
         }
 
         public virtual void DrawPins() {
-
             GUILayout.BeginArea(body);
             foreach(NodePin pin in AllPins) {
                 GUI.Box(pin.bounds, "", skin.GetStyle(pin.StyleName));
             }
             GUILayout.EndArea();
+        }
+
+        public void DrawConnections() {
+            foreach (InputPin ip in inPins)
+                ip.DrawConnection();
         }
 
         /// <summary>
@@ -227,11 +246,12 @@ namespace ScriptEditor.Graph {
         /// <param name="e"></param>
         /// <param name="viewRect"></param>
         public virtual void ProcessEvents(Event e, Rect viewRect) {
+
+            // Drag around the node
             if (isSelected && e.button == 0) {
                 if (e.type == EventType.MouseDrag) {
                     body.position += e.delta;
                 }
-                
             }
         }
 
@@ -239,14 +259,30 @@ namespace ScriptEditor.Graph {
         /// completely disconnect node. NOTE: this function does not work as intended!
         /// </summary>
         /// <param name="pin"></param>
-        public static void RemoveAllPins (object pin) {
-            NodeBase n = ((NodePin)pin).node;
-            n.outPins = new List<OutputPin>();
-            n.inPins = new List<InputPin>();
+        public void RemoveAllPins () {
+            outPins = new List<OutputPin>();
+            inPins = new List<InputPin>();
         }
 
-        protected void DrawConnections() {
+        public static void RemoveConnection(object p) {
+            NodePin pin = (NodePin)p;
+            pin.isConnected = false;
 
+            if (pin.GetType().Equals(typeof(OutputPin))) {
+                // find InputPin from ID
+                //InputFromID(((OutputPin)pin).ConnectedInputID).isSelected = false;
+                //InputFromID(((OutputPin)pin).ConnectedInputID).ConnectedOutput = null;
+                ((OutputPin)pin).ConnectedInput.isConnected = false;
+                ((OutputPin)pin).ConnectedInput.ConnectedOutput = null;
+                ((OutputPin)pin).ConnectedInput = null;
+                //((OutputPin)pin).ConnectedInputID = -1;
+
+            } else {
+                ((InputPin)pin).ConnectedOutput.isConnected = false;
+                //((InputPin)pin).ConnectedOutput.ConnectedInputID = -1;
+                ((InputPin)pin).ConnectedOutput.ConnectedInput = null;
+                ((InputPin)pin).ConnectedOutput = null;
+            }
         }
 
         public void DrawNodeStatus() {
@@ -264,25 +300,18 @@ namespace ScriptEditor.Graph {
         public NodeBase node;
         public PinType varType;
         public Rect bounds;
-        public Vector2 Center {
-            get {
-
-                if (bounds != null)
-                    return new Vector2(bounds.y + pinSize.y / 2f, bounds.x + 8);
-                return Vector2.zero;
-            }
-        }
         public object Value { get { return val; }
             set {
-                switch (varType) {
-                    case PinType.Bool: val = (bool)value; break;
-                    case PinType.Float: val = (float)value; break;
-                    case PinType.Integer: val = (int)value; break;
-                    case PinType.String: val = (string)value; break;
-                    case PinType.Vector2: val = (Vector2)value; break;
-                    case PinType.Vector3: val = (Vector3)value; break;
-                    case PinType.Vector4: val = (Vector4)value; break;
-                }
+                if(value!=null)
+                    switch (varType) {
+                        case PinType.Bool: val = (bool)value; break;
+                        case PinType.Float: val = (float)value; break;
+                        case PinType.Integer: val = (int)value; break;
+                        case PinType.String: val = (string)value; break;
+                        case PinType.Vector2: val = (Vector2)value; break;
+                        case PinType.Vector3: val = (Vector3)value; break;
+                        case PinType.Vector4: val = (Vector4)value; break;
+                    }
             }
         }
 
@@ -301,7 +330,8 @@ namespace ScriptEditor.Graph {
                     case PinType.String: color = "Purple"; break;
                     case PinType.Logic: color = "White"; break;
                 }
-                return "Pin" + color + (isConnected ? "Closed" : "Open");
+
+                return "Pin" + color + (this.isConnected ? "Closed" : "Open");
             }
         }
 
@@ -342,28 +372,38 @@ namespace ScriptEditor.Graph {
             return PinType.Object;
         }
 
-#if UNITY_EDITOR
-        public void DrawConnection() {
-            if (!isConnected) return;
-            Color c;
+        public Color Color { get{ 
             switch (varType) {
-                case PinType.Logic: c = Color.white; break;
-                case PinType.Actor: c = Color.Lerp(Color.red, Color.yellow, .5f); break;
-                case PinType.Bool: c = Color.red; break;
-                case PinType.Float: c = Color.green; break;
-                case PinType.Integer: c = Color.cyan; break;
-                case PinType.String: c = Color.Lerp(Color.red, Color.blue, .5f); break;
+                case PinType.Logic: return Color.white;
+                case PinType.Actor:  return Color.Lerp(Color.red, Color.yellow, .5f);
+                case PinType.Bool:  return Color.red;
+                case PinType.Float:  return Color.green;
+                case PinType.Integer:  return Color.cyan;
+                case PinType.String:  return Color.Lerp(Color.red, Color.blue, .5f);
                 case PinType.Vector2:
                 case PinType.Vector3:
-                case PinType.Vector4: c = Color.yellow; break;
-                default: c = Color.blue; break;
+                case PinType.Vector4:  return Color.yellow;
+                default:  return Color.blue;
             }
-        }
+} }
+
+#if UNITY_EDITOR
 
         public bool Contains(Vector2 pos) {
             Rect b = new Rect(bounds);
             b.position += node.GetBody().position;
             return b.Contains(pos);
+        }
+
+        public Vector2 Position { get {
+                if(bounds==null) return Vector2.zero;
+                return bounds.position + node.GetBody().position;
+            }
+        }
+        public Vector2 Center {
+            get {
+               return Position + new Vector2(pinSize.y / 2f, 8);
+            }
         }
 #endif  
     }
@@ -371,7 +411,9 @@ namespace ScriptEditor.Graph {
     /// <summary> Input pin. If disconnected, a constant can be provided </summary>
     [Serializable]
     public class InputPin : NodePin {
-        public OutputPin ConnectedOutput;
+        public OutputPin ConnectedOutput = null;
+        //public bool isConnected { get {
+        //        return ConnectedOutput != null; } }
 
         public InputPin(NodeBase n, object val) : base(n, val) { }
         public InputPin(NodeBase n, PinType t) : base(n, t) { }
@@ -379,18 +421,54 @@ namespace ScriptEditor.Graph {
         public override string ConName() {
             return ConnectedOutput.node.name;
         }
+        public override string ToString() {
+            return "(IN) Node: " + node.STName + " | " + varType+"\n"+node.description;
+        }
+
+#if UNITY_EDITOR
+        public void DrawConnection() {
+            if (!isConnected) return;
+
+            // draw bezier curve from output pin to input pin
+            try {
+                Vector3 start = ConnectedOutput.Center;
+                Vector3 end = this.Center;
+                Vector2 startTangent, endTangent;
+
+                float offset = Mathf.Abs(start.x - end.x) / 1.75f;
+                offset *= (end.x < start.x) ? -1 : 1;
+                startTangent = new Vector2(start.x + offset, start.y);
+                endTangent = new Vector2(end.x - offset, end.y);
+                //Debug.Log(start + " | " + end + "\n" + startTangent + " | " + endTangent);
+                Handles.BeginGUI();
+                {
+                    Handles.color = Color.white;
+                    Handles.DrawBezier(start, end, startTangent, endTangent, this.Color, null, 2);
+                }
+                Handles.EndGUI();
+            } catch {
+                Debug.Log("Unable to draw: " + this);
+                //Debug.Log("ConnO: " + ConnectedOutput);
+            }
+        }
+#endif
     }
 
     /// <summary> Output connection. Must always have a value, even if disconnected </summary>
     [Serializable]
     public class OutputPin : NodePin {
-        public int ConnectedInputID = -1;
+        //public int ConnectedInputID = -1;
+        public InputPin ConnectedInput = null;
+        //public bool isConnected { get { return ConnectedInputID != -1; } }
 
         public OutputPin(NodeBase n, object val) : base(n, val) { }
         public OutputPin(NodeBase n, PinType t) : base(n, t) { }
 
         public override string ConName() {
             return "???";
+        }
+        public override string ToString() {
+            return "(OUT) Node: " + (node==null?"???":node.STName) + " | " + varType;
         }
     }
 

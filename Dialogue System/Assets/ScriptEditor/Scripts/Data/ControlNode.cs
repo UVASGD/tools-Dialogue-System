@@ -21,9 +21,10 @@ namespace ScriptEditor.Graph {
         public enum ControlType {
             Set, Branch, ForLoop, Cast,  Log, PlaySound, Text, Wait,
 
-            Custom,
-            
+            Custom
         }
+
+        public ControlType SubType() { return conType; }
 
         /// <summary>
         /// Constructs the pins for a Cast Node

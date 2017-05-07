@@ -26,7 +26,9 @@ namespace ScriptEditor.Graph {
         public enum OpType {
             Abs, SQRT, Add, Subtract, Multiply, Divide, And, Or, Not, Xor,  POW
         }
-        
+
+        public OpType SubType() { return op; }
+
         /// <summary>
         /// Build pins for node
         /// </summary>
@@ -34,7 +36,6 @@ namespace ScriptEditor.Graph {
         public void Construct(OpType type, PinType nT, int inCount) {
             base.SetName(GetTitle(type));
             op = type;
-            bool isFloat = nT == PinType.Float;
 
             // set description
             switch (type) {
@@ -187,7 +188,6 @@ namespace ScriptEditor.Graph {
 
 #if UNITY_EDITOR
         public override void DrawNode(Event e, Rect viewRect) {
-            DrawConnections();
             this.viewRect = viewRect;
             ProcessEvents(e, viewRect);
 
@@ -196,6 +196,7 @@ namespace ScriptEditor.Graph {
                 skin.GetStyle("NodeMathBackground"));
             DrawPins();
 
+            // pin buttons
             float bw = Mathf.Max(baseButton.x, skin.GetStyle("NodeMathButton")
                 .CalcSize(new GUIContent("- Remove Pin")).x);
             if (multiplePins) {
