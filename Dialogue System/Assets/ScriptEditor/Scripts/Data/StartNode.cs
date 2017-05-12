@@ -12,30 +12,34 @@ namespace ScriptEditor.Graph {
     public class StartNode : NodeBase {
 
         protected static Vector2 baseBox = new Vector2 ();
-        protected static Vector2 margin = new Vector2(10, 10);
+        protected const float Left = 10, Header = 10;
+        private Vector2 Center {
+            get { return new Vector2(baseBox.x / 2f + Left, baseBox.y / 2f + Header); }
+        }
 
         public virtual void Construct() {
             base.SetName("Start");
-            outPins.Add(new OutputPin(this, PinType.Logic));
+            outPins.Add(new OutputPin(this, VarType.Exec));
             Resize();
         }
 
         public override void Initialize() {
             base.Initialize();
             nodeType = NodeType.Event;
+            description = "Begins root script execution";
         }
-        
+
+        //public override void Lookup(bool compileTime) {
+            
+        //}
+
         /// <summary>
         /// Resize the body of node. Necessary when number of pins changes or the width of text to be displayed changes.
         /// </summary>
         protected override void Resize() {
-            body = new Rect(0, 0, 170, 80);
-            baseBox = body.size - margin;
-
-            // reposition output node
-            float y = body.height / 2f;
-            float x = body.width - NodePin.margin.x - NodePin.pinSize.x;
-            outPins[0].bounds.position = new Vector2(x, y);
+            body = new Rect(0, 0, Width, 77);
+            outPins[0].bounds.position = new Vector2(body.width - NodePin.margin.x -
+                NodePin.pinSize.x, 30);
         }
     }
     
@@ -45,8 +49,14 @@ namespace ScriptEditor.Graph {
     public class SubStartNode : StartNode {
         public override void Construct() {
             base.SetName("Sub Start");
-            outPins.Add(new OutputPin(this, PinType.Logic));
+            outPins.Add(new OutputPin(this, VarType.Exec));
             Resize();
+        }
+
+        public override void Initialize() {
+            base.Initialize();
+            nodeType = NodeType.Event;
+            description = "Begins script execution";
         }
     }
 

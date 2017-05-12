@@ -14,7 +14,7 @@ namespace ScriptEditor.EditorScripts {
         public HeaderView headerView;
         public StatusView statusView;
         public NodeCreateView nodeCreateView;
-
+        public NodeToolTipView toolTipView;
         public NodeGraph graph = null;
 
         const float VIEW_HORIZONTAL_PERCENTAGE = 0.75f;
@@ -30,19 +30,15 @@ namespace ScriptEditor.EditorScripts {
             instance = GetWindow<ScriptEditorWindow>();
             instance.titleContent = new GUIContent("Script Editor");
         }
-
-        List<NodeBase> nodes;
         Vector2 pan;
 
         void OnEnable() {
-            nodes = new List<NodeBase>();
         }
 
 
         #region GUI
         public void Update() {
             Event e = Event.current;
-            if (graph != null) graph.UpdateGraph(e);
         }
 
         //Vector3 vanishingPoint = new Vector2(0, 19.12f); public float zoomScale = 1;
@@ -76,10 +72,12 @@ namespace ScriptEditor.EditorScripts {
             statusView.DrawView(new Rect(0, position.height - headerBox.height, position.width, headerBox.height),
                             new Rect(0, 1, 1, 1),
                             e, graph);
+            if (toolTipView != null)
+                toolTipView.DrawView(new Rect(e.mousePosition+new Vector2(20,20), toolTipView.size),
+                    new Rect(1,1,1,1), e, graph);
             if (nodeCreateView != null)
                 nodeCreateView.DrawView(new Rect(nodeCreateView.mouseLoc, nodeCreateView.size),
-                    new Rect(1, 1, 1, 1),
-                    e, graph);
+                    new Rect(1, 1, 1, 1), e, graph);
 
             ProcessEvents(e);
             Repaint();
@@ -135,12 +133,16 @@ namespace ScriptEditor.EditorScripts {
     /// <summary> Small popup window that allows the user to choose the variable type of the node
     /// they wish to create </summary>
     public class NodeCreatePopup : EditorWindow {
+        public Vector2 mouseLoc;
+
         private static NodeCreatePopup Instance;
         private NodeType nodeType;
         private object subType;
         int nodeCount;
-        private static PinType inType, outType;
-        private Vector2 pos, selectedIndex;
+        private static VarType inType, outType;
+        private Vector2 selectedIndex;
+        private NodePin pinToAttach;
+
         private NodeGraph GraphObj {
             get {
                 ScriptEditorWindow window = GetWindow<ScriptEditorWindow>();
@@ -150,15 +152,31 @@ namespace ScriptEditor.EditorScripts {
         }
         List<string> posInp;
 
-        public static void Init(NodeType nT, object sT, Vector2 pos, int count=2) {
+
+        private static void SetNCP() {
+            ScriptEditorWindow window = GetWindow<ScriptEditorWindow>();
+            if (window != null) window.workView.NCPopup = Instance;
+        }
+
+        private static void RemoveNCP() {
+            ScriptEditorWindow window = GetWindow<ScriptEditorWindow>();
+            if (window != null) {
+                window.workView.NCPopup = null;
+                window.workView.SelectedPin = null;
+            }
+        }
+
+        public static void Init(NodeType nT, object sT, NodePin pin, Vector2 pos, int count=2) {
             Instance = GetWindow<NodeCreatePopup>(true);
             Instance.maxSize = new Vector2(200, 100);
             Instance.minSize = Instance.maxSize;
             Instance.nodeType = nT;
             Instance.subType = sT;
-            Instance.pos = pos;
+            Instance.mouseLoc = pos;
+            Instance.pinToAttach = pin;
             Instance.posInp = new List<string>();
             Instance.nodeCount = count;
+            SetNCP();
 
             switch (nT) {
                 case NodeType.Function:
@@ -240,6 +258,11 @@ namespace ScriptEditor.EditorScripts {
 
         }
 
+        public new void Close() {
+            base.Close();
+            RemoveNCP();
+        }
+
         /// <summary>
         /// Create the node using NodeUtilities
         /// </summary>
@@ -247,22 +270,40 @@ namespace ScriptEditor.EditorScripts {
             NodeBase node = null;
             switch (nodeType) {
                 case NodeType.Math:
-                    PinType pT = (PinType)Enum.Parse(typeof(PinType), posInp[(int)selectedIndex.x]);
+                    VarType pT = (VarType)Enum.Parse(typeof(VarType), posInp[(int)selectedIndex.x]);
                     //Debug.Log(GraphObj + "," + subType + ", " + pT);
-                    node = NodeUtilities.CreateNode(GraphObj, (MathNode.OpType)subType,
-                        pos, pT, nodeCount);
+                    node = NodeUtilities.CreateNode(GraphObj, NodeType.Math, 
+                        subType, pT, mouseLoc, nodeCount);
                     break;
                 case NodeType.Fetch:
 
                     break;
                 case NodeType.Control:
                     if ((ControlNode.ControlType)subType != ControlNode.ControlType.Cast)
-                        node = NodeUtilities.CreateNode(GraphObj, nodeType, subType, pos);
+                        node = NodeUtilities.CreateNode(GraphObj, nodeType, subType, mouseLoc);
                     else node = NodeUtilities.CreateNode(GraphObj,
-                        (PinType)Enum.Parse(typeof(PinType), posInp[(int)selectedIndex.x]),
-                        (PinType)Enum.Parse(typeof(PinType), ControlNode.castables[posInp[(int)selectedIndex.x]][(int)selectedIndex.y]),
-                        pos);
+                        (VarType)Enum.Parse(typeof(VarType), posInp[(int)selectedIndex.x]),
+                        (VarType)Enum.Parse(typeof(VarType), ControlNode.castables[posInp[(int)selectedIndex.x]][(int)selectedIndex.y]),
+                        mouseLoc);
                     break;
+            }
+            
+            // establish connection between selected pin and first input/output of matching type
+            // e.g. float to float
+            if (pinToAttach != null) {
+                if (!pinToAttach.isInput) {
+                    foreach (InputPin ip in node.inPins)
+                        if (ip.varType == pinToAttach.varType) {
+                            GraphObj.ConnectPins(ip, (OutputPin)pinToAttach);
+                            break;
+                        }
+                } else {
+                    foreach (OutputPin op in node.outPins)
+                        if (op.varType == pinToAttach.varType) {
+                            GraphObj.ConnectPins((InputPin)pinToAttach, op);
+                            break;
+                        }
+                }
             }
             Instance.Close();
         }

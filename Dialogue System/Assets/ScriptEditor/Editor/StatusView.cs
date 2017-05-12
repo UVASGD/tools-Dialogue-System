@@ -38,19 +38,21 @@ namespace ScriptEditor.EditorScripts {
                 title = getTitle();
             }
 
-
-            GUI.Box(body, "", skin.GetStyle("HeaderViewBackground"));
-            GUILayout.BeginArea(body);
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(new GUIContent(statusTxt));
-                GUILayout.EndHorizontal();
-            } GUILayout.EndArea();
-            if(Selection.activeGameObject == null) {
-                resetStatus();
-            } else {
-                // show status for selected Node
-            }
+            try {
+                GUI.Box(body, "", skin.GetStyle("HeaderViewBackground"));
+                GUILayout.BeginArea(body);
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(new GUIContent(statusTxt));
+                    GUILayout.EndHorizontal();
+                }
+                GUILayout.EndArea();
+                if (Selection.activeGameObject == null) {
+                    resetStatus();
+                } else {
+                    // show status for selected Node
+                }
+            } catch { }
         }
 
         public override void ProcessEvents(Event e) {

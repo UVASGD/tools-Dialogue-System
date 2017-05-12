@@ -7,18 +7,15 @@ using ScriptEditor.Graph;
 
 namespace ScriptEditor.EditorScripts {
     [Serializable]
-    public class ViewBase  {
-
-        //public string name;
-        public NodeType type { get { return nodeType; } }
+    public class ViewBase {
         public Vector2 center { get { return new Vector2(body.x+body.width/2f, body.y+body.height/2f); } }
-
-        protected NodeType nodeType;
+        
         protected Rect body;
         protected string title;
         protected GUISkin skin;
         protected NodeGraph graph;
         protected ScriptEditorWindow window { get { return EditorWindow.GetWindow<ScriptEditorWindow>(); } }
+        public NodeCreatePopup NCPopup = null;
 
         public ViewBase(string title) {
             this.title = title;
@@ -49,13 +46,6 @@ namespace ScriptEditor.EditorScripts {
         protected void GetEditorSkin() {
             string skinName = EditorGUIUtility.isProSkin ? "NodeEditorDark" : "NodeEditorLight";
             skin = Resources.Load<GUISkin>("GUI Skins/Editor/" + skinName);
-            //foreach (UnityEngine.Object o in Resources.FindObjectsOfTypeAll(typeof(GUISkin))) {
-            //    //Debug.Log("Skin: " + o);
-            //    if (o.name.Equals(skinName)) {
-            //        skin = (GUISkin)o;
-            //        break;
-            //    }
-            //}
         }
     }
 }

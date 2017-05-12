@@ -12,13 +12,6 @@ namespace ScriptEditor.EditorScripts {
         public HeaderView() : base(GetTitle()) {
 
         }
-        private void ProcessContextMenu(Event e) {
-
-        }
-
-        private void ContextCallback(object obj) {
-
-        }
 
         #region Override
         public override void DrawView(Rect editorRect, Rect PercentRect, Event e, NodeGraph graph) {
@@ -29,26 +22,28 @@ namespace ScriptEditor.EditorScripts {
             } else {
                 title = GetTitle();
             }
-            
-            //GUI.Box(body, "", skin.GetStyle("HeaderViewBackground"));
-            GUILayout.BeginArea(body);
-            {
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("New Script",
-                    skin.GetStyle("HeaderButton"),
-                    GUILayout.Width(80),
-                    GUILayout.Height(body.height))) {
-                    GraphCreatePopup.Init();
-                }
-                if (graph != null)
-                    if (GUILayout.Button("Delete Script",
+
+            try {
+                GUI.Box(body, "", skin.GetStyle("HeaderViewBackground"));
+                GUILayout.BeginArea(body);
+                {
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("New Script",
                         skin.GetStyle("HeaderButton"),
                         GUILayout.Width(80),
                         GUILayout.Height(body.height))) {
-                        NodeUtilities.DeleteScript(graph);
+                        GraphCreatePopup.Init();
                     }
-                GUILayout.EndHorizontal();
-            } GUILayout.EndArea();
+                    if (graph != null)
+                        if (GUILayout.Button("Delete Script",
+                            skin.GetStyle("HeaderButton"),
+                            GUILayout.Width(80),
+                            GUILayout.Height(body.height))) {
+                            NodeUtilities.DeleteScript(graph);
+                        }
+                    GUILayout.EndHorizontal();
+                }  GUILayout.EndArea();
+            } catch { }
         }
 
         public override void ProcessEvents(Event e) {

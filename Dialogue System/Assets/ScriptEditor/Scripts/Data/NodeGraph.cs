@@ -11,18 +11,18 @@ namespace ScriptEditor.Graph {
     public class NodeGraph : ScriptableObject{
         public string Name = "New Script";
         public List<NodeBase> nodes;
+        public List<StartNode> starts;
+        /// <summary> the graph must becompiled before the game is run. 
+        /// variable is invalidated whenever unsaved changes are made or compile returns error</summary>
+        public bool compiled = true;
         [HideInInspector]public NodeBase SelectedNode;
-        //[HideInInspector]public NodeBase ConnectionNode;
-        //[HideInInspector] public NodePin SelectedPin;
         [HideInInspector]public bool wantsConnection;
         [HideInInspector]public bool showProperties;
         public string Path { get { return AssetDatabase.GetAssetPath(this); } }
 
-        private string ScriptPath;
-
         public void OnEnable() {
-            if (nodes == null) {
-            }
+            //if (nodes == null) {
+            //}
         }
 
         public void Initialize() {
@@ -32,76 +32,158 @@ namespace ScriptEditor.Graph {
                 }
         }
 
-        public void UpdateGraph(Event e) {
-            //if (nodes.Any()) {
-            //    foreach (NodeBase node in nodes)
-            //        node.UpdateNode(e);
-            //}
+        public void AddNode(NodeBase n) {
+            nodes.Add(n);
+            compiled = false;
+            if(n as StartNode != null) {
+
+            }
+        }
+
+        public void ConnectPins(InputPin ip, OutputPin op) {
+            compiled = false;
+
+            ip.isConnected = op.isConnected = true;
+
+            ip.ConnectedOutput = op;
+            //op.ConnectedInputID = ip.node.inPins.IndexOf(ip);
+            op.ConnectedInput = ip;
+        }
+
+        public Stack<NodeBase> lookupStack, compileStack;
+        public bool foundEnd;
+        public void Compile() {
+            compileStack = new Stack<NodeBase>();
+            lookupStack = new Stack<NodeBase>();
+            // clear errors from previous compile
+            foreach (NodeBase node in nodes) {
+                node.errors = new List<NodeError>();
+                node.errors.Add(new NodeError(NodeError.ErrorType.NotConnected));
+                node.compiled = false;
+            }
+
+            // start compile each execution path
+            foreach(NodeBase node in nodes) {
+                StartNode start = node as StartNode;
+                if (start != null) {
+                    foundEnd = false;
+                    start.Compile();
+                    if (!foundEnd)
+                        start.errors.Add(new NodeError(NodeError.ErrorType.NoEnd));
+                }
+            }
+
+            // check if compiling node found any errors
+            foreach(NodeBase node in nodes)
+                if (node.errors.Any()) {
+                    compiled = false;
+                    break;
+                }
         }
 
 #if UNITY_EDITOR
+        private static float errMargin = 20f;
         public void DrawGraph(Event e, Rect viewRect) {
             if (nodes.Any()) {
                 ProcessEvents(e, viewRect);
-                
+
+                Texture2D texture = new Texture2D(1, 1);
+                texture.SetPixel(0, 0, Color.Lerp(Color.red, Color.black, .25f));
+                texture.Apply();
+                GUI.skin.box.normal.background = texture;
+                GUI.skin.box.normal.textColor = Color.white;
                 foreach (NodeBase n in nodes)
                     n.DrawConnections();
-                foreach (NodeBase n in nodes) 
+                foreach (NodeBase n in nodes)
                     n.DrawNode(e, viewRect);
-
-            }
-        }
-
-        private void ProcessEvents(Event e, Rect viewRect) {
-            if (viewRect.Contains(e.mousePosition)) {
-                if (e.button == 0) {
-                    if (e.type == EventType.MouseDown) {
-                        DeselectAllNodes();
-                        bool setNode = false;
-                        foreach(var node in nodes) {
-                            if (node.Contains(e.mousePosition)) {
-                                if (node.InsidePin(e.mousePosition)== null) {
-                                    SelectedNode = node;
-                                    node.isSelected = true;
-                                    setNode = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!setNode) DeselectAllNodes();
-                        else
-                            BringToFront(SelectedNode);
-                        if (wantsConnection) {
-
-                        }
+                foreach (NodeBase n in nodes) {
+                    Rect b = n.GetBody();
+                    Vector2 start = b.position;
+                    start.y += b.height;
+                    int i = 0;
+                    foreach (NodeError err in n.errors) {
+                        string s = "#ERR " + err.Title;
+                        Vector2 size = GUI.skin.box.CalcSize(new GUIContent(s));
+                        GUI.Box(new Rect(start.x, start.y+errMargin*i-size.y/2f, 
+                            size.x,
+                            errMargin), s);
+                        i++;
                     }
                 }
             }
-            if (e.keyCode == KeyCode.Delete && SelectedNode != null) {
-                DeleteNode(SelectedNode);
-                SelectedNode = null;
+        }
+
+        private bool shift = false;
+        /// <summary> handle user input </summary>
+        private void ProcessEvents(Event e, Rect viewRect) {
+
+            // hold shift
+            if (e.keyCode == KeyCode.LeftShift || e.keyCode == KeyCode.RightShift) {
+                shift = (e.type == EventType.KeyDown);
             }
+
+            if (viewRect.Contains(e.mousePosition)) {
+                if (e.button == 0) {
+                    if (e.type == EventType.MouseDown) {
+                        bool setNode = false;
+                        if (!shift) {
+                            DeselectAllNodes();
+                            foreach (var node in nodes) {
+                                if (node.Contains(e.mousePosition)) {
+                                    if (node.InsidePin(e.mousePosition) == null) {
+                                        Selection.activeObject = node;
+                                        SelectedNode = node;
+                                        node.isSelected = true;
+                                        setNode = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            Debug.Log("Pls ckae");
+                            foreach (var node in nodes)
+                                if (node.Contains(e.mousePosition)) {
+                                    List<UnityEngine.Object> objs = new List<UnityEngine.Object>(Selection.objects);
+                                    objs.Add(node);
+                                    node.isSelected = true;
+                                    Selection.objects = objs.ToArray();
+                                }
+                        }
+
+                        if (!setNode) DeselectAllNodes();
+                        else BringToFront(SelectedNode);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// checks if the mouse position is inside any node
+        /// </summary>
+        /// <param name="mousePos"></param>
+        /// <returns></returns>
+        public NodeBase InsideNode(Vector2 mousePos) {
+            foreach (NodeBase node in nodes) {
+                if (node == null) continue;
+                if (node.Contains(mousePos)) return node;
+            }
+            return null;
         }
 
         public void DeleteNode(object n) {
             // remove node connections
             NodeBase node = (NodeBase)n;
-            foreach (InputPin ip in node.inPins) {
-                ip.ConnectedOutput.isConnected = false;
-                ip.ConnectedOutput = null;
-            } foreach(OutputPin op in node.outPins) {
-                op.ConnectedInput.isConnected = false;
-                op.ConnectedInput = null;
-            }
+            if (node as StartNode != null || node as EndNode != null)
+                return;
 
-            nodes.Remove((NodeBase)node);
-
+            foreach (NodePin pin in node.AllPins)
+                NodeBase.RemoveConnection(pin);
+            nodes.Remove(node);
+            DestroyImmediate(node, true);
+            compiled = false;
         }
 
-        /// <summary>
-        /// Brings the selected node to the front in draw order
-        /// </summary>
+        /// <summary>  Brings the selected node to the front in draw order </summary>
         /// <param name="node"></param>
         private void BringToFront(NodeBase node) {
             nodes.Remove(node);
@@ -113,6 +195,7 @@ namespace ScriptEditor.Graph {
                 node.isSelected = false;
             }
             SelectedNode = null;
+            Selection.activeObject = null;
         }
 #endif
 

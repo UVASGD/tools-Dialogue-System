@@ -10,7 +10,7 @@ namespace ScriptEditor.EditorScripts {
     public class WorkView : ViewBase{
 
         Texture2D backgroundTexture;
-        NodePin SelectedPin;
+        public NodePin SelectedPin;
         public Vector2 pan;
 
         public WorkView() : base(GetTitle()) {
@@ -20,6 +20,9 @@ namespace ScriptEditor.EditorScripts {
         }
 
         #region Override
+        /// <summary>
+        /// draw view GUI, buttons and all
+        /// </summary>
         public override void DrawView(Rect editorRect, Rect PercentRect, Event e, NodeGraph graph) {
             base.DrawView(editorRect, PercentRect, e, graph);
             ProcessEvents(e);
@@ -33,12 +36,20 @@ namespace ScriptEditor.EditorScripts {
                 body.height / backgroundTexture.height));
             GUI.Box(body, title, skin.GetStyle("WorkViewBackground"));
             if (graph != null) {
-                graph.UpdateGraph(e);
                 graph.DrawGraph(e, body);
+                if (GUI.Button(new Rect(0,editorRect.y, 80, 25), "Compile"))
+                    graph.Compile();
+                if (GUI.Button(new Rect(0, editorRect.y + 35, 80, 25), "Reseize"))
+                    foreach(NodeBase n in graph.nodes) n.Resize(true);
             }
 
             if (SelectedPin != null) {
-                DrawConnectionToMouse(e.mousePosition);
+            // is a window currently showing? if so, don't constantly draw to mouse pos
+                if (NCPopup != null) {
+                    DrawConnectionToMouse(NCPopup.mouseLoc);
+                } else if (window.nodeCreateView != null)
+                    DrawConnectionToMouse(window.nodeCreateView.mouseLoc);
+                else DrawConnectionToMouse(e.mousePosition);
             }
         }
 
@@ -46,19 +57,19 @@ namespace ScriptEditor.EditorScripts {
         /// Draw a bezier curve from selected node to the mouse
         /// </summary>
         /// <param name="end"> location of the mouse</param>
-        private void DrawConnectionToMouse(Vector2 end) {
-            Vector3 start = SelectedPin.Center;
+        private void DrawConnectionToMouse(Vector2 mousePos) {
+            Vector2 end = SelectedPin.isInput ? SelectedPin.Center : mousePos;
+            Vector3 start = SelectedPin.isInput ? mousePos : SelectedPin.Center;
             Vector2 startTangent, endTangent;
-
-            float offset = Mathf.Abs(start.x - end.x) / 1.75f;
-            offset *= (end.x < start.x) ? -1 : 1;
+            
+            float offset = Mathf.Max(Mathf.Abs(start.x - end.x) / 1.75f,1);
             startTangent = new Vector2(start.x + offset, start.y);
             endTangent = new Vector2(end.x - offset, end.y);
 
             Handles.BeginGUI();
             {
                 Handles.color = Color.white;
-                Handles.DrawBezier(start, end, startTangent, endTangent, SelectedPin.Color, null, 2);
+                Handles.DrawBezier(start, end, startTangent, endTangent, SelectedPin._Color, null, 2);
             }
             Handles.EndGUI();
         }
@@ -72,10 +83,11 @@ namespace ScriptEditor.EditorScripts {
             return "Work View";
         }
 
+        private bool shift=false;
         public override void ProcessEvents(Event e) {
             base.ProcessEvents(e);
             Vector2 mousePos = e.mousePosition;
-            NodeBase node = InsideNode(mousePos);
+            NodeBase node = (graph != null) ? graph.InsideNode(mousePos) : null;
             NodePin pin = null;
             if(node!=null) pin = node.InsidePin(mousePos);
 
@@ -98,49 +110,85 @@ namespace ScriptEditor.EditorScripts {
             //}
 
             // toolTip
-            {
-                if (node != null) {
-                    if (pin != null) {
-                        if (SelectedPin != null) {
-                            if (!SelectedPin.GetType().Equals(pin.GetType()) && pin.varType != SelectedPin.varType) {
-                                if (ControlNode.castables.ContainsKey(SelectedPin.varType.ToString())) {
-                                    if (ControlNode.castables[SelectedPin.varType.ToString()].Contains(pin.varType.ToString())) {
-                                        Debug.Log("Casting tooltip");
-                                        GUI.Box(new Rect(mousePos, new Vector2(100, 35)),
-                                           ("Cast from " + Enum.GetName(typeof(PinType),SelectedPin.varType)
-                                            + " to " + Enum.GetName(typeof(PinType), pin.varType)));
+            if (window.nodeCreateView == null) {
+                if (window.toolTipView == null) {
+                    if (node != null) {
+                        if (pin == null) {
+                            window.toolTipView = new NodeToolTipView(node, node.description);
+                        } else {
+                            if (SelectedPin != null) {
+                                if (!SelectedPin.GetType().Equals(pin.GetType()) && pin.varType != SelectedPin.varType) {
+                                    if (ControlNode.castables.ContainsKey(SelectedPin.varType.ToString())) {
+                                        if (ControlNode.castables[SelectedPin.varType.ToString()].Contains(pin.varType.ToString())) {
+
+                                            window.toolTipView = new NodeToolTipView(pin,
+                                                ("Cast " + Enum.GetName(typeof(VarType), SelectedPin.varType)
+                                                 + " to " + Enum.GetName(typeof(VarType), pin.varType)));
+                                        }
                                     }
                                 }
+                            } else {
+                                if (!String.IsNullOrEmpty(pin.Description))
+                                    window.toolTipView = new NodeToolTipView(pin, pin.Description);
                             }
                         }
+                    } else if (SelectedPin != null) {
+                        window.toolTipView = new NodeToolTipView(null, "Create New Node");
+                    }
+                } else {
+                    if (pin != null) 
+                        if (!String.IsNullOrEmpty(pin.Description) && window.toolTipView.Parent != pin){
+                            window.toolTipView = new NodeToolTipView(pin, pin.Description);
                     }
                 }
             }
 
+            // hit escape
+            if (e.keyCode == KeyCode.Escape) {
+                if (SelectedPin != null) SelectedPin = null;
+            }
+
+            // hold shift
+            if(e.keyCode == KeyCode.LeftShift || e.keyCode == KeyCode.RightShift) {
+                shift = (e.type == EventType.KeyDown);
+            }
+
+            // press delete
+            if (graph != null) {
+                if (e.keyCode == KeyCode.Delete && graph.SelectedNode != null) {
+                    graph.DeleteNode(graph.SelectedNode);
+                    graph.SelectedNode = null;
+                    Selection.activeObject = null;
+                }
+            }
+
+            if(e.type == EventType.MouseDrag)
+                window.toolTipView = null;
+
             // right click a thing
-            if (e.type == EventType.ContextClick) {
+            if (window.nodeCreateView == null && e.type == EventType.ContextClick) {
                 GenericMenu menu = new GenericMenu();
                 if (graph != null) {
                     if (node != null) {
                         if (pin != null) {
                             //Debug.Log("Right Clicked a PIN");
                             // pin connection menu
-                            bool isOutput = pin.GetType().Equals(typeof(OutputPin));
 
                             //break all connections
                             if (pin.isConnected) {
                                 menu.AddItem(new GUIContent("Break Connection"), false, NodeBase.RemoveConnection, pin);
-
-                                //break individual Conections
-                                //if (isOutput) {
-                                //    foreach (InputPin n in pin.node.inPins) {
-                                //        menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
-                                //    }
-                                //} else {
-                                //    foreach (OutputPin n in pin.node.outPins) {
-                                //        menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
-                                //    }
-                                //}
+                                {
+                                    //break individual Conections
+                                    //if (pin.isInput) {
+                                    //    foreach (OutputPin n in pin.node.outPins) {
+                                    //        menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
+                                    //    }
+                                    //} else {
+                                    //    foreach (InputPin n in pin.node.inPins) {
+                                    //        menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
+                                    //    }
+                                    //}
+                                }
 
                                 //add separator
                                 menu.AddSeparator("");
@@ -165,39 +213,32 @@ namespace ScriptEditor.EditorScripts {
                     } else if(window.nodeCreateView== null) {
                         // add node creation window
                         //Debug.Log("Right Clicked nowhere");
-                        window.nodeCreateView = new NodeCreateView(mousePos);
+                        window.nodeCreateView = new NodeCreateView(mousePos, SelectedPin);
+                        window.toolTipView = null;
+                        //SelectedPin = null;
                     } else {
                         //Debug.Log("NCV: " + new Rect(window.nodeCreateView.mouseLoc, window.nodeCreateView.size));
                     }
                 }
             }
 
-            // hit escape
-            if (e.keyCode == KeyCode.Escape) {
-                if (SelectedPin != null) SelectedPin = null;
-            }
-
             // left click a pin
-            if(e.button == 0 && e.type == EventType.MouseDown) {
+            if(window.nodeCreateView == null && e.button == 0 &&
+                e.type == EventType.MouseDown) {
                 if (node != null) {
                     if (pin != null) {
                         if (SelectedPin != null) {
-                            bool isInput = SelectedPin.GetType().Equals(typeof(InputPin));
                             // must connect inputs to outputs
                             if (!SelectedPin.GetType().Equals(pin.GetType())) {
                                 if (pin.varType == SelectedPin.varType) {
                                     if (pin.node != SelectedPin.node) {
-                                        SelectedPin.isConnected = true;
-                                        pin.isConnected = true;
-                                        if (isInput) {
-                                            ((InputPin)SelectedPin).ConnectedOutput = ((OutputPin)pin);
-                                            //((OutputPin)pin).ConnectedInputID = SelectedPin.node.inPins.IndexOf((InputPin)pin);
-                                            ((OutputPin)pin).ConnectedInput = (InputPin)SelectedPin;
-                                        } else {
-                                            ((InputPin)pin).ConnectedOutput = ((OutputPin)SelectedPin);
-                                            //((OutputPin)SelectedPin).ConnectedInputID = pin.node.inPins.IndexOf((InputPin)pin);
-                                            ((OutputPin)SelectedPin).ConnectedInput = (InputPin)pin;
-                                        }
+                                        //if (pin.isConnected && pin.isInput && pin.varType==VarType.Exec)
+                                        //    NodeBase.RemoveConnection(pin);
+                                        
+                                        if (SelectedPin.isInput)
+                                            graph.ConnectPins((InputPin)SelectedPin, (OutputPin)pin);
+                                        else
+                                            graph.ConnectPins((InputPin)pin, (OutputPin)SelectedPin);
                                     }
                                 } else {
                                     // if vartype of selectedPin can be cast to clicked pin,
@@ -206,28 +247,23 @@ namespace ScriptEditor.EditorScripts {
                                             //Debug.Log("sPin can be cast to Pin");
                                             // create a cast node
                                             ControlNode CN;
-                                            if (isInput) {
+                                            if (SelectedPin.isInput) {
                                                 CN = (ControlNode)NodeUtilities.CreateNode(graph, pin.varType,
                                                     SelectedPin.varType, e.mousePosition);
                                                 //CN.outPins[0].ConnectedInputID = SelectedPin.node.inPins.IndexOf((InputPin)SelectedPin);
-                                                ((InputPin)pin).ConnectedOutput = CN.outPins[0];
-                                                CN.inPins[0].ConnectedOutput = (OutputPin)pin;
                                                 //((OutputPin)pin).ConnectedInputID = 0;
-                                                ((OutputPin)pin).ConnectedInput = CN.inPins[0];
+
+                                                graph.ConnectPins((InputPin)SelectedPin, CN.outPins[0]);
+                                                graph.ConnectPins(CN.inPins[0], (OutputPin)pin);
                                             } else {
                                                 CN = (ControlNode)NodeUtilities.CreateNode(graph, SelectedPin.varType, 
                                                     pin.varType, e.mousePosition);
                                                 //CN.outPins[0].ConnectedInputID = pin.node.inPins.IndexOf((InputPin)pin);
-                                                CN.outPins[0].ConnectedInput = (InputPin)pin;
-                                                ((InputPin)pin).ConnectedOutput = CN.outPins[0];
-                                                CN.inPins[0].ConnectedOutput = (OutputPin)SelectedPin;
                                                 //((OutputPin)SelectedPin).ConnectedInputID = 0;
-                                                ((OutputPin)SelectedPin).ConnectedInput = CN.inPins[0];
+
+                                                graph.ConnectPins((InputPin)pin, CN.outPins[0]);
+                                                graph.ConnectPins(CN.inPins[0], (OutputPin)SelectedPin);
                                             }
-                                            CN.inPins[0].isConnected = true;
-                                            CN.outPins[0].isConnected = true;
-                                            SelectedPin.isConnected = true;
-                                            pin.isConnected = true;
                                         }
                                     }
                                 }
@@ -241,19 +277,11 @@ namespace ScriptEditor.EditorScripts {
                 } else {
                     if (SelectedPin != null) {
                         SelectedPin = null;
+                        window.toolTipView = null;
                     }
                 }
             }
 
-        }
-
-        private NodeBase InsideNode(Vector2 mousePos) {
-            if (graph == null) return null;
-            foreach(NodeBase node in graph.nodes) {
-                if (node == null) continue;
-                if (node.Contains(mousePos)) return node;
-            }
-            return null;
         }
         #endregion
 

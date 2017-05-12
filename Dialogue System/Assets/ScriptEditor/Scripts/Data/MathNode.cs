@@ -20,11 +20,12 @@ namespace ScriptEditor.Graph {
         static Vector2 baseBox = new Vector2(153, 87);
         static Vector2 baseButton = new Vector2(55, 14);
         Vector2 boxSize;
-        private string splashText;
+        [SerializeField] private string splashText;
 
         /// <summary> What function is performed by node </summary>
         public enum OpType {
-            Abs, SQRT, Add, Subtract, Multiply, Divide, And, Or, Not, Xor,  POW
+            Abs, SQRT, Add, Subtract, Multiply, Divide, And, Or, Not, Xor, POW,
+            EqualTo, LessThan, GreaterThan, LessOrEqual, GreaterOrEqual
         }
 
         public OpType SubType() { return op; }
@@ -33,7 +34,7 @@ namespace ScriptEditor.Graph {
         /// Build pins for node
         /// </summary>
         /// <param name="title"></param>
-        public void Construct(OpType type, PinType nT, int inCount) {
+        public void Construct(OpType type, VarType nT, int inCount) {
             base.SetName(GetTitle(type));
             op = type;
 
@@ -99,6 +100,26 @@ namespace ScriptEditor.Graph {
                     name = "Power Function";
                     splashText = "^";
                     break;
+                case OpType.EqualTo:
+                    description = "Compares equality between values.";
+                    name = "Equal To";
+                    break;
+                case OpType.GreaterThan:
+                    description = "Compares if first value is greater than the second.";
+                    name = "Greater Than";
+                    break;
+                case OpType.GreaterOrEqual:
+                    description = "Compares if first value is greater than or equal to the second..";
+                    name = "Greater Than or Equal To";
+                    break;
+                case OpType.LessThan:
+                    description = "Compares if first value is less than the second.";
+                    name = "Less Than";
+                    break;
+                case OpType.LessOrEqual:
+                    description = "Compares if first value is less than or equal to the second.";
+                    name = "Less Than or Equal To";
+                    break;
             }
 
             // create pins;
@@ -107,8 +128,10 @@ namespace ScriptEditor.Graph {
                 case OpType.Subtract:
                 case OpType.Multiply:
                 case OpType.Divide:
-                    for (int i = 0; i < inCount; i++)
-                        inPins.Add(new InputPin(this, nT));
+                    for (int i = 0; i < inCount; i++) {
+                        InputPin p = new InputPin(this, nT);
+                        inPins.Add(p);
+                    }
                     outPins.Add(new OutputPin(this, nT));
                     multiplePins = true;
                     break;
@@ -123,19 +146,29 @@ namespace ScriptEditor.Graph {
                     outPins.Add(new OutputPin(this, nT));
                     break;
                 case OpType.Not:
-                    inPins.Add(new InputPin(this, PinType.Bool));
-                    outPins.Add(new OutputPin(this, PinType.Bool));
+                    inPins.Add(new InputPin(this, VarType.Bool));
+                    outPins.Add(new OutputPin(this, VarType.Bool));
                     break;
                 case OpType.And:
                 case OpType.Or:
                 case OpType.Xor:
                     for (int i = 0; i < inCount; i++)
-                        inPins.Add(new InputPin(this, PinType.Bool));
-                    outPins.Add(new OutputPin(this, PinType.Bool));
+                        inPins.Add(new InputPin(this, VarType.Bool));
+                    outPins.Add(new OutputPin(this, VarType.Bool));
                     multiplePins = true;
                     break;
-            }
+                case OpType.EqualTo:
+                case OpType.GreaterThan:
+                case OpType.GreaterOrEqual:
+                case OpType.LessThan:
+                case OpType.LessOrEqual:
+                    inPins.Add(new InputPin(this, nT));
+                    inPins.Add(new InputPin(this, nT));
+                    outPins.Add(new OutputPin(this, VarType.Bool));
+                    break;
 
+            }
+            
             if (multiplePins) description += " Maximum pins allowed is 16.";
             Resize();
         }
@@ -177,7 +210,7 @@ namespace ScriptEditor.Graph {
         /// </summary>
         private Vector2 Center {
             get {
-                return new Vector2(boxSize.x / 2f + Header, boxSize.y / 2f + Left);
+                return new Vector2(boxSize.x / 2f + Left, boxSize.y / 2f + Header);
             }
         }
 
@@ -232,19 +265,20 @@ namespace ScriptEditor.Graph {
 
         #region Override
         /// <summary> calculate value of output </summary>
-        public override void UpdateNode(Event e) {
-            base.UpdateNode(e);
+        public override void Lookup(bool compileTime) {
+            base.Lookup(compileTime);
 
+            if (compileTime) return;
             int start = Start();
             switch (op) {
                 case OpType.Abs:
                     switch (outPins[0].varType) {
-                        case PinType.Integer:
-                        case PinType.Float:
+                        case VarType.Integer:
+                        case VarType.Float:
                             outPins[0].Value = inPins[0].isConnected ?
                                 (Mathf.Abs((float)inPins[0].Value)) : 0;
                             break;
-                        case PinType.Vector2:
+                        case VarType.Vector2:
                             if (inPins[0].isConnected) {
                                 Vector2 tmp = (Vector2)inPins[0].Value;
                                 outPins[0].Value = new Vector2(Mathf.Abs(tmp.x),
@@ -255,32 +289,32 @@ namespace ScriptEditor.Graph {
                     break;
                 case OpType.Add:
                     switch (outPins[0].varType) {
-                        case PinType.Integer:
-                        case PinType.Float:
+                        case VarType.Integer:
+                        case VarType.Float:
                             outPins[0].Value = 0;
                             foreach (InputPin p in inPins) {
                                 outPins[0].Value = (float)outPins[0].Value + (p.isConnected ? (float)p.Value : 0);
                             }
                             break;
-                        case PinType.String:
+                        case VarType.String:
                             outPins[0].Value = "";
                             foreach (InputPin p in inPins) {
                                 outPins[0].Value = (string)outPins[0].Value + (p.isConnected ? (string)p.Value : "");
                             }
                             break;
-                        case PinType.Vector2:
+                        case VarType.Vector2:
                             outPins[0].Value = Vector2.zero;
                             foreach (InputPin p in inPins) {
                                 outPins[0].Value = (Vector2)outPins[0].Value + (p.isConnected ? (Vector2)p.Value : Vector2.zero);
                             }
                             break;
-                        case PinType.Vector3:
+                        case VarType.Vector3:
                             outPins[0].Value = Vector3.zero;
                             foreach (InputPin p in inPins) {
                                 outPins[0].Value = (Vector3)outPins[0].Value + (p.isConnected ? (Vector3)p.Value : Vector3.zero);
                             }
                             break;
-                        case PinType.Vector4:
+                        case VarType.Vector4:
                             outPins[0].Value = Vector4.zero;
                             foreach (InputPin p in inPins) {
                                 outPins[0].Value = (Vector4)outPins[0].Value + (p.isConnected ? (Vector4)p.Value : Vector4.zero);
@@ -291,23 +325,23 @@ namespace ScriptEditor.Graph {
                 case OpType.Subtract:
                     if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
                     switch (outPins[0].varType) {
-                        case PinType.Integer:
-                        case PinType.Float:
+                        case VarType.Integer:
+                        case VarType.Float:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 outPins[0].Value = (float)outPins[0].Value - (inPins[i].isConnected ? (float)inPins[i].Value : 0);
                             }
                             break;
-                        case PinType.Vector2:
+                        case VarType.Vector2:
                             for (int i = 1; i < inPins.Count; i++) {
                                 outPins[0].Value = (Vector2)outPins[0].Value - (inPins[i].isConnected ? (Vector2)inPins[i].Value : Vector2.zero);
                             }
                             break;
-                        case PinType.Vector3:
+                        case VarType.Vector3:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 outPins[0].Value = (Vector3)outPins[0].Value - (inPins[i].isConnected ? (Vector3)inPins[i].Value : Vector3.zero);
                             }
                             break;
-                        case PinType.Vector4:
+                        case VarType.Vector4:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 outPins[0].Value = (Vector4)outPins[0].Value - (inPins[i].isConnected ? (Vector4)inPins[i].Value : Vector4.zero);
                             }
@@ -317,26 +351,26 @@ namespace ScriptEditor.Graph {
                 case OpType.Multiply:
                     if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
                     switch (outPins[0].varType) {
-                        case PinType.Integer:
-                        case PinType.Float:
+                        case VarType.Integer:
+                        case VarType.Float:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 if (inPins[i].isConnected)
                                     outPins[0].Value = (float)outPins[0].Value * (float)inPins[i].Value;
                             }
                             break;
-                        case PinType.Vector2:
+                        case VarType.Vector2:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 if (inPins[i].isConnected)
                                     outPins[0].Value = Vector2.Scale((Vector2)outPins[0].Value, (Vector2)inPins[i].Value);
                             }
                             break;
-                        case PinType.Vector3:
+                        case VarType.Vector3:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 if (inPins[i].isConnected)
                                     outPins[0].Value = Vector2.Scale((Vector3)outPins[0].Value, (Vector3)inPins[i].Value);
                             }
                             break;
-                        case PinType.Vector4:
+                        case VarType.Vector4:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 if (inPins[i].isConnected)
                                     outPins[0].Value = Vector4.Scale((Vector4)outPins[0].Value, (Vector4)inPins[i].Value);
@@ -347,8 +381,8 @@ namespace ScriptEditor.Graph {
                 case OpType.Divide:
                     if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
                     switch (outPins[0].varType) {
-                        case PinType.Integer:
-                        case PinType.Float:
+                        case VarType.Integer:
+                        case VarType.Float:
                             for (int i = start + 1; i < inPins.Count; i++) {
                                 if (inPins[i].isConnected)
                                     if (!inPins[i].Equals(0))
@@ -408,35 +442,35 @@ namespace ScriptEditor.Graph {
             validCombos = new Dictionary<OpType, List<string>>();
 
             List<string> pins = new List<string>();
-            pins.Add(PinType.Float.ToString());
-            pins.Add(PinType.Integer.ToString());
-            pins.Add(PinType.String.ToString());
-            pins.Add(PinType.Vector2.ToString());
-            pins.Add(PinType.Vector3.ToString());
-            pins.Add(PinType.Vector4.ToString());
+            pins.Add(VarType.Float.ToString());
+            pins.Add(VarType.Integer.ToString());
+            pins.Add(VarType.String.ToString());
+            pins.Add(VarType.Vector2.ToString());
+            pins.Add(VarType.Vector3.ToString());
+            pins.Add(VarType.Vector4.ToString());
             validCombos.Add(OpType.Add, pins);
             validCombos.Add(OpType.Subtract, pins);
 
             pins = new List<string>();
-            pins.Add(PinType.Float.ToString());
-            pins.Add(PinType.Integer.ToString());
-            pins.Add(PinType.Vector2.ToString());
-            pins.Add(PinType.Vector3.ToString());
-            pins.Add(PinType.Vector4.ToString());
+            pins.Add(VarType.Float.ToString());
+            pins.Add(VarType.Integer.ToString());
+            pins.Add(VarType.Vector2.ToString());
+            pins.Add(VarType.Vector3.ToString());
+            pins.Add(VarType.Vector4.ToString());
             validCombos.Add(OpType.Multiply, pins);
             
 
             pins = new List<string>(new string[] {
-                PinType.Float.ToString(), PinType.Integer.ToString() });
+                VarType.Float.ToString(), VarType.Integer.ToString() });
             validCombos.Add(OpType.Divide, pins);
             validCombos.Add(OpType.SQRT, pins);
             validCombos.Add(OpType.Abs, pins);
             validCombos.Add(OpType.POW, pins);
 
-            pins = new List<string>(new string[] { PinType.Float.ToString(),
-                PinType.Integer.ToString() });
+            pins = new List<string>(new string[] { VarType.Float.ToString(),
+                VarType.Integer.ToString() });
 
-            pins = new List<string>(new string[] { PinType.Bool.ToString() });
+            pins = new List<string>(new string[] { VarType.Bool.ToString() });
             validCombos.Add(OpType.And, pins);
             validCombos.Add(OpType.Or, pins);
             validCombos.Add(OpType.Not, pins);

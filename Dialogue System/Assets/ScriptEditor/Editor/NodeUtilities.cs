@@ -30,8 +30,10 @@ namespace ScriptEditor.EditorScripts {
 
                 ScriptEditorWindow sc = EditorWindow.GetWindow<ScriptEditorWindow>();
                 if (sc != null) {
-                    CreateNode(graph, NodeType.Event, false, new Vector2(sc.workView.center.x-170/4f, 
-                        sc.workView.center.y-90/2f));
+                    CreateNode(graph, NodeType.Event, false, new Vector2(sc.workView.center.x - 170 / 2f,
+                        sc.workView.center.y - 90 / 2f));
+                    CreateNode(graph, NodeType.Event, true, new Vector2(sc.workView.center.x + 170 / 2f,
+                        sc.workView.center.y - 90 / 2f));
                     sc.graph = graph;
                 }
             }
@@ -64,6 +66,12 @@ namespace ScriptEditor.EditorScripts {
             }
         }
 
+        //public static void DeleteNode(NodeBase node) {
+        //    AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(node));
+        //    //AssetDatabase.SaveAssets();
+        //    //AssetDatabase.Refresh();
+        //}
+
         /// <summary>
         /// creates a new generic node in the passed graph
         /// </summary>
@@ -83,12 +91,22 @@ namespace ScriptEditor.EditorScripts {
                         ((ControlNode)res).Construct((ControlNode.ControlType) var);
                         break;
                     case NodeType.Event:
-                        if ((bool)var) res = ScriptableObject.CreateInstance <SubStartNode>();
-                        else res = ScriptableObject.CreateInstance <StartNode>();
+                        int i = 1;
+                        if (var as string != null) {
+                            res = ScriptableObject.CreateInstance<SubStartNode>();
+                            i = 2;
+                        } else {
+                            if ((bool)var) {
+                                res = ScriptableObject.CreateInstance<EndNode>();
+                                i = 3;
+                            } else res = ScriptableObject.CreateInstance<StartNode>();
+                        }
                         res.Initialize();
-                        ((StartNode)res).Construct();
-                        break;
-                    case NodeType.Function:
+                        switch(i){
+                            case 1: ((StartNode)res).Construct(); break;
+                            case 2: ((SubStartNode)res).Construct(); break;
+                            case 3: ((EndNode)res).Construct(); break;
+                        }
                         break;
                 }
 
@@ -99,21 +117,30 @@ namespace ScriptEditor.EditorScripts {
         }
 
         /// <summary>
-        /// creates a new mathematical operator node
+        /// creates a new node with a specified variable type
         /// </summary>
         /// <param name="graph"></param>
-        /// <param name="type"></param>
+        /// <param name="var"></param>
         /// <param name="pos"></param>
         /// <param name="inType"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public static NodeBase CreateNode(NodeGraph graph, MathNode.OpType type, Vector2 pos, PinType inType, int count) {
-            MathNode res = null;
+        public static NodeBase CreateNode(NodeGraph graph, NodeType type, object var, VarType inType, Vector2 pos, int count) {
+            NodeBase res = null;
             if (graph != null) {
-                res = ScriptableObject.CreateInstance<MathNode>();
-                res.Initialize();
-                res.Construct(type, inType, count);
-                InitNode(res, graph, pos);
+                switch (type) {
+                    case NodeType.Math:
+                        res = ScriptableObject.CreateInstance<MathNode>();
+                        res.Initialize();
+                        ((MathNode)res).Construct((MathNode.OpType)var, inType, count);
+                        break;
+                    case NodeType.Function:
+                        res = ScriptableObject.CreateInstance<FunctionNode>();
+                        res.Initialize();
+                        ((FunctionNode)res).Construct((FunctionNode.FunctionType)var, inType);
+                        break;
+                }
+                        InitNode(res, graph, pos);
             }
 
             return res;
@@ -127,7 +154,7 @@ namespace ScriptEditor.EditorScripts {
         /// <param name="output"></param>
         /// <param name="pos"></param>
         /// <returns></returns>
-        public static NodeBase CreateNode(NodeGraph graph, PinType input, PinType output, Vector2 pos) {
+        public static NodeBase CreateNode(NodeGraph graph, VarType input, VarType output, Vector2 pos) {
             ControlNode res = null;
 
             if (graph != null) {
@@ -148,7 +175,7 @@ namespace ScriptEditor.EditorScripts {
         private static void InitNode(NodeBase res, NodeGraph graph, Vector2 pos) {
             res.SetPos(pos);
             res.parentGraph = graph;
-            graph.nodes.Add(res);
+            graph.AddNode(res);
             AssetDatabase.AddObjectToAsset(res, graph);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
