@@ -10,20 +10,20 @@ using UnityEditor;
 namespace ScriptEditor.Graph {
 
     /// <summary>
-    /// Node that executes a base function
+    /// Node that executes a basic function
     /// </summary>
     public class ControlNode : NodeBase {
 
         private ControlType conType;
-        /// <summary> Defines which PinTypes can be cast to other which other PinTypes </summary>
+        /// <summary> Defines which PinTypes can be cast to  which other PinTypes </summary>
         public static Dictionary<string, List<string>> castables;
         public static List<ControlType> dialogControls;
 
-        public List<string> options;
+        //public List<string> options; // i don't remember where i was going with this?
 
         public enum ControlType {
-            Set, Branch, ForLoop, Sequence, Print, PlaySound, Dialogue, Delay,
-            Music, Quest, Choice, Cast,
+            Branch, ForLoop, Sequence, Print, PlaySound, Dialogue, Delay,
+            Music, Quest, Choice, Cast, 
             Custom
         }
 
@@ -44,7 +44,7 @@ namespace ScriptEditor.Graph {
             Resize();
 
         }
-
+        
         /// <summary>
         /// Constructs the pins for a generic Control Node
         /// </summary>
@@ -80,13 +80,13 @@ namespace ScriptEditor.Graph {
                     name = "Choice";
                     description = "Splits execution based on an on-screen decision.";
                     break;
+                case ControlType.Custom:
+                    name = "Custom";
+                    description = "Calls a custom function";
+                    break;
                 case ControlType.Quest:
                     name = "Quest";
                     description = "Defines a quest and shit";
-                    break;
-                case ControlType.Set:
-                    name = "Set";
-                    description = "Does a thing... as to what, I'm not yet sure";
                     break;
                 case ControlType.ForLoop:
                     name = "For Loop";
@@ -208,11 +208,6 @@ namespace ScriptEditor.Graph {
                     outPins[1].Name = "Choice 2";
                     nodeType = NodeType.Dialog;
                     break;
-                case ControlType.Set:
-                    inPins.Add(new InputPin(this, VarType.Exec));
-
-                    outPins.Add(new OutputPin(this, VarType.Exec));
-                    break;
                 case ControlType.ForLoop:
                     inPins.Add(new InputPin(this, VarType.Exec));
                     inPins.Add(new InputPin(this, VarType.Integer));
@@ -250,6 +245,11 @@ namespace ScriptEditor.Graph {
                     inPins.Add(new InputPin(this, VarType.Exec));
 
                     outPins.Add(new OutputPin(this, VarType.Exec));
+                    break;
+                case ControlType.Custom:
+                    inPins.Add(new InputPin(this, VarType.Exec));
+                    outPins.Add(new OutputPin(this, VarType.Exec));
+
                     break;
             }
             Resize();
@@ -297,7 +297,7 @@ namespace ScriptEditor.Graph {
         public override void Initialize() {
             base.Initialize();
             nodeType = NodeType.Control;
-            options = new List<string>();
+            //options = new List<string>();
             body = new Rect(0, 0, 150, 35*MaxNodes);
         }
 

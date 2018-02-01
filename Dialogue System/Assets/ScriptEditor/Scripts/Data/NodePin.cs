@@ -5,7 +5,7 @@ using UnityEditor;
 using System;
 
 namespace ScriptEditor.Graph {
-    //[Serializable]
+    [Serializable]
     public abstract class NodePin {
 
         [SerializeField] public string Name, Description;
@@ -13,8 +13,26 @@ namespace ScriptEditor.Graph {
         [SerializeField] public NodeBase node;
         [SerializeField] public VarType varType;
         [SerializeField] public Rect bounds;
+
+        [SerializeField] protected object val;
+
         public object Value {
-            get { return val; }
+            get {
+                if(val!=null)return val;
+                if (isInput)
+                    Debug.Log("Pin Val is null... Default: \"" + ((InputPin)this).Default+"\"");
+                switch (varType) {
+                    case VarType.Bool: return val = false;
+                    case VarType.Float: return val = 0;
+                    case VarType.Integer: return val = 0;
+                    case VarType.String: return val = "";
+                    case VarType.Vector2: return val = Vector2.zero;
+                    case VarType.Vector3: return val = Vector3.zero;
+                    case VarType.Vector4: return val = Vector4.zero;
+                    case VarType.Color: return val = Color.white;
+                }
+                return "";
+            }
             set {
                 if (value != null)
                     switch (varType) {
@@ -65,7 +83,6 @@ namespace ScriptEditor.Graph {
         public const float padding = 16;
         public static float Top { get { return margin.y + padding; } }
 
-        [SerializeField] protected object val;
 
         public NodePin(NodeBase n, object val) : this(n, GetVarType(val)) {
             Value = val;
@@ -76,6 +93,15 @@ namespace ScriptEditor.Graph {
             this.varType = varType;
             node = n;
             bounds = new Rect(Vector2.zero, pinSize);
+
+            switch (varType) {
+                case VarType.Bool: val = false;break;
+                case VarType.Integer:
+                case VarType.Float: val = 0; break;
+                case VarType.Vector2: val = Vector2.zero; break;
+                case VarType.Vector3: val = Vector3.zero; break;
+                case VarType.Vector4: val = Vector4.zero; break;
+            }
         }
 
         /// <summary> returns the name of the base connected node </summary>
@@ -120,15 +146,14 @@ namespace ScriptEditor.Graph {
         public bool Contains(Vector2 pos) {
             Rect b = new Rect(bounds);
             b.position += node.GetBody().position;
-            bool res = b.Contains(pos);
+            return b.Contains(pos);
+        }
 
-            if (!res) {
-                b = new Rect(TextBox);
-                b.position += node.GetBody().position;
-                res = b.Contains(pos);
-            }
-
-            return res;
+        /// <summary> determine if mouse is inside textbox for name </summary>
+        public bool TxtContains(Vector2 pos) {
+            Rect b = new Rect(TextBox);
+            b.position += node.GetBody().position;
+            return b.Contains(pos);
         }
 
         public Vector2 Position {
@@ -137,6 +162,7 @@ namespace ScriptEditor.Graph {
                 return bounds.position + node.GetBody().position;
             }
         }
+
         public Vector2 Center {
             get {
                 return Position + new Vector2(isInput ? -pinSize.y / 2f :

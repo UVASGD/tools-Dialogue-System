@@ -15,7 +15,8 @@ namespace ScriptEditor.Graph {
         public static Dictionary<OpType, List<string>> validCombos;
         OpType op = OpType.Abs;
 
-        const float Header = 13, Bottom = 17, Left = 15;
+        const float Header = 13, Left = 15;
+        new const float Bottom = 17;
         const float splashHeight = 36, buttonTop = 3, buttonLeft = 7;
         static Vector2 baseBox = new Vector2(153, 87);
         static Vector2 baseButton = new Vector2(55, 14);
@@ -185,10 +186,11 @@ namespace ScriptEditor.Graph {
                 skin.GetStyle("NodeMathSelected").CalcSize(new GUIContent(splashText)).x;
 
             body = new Rect(pan.x, pan.y, Mathf.Max(txtW, baseBox.x + 2 * Left), Mathf.Max(outH, inH) + Header + Bottom);
+
+            // disconnected input sizes
+
             boxSize = new Vector2(body.width - 2 * Left, body.height - Header - Bottom);
-
-            //Debug.Log(inH + " | " + outH + " | " + Mathf.Max(outH, inH));
-
+            
             // relocate pins
             foreach(NodePin pin in AllPins) {
                 Vector2 pos = Vector2.zero;

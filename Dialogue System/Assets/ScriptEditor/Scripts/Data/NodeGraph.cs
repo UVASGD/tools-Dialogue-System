@@ -18,7 +18,11 @@ namespace ScriptEditor.Graph {
         [HideInInspector]public NodeBase SelectedNode;
         [HideInInspector]public bool wantsConnection;
         [HideInInspector]public bool showProperties;
+
         public string Path { get { return AssetDatabase.GetAssetPath(this); } }
+        public bool ContainsVariable (string varName) { return localVariables.getVariable(varName) != null; }
+        
+        private VariableDictionary localVariables;
 
         public void OnEnable() {
             //if (nodes == null) {
@@ -26,6 +30,7 @@ namespace ScriptEditor.Graph {
         }
 
         public void Initialize() {
+            localVariables = new VariableDictionary();
             if (nodes.Any())
                 foreach(var n in nodes) {
                     n.Initialize();
@@ -76,6 +81,9 @@ namespace ScriptEditor.Graph {
             // check if compiling node found any errors
             foreach(NodeBase node in nodes)
                 if (node.errors.Any()) {
+                    if (node.errors.Count == 1 && node.errors[0] ==
+                        new NodeError(NodeError.ErrorType.NotConnected))
+                        continue; // ignore isolated nodes 
                     compiled = false;
                     break;
                 }
@@ -111,6 +119,10 @@ namespace ScriptEditor.Graph {
                     }
                 }
             }
+        }
+
+        public void CreateVariable(Variable variable) {
+            localVariables.addVariable(variable);
         }
 
         private bool shift = false;

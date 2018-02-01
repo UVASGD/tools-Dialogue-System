@@ -10,7 +10,7 @@ using System;
 namespace ScriptEditor.Graph {
 
     public enum NodeType {
-        Math, Function, Fetch, Dialog, Control, Event
+        Math, Function, Fetch, Dialog, Control, Event, Variable
     }
 
     public enum VarType {
@@ -18,6 +18,10 @@ namespace ScriptEditor.Graph {
         Color, Object, Actor,
     }
 
+    /// <summary>
+    /// The base node class. Nodes are what the graphs are made from and can contain a number of 
+    /// either input or output pins, or a combination of both. See _____ for a list of child classes
+    /// </summary>
     [Serializable]
     public abstract class NodeBase : ScriptableObject {
         
@@ -58,7 +62,7 @@ namespace ScriptEditor.Graph {
             }
         }
 
-        /// <summary> longest input name </summary>
+        /// <summary> get the longest name name from input pins </summary>
         public string LongestInName {
             get {
                 string res = "";
@@ -69,7 +73,7 @@ namespace ScriptEditor.Graph {
             }
         }
 
-        /// <summary> longest output name </summary>
+        /// <summary> get the longest name from the output pins </summary>
         public string LongestOutName {
             get {
                 string res = "";
@@ -144,11 +148,39 @@ namespace ScriptEditor.Graph {
             float nameWidth = style.CalcSize(new GUIContent(LongestInName)).x +
                 style.CalcSize(new GUIContent(LongestOutName)).x;
             float pinWidth = 50;
-            float w = 2*pinWidth + nameWidth + 30;
-            body = new Rect(0, 0, Mathf.Max(w,Width), Top + NodePin.Top * MaxNodes + Bottom);
+            float w = 2 * pinWidth + nameWidth + 30;
+            body = new Rect(0, 0, Mathf.Max(w, Width), Top + NodePin.Top * MaxNodes + Bottom);
+
+            // widen body based on disconnected, changeable inputs
+            // for types with multiple inputs, this offset is based only on widest field
+            Vector2 inputWidths = Vector2.zero;
+            foreach (NodePin pin in AllPins) {
+                if (!pin.isConnected) {
+                    switch (pin.varType) {
+                        case VarType.Bool: // checkbox
+                            break;
+                        case VarType.Integer: // int field
+                            break;
+                        case VarType.Float: // float field
+                            break;
+                        case VarType.String: // text field
+                            break;
+                        case VarType.Vector2: // 2 float fields
+                            break;
+                        case VarType.Vector3: // 3 float fields
+                            break;
+                        case VarType.Vector4: // 4 float fields
+                            break;
+                        case VarType.Color: // box showing color
+                            break;
+                    }
+                }
+            }
+
+            body.size += inputWidths;
 
             // set pin visual information
-            foreach(NodePin pin in AllPins) {
+            foreach (NodePin pin in AllPins) {
                 float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
                 float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) :
                     inPins.IndexOf((InputPin)pin);
@@ -180,6 +212,7 @@ namespace ScriptEditor.Graph {
         /// <summary> add new pin with base variable type</summary>
         public virtual void AddInputPin() {
             if (multiplePins && inPins.Count < 16) {
+                //ScriptableObject.Instantiate<InputPin>();
                 inPins.Add(new InputPin(this, inPins[0].varType));
                 Resize();
             }
@@ -268,7 +301,7 @@ namespace ScriptEditor.Graph {
         }
 
         /// <summary>
-        /// check for mouse collision
+        /// check if the mouse is inside the entire node
         /// </summary>
         /// <param name="pos"></param>
         /// <returns></returns>
@@ -284,6 +317,18 @@ namespace ScriptEditor.Graph {
         public NodePin InsidePin(Vector2 mousePos) {
             foreach(NodePin pin in AllPins) {
                 if (pin.Contains(mousePos)) return pin;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// determine if the mouse's location is inside a pin;
+        /// </summary>
+        /// <param name="mousePos"></param>
+        /// <returns> the pin in which the mouse collides</returns>
+        public NodePin InsidePinText(Vector2 mousePos) {
+            foreach(NodePin pin in AllPins) {
+                if (pin.TxtContains(mousePos)) return pin;
             }
             return null;
         }
@@ -312,17 +357,60 @@ namespace ScriptEditor.Graph {
             DrawPins();
         }
 
-        public virtual void DrawPins() {
-            try {
+        /// <summary>
+        /// Draws the pins for the Node; 
+        /// Each NodeType is drawn with a different color
+        /// </summary>
+        public  void DrawPins() {
+            //try {
                 GUILayout.BeginArea(body);
                 foreach (NodePin pin in AllPins) {
+                    Rect txt = pin.TextBox;
                     GUI.Box(pin.bounds, "", skin.GetStyle(pin.StyleName));
+                    GUI.Label(txt, pin.Name);
 
-                    
-                    GUI.Label(pin.TextBox, pin.Name);
+                // casting error? wtf, C#
+                Vector2 offset = new Vector2(txt.size.x-15, 0);
+                    if (!pin.isConnected && pin.isInput) {
+                    //Debug.Log("Pin: " + pin + "\nVal: " + pin.Value);
+                        switch (pin.varType) {
+                            case VarType.Bool: // checkbox
+                                //pin.Value = (bool)EditorGUI.Toggle(new Rect(txt.position + offset, new Vector2(15, 15)),
+                                //    (bool)pin.Value);
+                                break;
+                            case VarType.Integer: // int field
+                            //pin.Value = (int)EditorGUI.IntField(new Rect(txt.position + offset, new Vector2(35, 20)),
+                            //    (int)pin.Value);
+                            break;
+                            case VarType.Float: // float field
+                            //pin.Value = (float)EditorGUI.FloatField(new Rect(txt.position + offset, new Vector2(45, 20)),
+                            //    (float)pin.Value);
+                            break;
+                            case VarType.String: // text field
+                            //pin.Value = (string)EditorGUI.TextField(new Rect(txt.position + offset, new Vector2(75, 20)),
+                            //    (string)pin.Value);
+                            break;
+                            case VarType.Vector2: // 2 float fields
+                                //pin.Value = (Vector2)EditorGUI.Vector2Field(new Rect(txt.position + offset, new Vector2(65, 20)),
+                                //    "", (Vector2)pin.Value);
+                                break;
+                            case VarType.Vector3: // 3 float fields
+                                //pin.Value = (Vector3)EditorGUI.Vector3Field(new Rect(txt.position + offset, new Vector2(85, 20)),
+                                //    "", (Vector3)pin.Value);
+                                break;
+                            case VarType.Vector4: // 4 float fields
+                                //pin.Value = (Vector4)EditorGUI.Vector2Field(new Rect(txt.position + offset, new Vector2(105, 20)),
+                                //    "", (Vector2)pin.Value);
+                                break;
+                            case VarType.Color: // box showing color
+                                //pin.Value = (Color) EditorGUI.ColorField(new Rect(txt.position + offset, new Vector2(65, 20)),
+                                //    (Color)pin.Value);
+                                break;
+                        }
+                    }
                 }
                 GUILayout.EndArea();
-            } catch { }
+            //} catch { }
         }
 
         public void DrawConnections() {

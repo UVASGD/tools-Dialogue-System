@@ -6,7 +6,12 @@ using ScriptEditor.Graph;
 using UnityEngine;
 using UnityEditor;
 
-namespace ScriptEditor.EditorScripts {
+namespace ScriptEditor.EditorScripts {  
+
+
+    /// <summary>
+    /// Subwindow (View) that shows a tooltip of the current object
+    /// </summary>
     public class NodeToolTipView : ViewBase {
         public Vector2 size;
         public string text="";
@@ -62,6 +67,100 @@ namespace ScriptEditor.EditorScripts {
         }
     }
 
+    /// <summary>
+    /// Subwindow (View) that shows a popup for naming promoted variables
+    /// only; variable type dictated by selected pin.
+    /// Will not create a variable of similar scope with same name
+    /// </summary>
+    public class VariableCreateView : ViewBase {
+
+        public Vector2 mouseLoc;
+        public static Vector2 DefaultSize = new Vector2(400, 100);
+
+        private NodePin pinToAttach;
+        private string varName;
+        private Variable.VarScope scope = Variable.VarScope.Local;
+        private Color defColor;
+
+        public VariableCreateView(Vector2 loc,NodePin pin) : base("Variable Creation") {
+            mouseLoc = loc;
+            pinToAttach = pin;
+            defColor = skin.font.material.color;
+        }
+
+        public override void DrawView(Rect editorRect, Rect PercentRect, Event e, NodeGraph graph) {
+            base.DrawView(editorRect, PercentRect, e, graph);
+
+            // reposition to fit on screen
+            float dy = window.position.height - (body.height + body.y);
+            if (dy < 0) body.y += dy;
+            float dx = window.position.width - (body.width + body.x);
+            if (dx < 0) body.x += dx;
+
+            ProcessEvents(e);
+            
+            // check validity of input name
+            // else case should look into the "Global" list of variables
+            bool isValid = scope==Variable.VarScope.Local ? !graph.ContainsVariable(varName) : true;
+            GUIStyle style = new GUIStyle();
+            style.font.material.color = isValid ? defColor : Color.red;
+
+            varName = EditorGUILayout.TextField(varName);
+            scope = (Variable.VarScope)EditorGUILayout.EnumPopup("Scope:", scope);
+            if(GUILayout.Button("Create Variable") && isValid && scope == Variable.VarScope.Local) {
+                Promote();
+            }
+        }
+
+        private void Promote() {
+            Variable var = new Variable(varName, pinToAttach.varType, 
+                pinToAttach.isInput?null:pinToAttach.Value, scope);
+
+            // put variable into appropiate dictionary
+            if (scope == Variable.VarScope.Local) {
+                graph.CreateVariable(var);
+            } else {
+
+            }
+
+            // create node
+            Vector2 off = new Vector2(10, 0);
+            off *= pinToAttach.isInput ? -1 : 1;
+            Vector2 loc = pinToAttach.Center + off;
+            VarNode node = NodeUtilities.CreateNode(graph, var, !pinToAttach.isInput, loc);
+
+
+            // establish connection between selected pin and nodes pin
+            if (pinToAttach != null) {
+                graph.ConnectPins(pinToAttach.isInput ? (InputPin)pinToAttach : node.inPins[0],
+                    pinToAttach.isInput ? node.outPins[0] : (OutputPin)pinToAttach);
+            }
+
+
+            //// establish connection between selected pin and first input/output of matching type
+            //// e.g. float to float
+            //if (pinToAttach != null) {
+            //    if (!pinToAttach.isInput) {
+            //        foreach (InputPin ip in node.inPins)
+            //            if (ip.varType == pinToAttach.varType) {
+            //                graph.ConnectPins(ip, (OutputPin)pinToAttach);
+            //                break;
+            //            }
+            //    } else {
+            //        foreach (OutputPin op in node.outPins)
+            //            if (op.varType == pinToAttach.varType) {
+            //                graph.ConnectPins((InputPin)pinToAttach, op);
+            //                break;
+            //            }
+            //    }
+            //}
+        }
+    }
+
+    /// <summary>
+    /// Subwindow (View) that allows the user to add a new node to the graph
+    /// in the Node Editor
+    /// </summary>
     public class NodeCreateView : ViewBase{
 
         public Vector2 mouseLoc, size;

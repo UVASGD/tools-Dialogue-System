@@ -14,13 +14,14 @@ namespace ScriptEditor.EditorScripts {
         public HeaderView headerView;
         public StatusView statusView;
         public NodeCreateView nodeCreateView;
+        public VariableCreateView varCreateView;
         public NodeToolTipView toolTipView;
         public NodeGraph graph = null;
 
         const float VIEW_HORIZONTAL_PERCENTAGE = 0.75f;
         const float VIEW_VERTICAL_PERCENTAGE = 0.75f;
 
-        [MenuItem("Tools/Script Editor/Blueprint")]
+        [MenuItem("Dope Dialogue/Script Editor")]
         private static void OpenScriptEditor() {
             EditorWindow.GetWindow(typeof(ScriptEditorWindow));
             Initialize();
@@ -72,12 +73,15 @@ namespace ScriptEditor.EditorScripts {
             statusView.DrawView(new Rect(0, position.height - headerBox.height, position.width, headerBox.height),
                             new Rect(0, 1, 1, 1),
                             e, graph);
-            if (toolTipView != null)
-                toolTipView.DrawView(new Rect(e.mousePosition+new Vector2(20,20), toolTipView.size),
-                    new Rect(1,1,1,1), e, graph);
             if (nodeCreateView != null)
                 nodeCreateView.DrawView(new Rect(nodeCreateView.mouseLoc, nodeCreateView.size),
                     new Rect(1, 1, 1, 1), e, graph);
+            if (varCreateView != null)
+                varCreateView.DrawView(new Rect(varCreateView.mouseLoc, VariableCreateView.DefaultSize),
+                    new Rect(1,1,1,1), e, graph);
+            if (toolTipView != null)
+                toolTipView.DrawView(new Rect(e.mousePosition+new Vector2(20,20), toolTipView.size),
+                    new Rect(1,1,1,1), e, graph);
 
             ProcessEvents(e);
             Repaint();

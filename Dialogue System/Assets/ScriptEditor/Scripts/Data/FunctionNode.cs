@@ -7,6 +7,9 @@ using UnityEditor;
 #endif
 
 namespace ScriptEditor.Graph {
+    /// <summary>
+    /// Node that retrieves and builds data from variables or other nodes
+    /// </summary>
     public class FunctionNode : NodeBase {
 
         private FunctionType funcType;

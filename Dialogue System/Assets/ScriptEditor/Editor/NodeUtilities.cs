@@ -83,7 +83,6 @@ namespace ScriptEditor.EditorScripts {
         public static NodeBase CreateNode(NodeGraph graph, NodeType type, object var, Vector2 pos) {
             NodeBase res = null;
             if (graph != null) {
-                //Debug.Log("var: " + var);
                 switch (type) {
                     case NodeType.Control:
                         res = ScriptableObject.CreateInstance<ControlNode>();
@@ -112,6 +111,23 @@ namespace ScriptEditor.EditorScripts {
 
                 InitNode(res, graph, pos);
             }
+
+            return res;
+        }
+
+        /// <summary>
+        /// creates a variable-container node
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="var"></param>
+        /// <param name="isInput"></param>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        public static VarNode CreateNode(NodeGraph graph, Variable var, bool isInput, Vector2 pos) {
+            VarNode res = ScriptableObject.CreateInstance<VarNode>();
+            res.Initialize();
+            res.Construct(var, isInput);
+            InitNode(res, graph, pos);
 
             return res;
         }
@@ -167,7 +183,7 @@ namespace ScriptEditor.EditorScripts {
         }
 
         /// <summary>
-        /// initializes certain things about the node ands saves it to asset database
+        /// initializes common attributes of the node ands saves it to asset database
         /// </summary>
         /// <param name="res"></param>
         /// <param name="graph"></param>
