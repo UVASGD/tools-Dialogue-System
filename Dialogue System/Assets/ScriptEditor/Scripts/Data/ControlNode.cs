@@ -29,6 +29,10 @@ namespace ScriptEditor.Graph {
 
         public ControlType SubType() { return conType; }
 
+        public /*abstract*/ void Construct() {
+
+        }
+
         /// <summary>
         /// Constructs the pins for a Cast Node
         /// </summary>
