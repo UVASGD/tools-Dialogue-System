@@ -7,6 +7,10 @@ using ScriptEditor.Graph;
 using UnityEditor;
 
 namespace ScriptEditor.EditorScripts {
+    /// <summary>
+    /// This class defines the base workspace for the node editor, where the user
+    /// is able to modify a Dialogue Scripts and compile thema
+    /// </summary>
     public class WorkView : ViewBase{
 
         Texture2D backgroundTexture;
@@ -66,14 +70,20 @@ namespace ScriptEditor.EditorScripts {
             startTangent = new Vector2(start.x + offset, start.y);
             endTangent = new Vector2(end.x - offset, end.y);
 
-            Handles.BeginGUI();
-            {
+            Handles.BeginGUI(); {
                 Handles.color = Color.white;
                 Handles.DrawBezier(start, end, startTangent, endTangent, SelectedPin._Color, null, 2);
             }
             Handles.EndGUI();
         }
 
+        /// <summary>
+        /// determine whether the current unity is in proskin theme and returns the appropiate theme
+        /// 
+        /// NOTE: this should be located in a static class; 
+        /// right now, it happens in multiple classes and can be combined
+        /// </summary>
+        /// <returns></returns>
         Texture2D getTexture() {
             string s = EditorGUIUtility.isProSkin ? "workViewBackgroundDark" : "workViewBackgroundLight";
             return Resources.Load<Texture2D>("Textures/Editor/" + s);
@@ -88,8 +98,11 @@ namespace ScriptEditor.EditorScripts {
             base.ProcessEvents(e);
             Vector2 mousePos = e.mousePosition;
             NodeBase node = (graph != null) ? graph.InsideNode(mousePos) : null;
-            NodePin pin = null;
-            if(node!=null) pin = node.InsidePin(mousePos);
+            NodePin pin = null, txtPin = null;
+            if (node != null) {
+                pin = node.InsidePin(mousePos);
+                txtPin = node.InsidePinText(mousePos);
+            }
 
             // pan the view
             if (body.Contains(e.mousePosition)) {
@@ -113,14 +126,15 @@ namespace ScriptEditor.EditorScripts {
             if (window.nodeCreateView == null) {
                 if (window.toolTipView == null) {
                     if (node != null) {
-                        if (pin == null) {
+                        if (pin == null && txtPin==null) {
                             window.toolTipView = new NodeToolTipView(node, node.description);
                         } else {
-                            if (SelectedPin != null) {
+                            if (SelectedPin != null && pin!=null) {
+                                // check if selected input pin can be cast to the highlighted output pin and vice versa
+                                // if check is valid, show a tooltip
                                 if (!SelectedPin.GetType().Equals(pin.GetType()) && pin.varType != SelectedPin.varType) {
                                     if (ControlNode.castables.ContainsKey(SelectedPin.varType.ToString())) {
                                         if (ControlNode.castables[SelectedPin.varType.ToString()].Contains(pin.varType.ToString())) {
-
                                             window.toolTipView = new NodeToolTipView(pin,
                                                 ("Cast " + Enum.GetName(typeof(VarType), SelectedPin.varType)
                                                  + " to " + Enum.GetName(typeof(VarType), pin.varType)));
@@ -128,8 +142,9 @@ namespace ScriptEditor.EditorScripts {
                                     }
                                 }
                             } else {
-                                if (!String.IsNullOrEmpty(pin.Description))
-                                    window.toolTipView = new NodeToolTipView(pin, pin.Description);
+                                NodePin p = pin == null ? txtPin : pin;
+                                if (!String.IsNullOrEmpty(p.Description))
+                                    window.toolTipView = new NodeToolTipView(p, p.Description);
                             }
                         }
                     } else if (SelectedPin != null) {
@@ -144,16 +159,19 @@ namespace ScriptEditor.EditorScripts {
             }
 
             // hit escape
+            // desekect the current pin
             if (e.keyCode == KeyCode.Escape) {
                 if (SelectedPin != null) SelectedPin = null;
             }
 
             // hold shift
+            // activate shift key relate functions
             if(e.keyCode == KeyCode.LeftShift || e.keyCode == KeyCode.RightShift) {
                 shift = (e.type == EventType.KeyDown);
             }
 
             // press delete
+            // delete the current node
             if (graph != null) {
                 if (e.keyCode == KeyCode.Delete && graph.SelectedNode != null) {
                     graph.DeleteNode(graph.SelectedNode);
@@ -166,6 +184,7 @@ namespace ScriptEditor.EditorScripts {
                 window.toolTipView = null;
 
             // right click a thing
+            // show a context menu
             if (window.nodeCreateView == null && e.type == EventType.ContextClick) {
                 GenericMenu menu = new GenericMenu();
                 if (graph != null) {
@@ -186,12 +205,18 @@ namespace ScriptEditor.EditorScripts {
                                     //} else {
                                     //    foreach (InputPin n in pin.node.inPins) {
                                     //        menu.AddItem(new GUIContent("Break Connection to " + pin.ConName()), false, node.RemovePin, "pin obj?");
-                                    //    }
+                                    //    
+
                                     //}
                                 }
 
                                 //add separator
                                 menu.AddSeparator("");
+                            }
+
+                            // Promote input to variable Node
+                            if(!pin.isConnected && pin.isInput && pin.varType != VarType.Exec) {
+                                menu.AddItem(new GUIContent("Promote to Variable"), false, PromoteVariable, pin);
                             }
                         }
                         
@@ -295,6 +320,14 @@ namespace ScriptEditor.EditorScripts {
 
         public void DupeNode(object o) {
 
+        }
+
+        public void PromoteVariable(object o) {
+            if (!o.GetType().Equals(typeof(NodePin))) return;
+            NodePin pin = (NodePin)o;
+            if(window.varCreateView != null) {
+                window.varCreateView = new VariableCreateView(pin.Center, pin);
+            }
         }
     }
 }
