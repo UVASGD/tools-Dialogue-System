@@ -21,7 +21,7 @@ namespace ScriptEditor.Graph {
         static Vector2 baseBox = new Vector2(153, 87);
         static Vector2 baseButton = new Vector2(55, 14);
         Vector2 boxSize;
-        [SerializeField] private string splashText;
+        [SerializeField] protected string splashText;
 
         /// <summary> What function is performed by node </summary>
         public enum OpType {
@@ -30,6 +30,10 @@ namespace ScriptEditor.Graph {
         }
 
         public OpType SubType() { return op; }
+        
+        public virtual void Construct() {
+
+        }
 
         /// <summary>
         /// Build pins for node

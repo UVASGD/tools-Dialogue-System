@@ -21,7 +21,7 @@ namespace ScriptEditor.Graph {
 
         }
 
-        public /*override*/ void Construct() {
+        public override void Construct() {
             // set information
             name = "Branch";
             description = "Splits execution based on the value of the condition.";

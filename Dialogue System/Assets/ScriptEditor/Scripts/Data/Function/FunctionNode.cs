@@ -13,14 +13,19 @@ namespace ScriptEditor.Graph {
     public class FunctionNode : NodeBase {
 
         private FunctionType funcType;
+        protected VarType /*argumentType*/nT;
         public static Dictionary<FunctionType, List<string>> validCombos;
 
         public enum FunctionType {
-            Magnitude, Length, SplitVector2, SplitVector3, SplitVector4, BuildVector2, BuildVector3, BuildVector4,
+            Magnitude, Length, SplitVector2, SplitVector3, SplitColor, BuildVector2, BuildVector3, BuildColor,
             GetLocation
         }
 
         public FunctionType SubType() { return funcType; }
+
+        public virtual void Construct() {
+
+        }
 
         /// <summary>
         /// Create input and output pins depending on function type
@@ -34,7 +39,7 @@ namespace ScriptEditor.Graph {
             // set name and description
             switch (funcType) {
                 case FunctionType.Magnitude:
-                    description = "Calculates the absolute value of the input node. Defaults to 0 if nothing is connected.";
+                    description = "Calculates the magnitude of the input vector. Defaults to 0 if nothing is connected.";
                     name = "Vector Magnitude";
                     break;
                 case FunctionType.Length:
@@ -49,8 +54,8 @@ namespace ScriptEditor.Graph {
                     description = "Breaks a Vector3 into its components";
                     name = "Split Vector3";
                     break;
-                case FunctionType.SplitVector4:
-                    description = "Breaks a Vector4 into its components";
+                case FunctionType.SplitColor:
+                    description = "Breaks a Color into its components";
                     name = "Split Vector4";
                     break;
                 case FunctionType.BuildVector2:
@@ -61,7 +66,7 @@ namespace ScriptEditor.Graph {
                     description = "Breaks a Vector3 into its components";
                     name = "Build Vector3";
                     break;
-                case FunctionType.BuildVector4:
+                case FunctionType.BuildColor:
                     description = "Breaks a Vector4 into its components";
                     name = "Build Vector4";
                     break;
@@ -95,7 +100,7 @@ namespace ScriptEditor.Graph {
                     outPins[1].Name = "y";
                     outPins[2].Name = "z";
                     break;
-                case FunctionType.SplitVector4:
+                case FunctionType.SplitColor:
                     inPins.Add(new InputPin(this, VarType.Vector4));
 
                     outPins.Add(new OutputPin(this, VarType.Float));
@@ -124,7 +129,7 @@ namespace ScriptEditor.Graph {
                     inPins[1].Name = "y";
                     inPins[2].Name = "z";
                     break;
-                case FunctionType.BuildVector4:
+                case FunctionType.BuildColor:
                     outPins.Add(new OutputPin(this, VarType.Vector4));
 
                     inPins.Add(new InputPin(this, VarType.Float));
@@ -140,6 +145,10 @@ namespace ScriptEditor.Graph {
                     break;
             }
             Resize();
+        }
+
+        public override void Execute() {
+            
         }
 
         /// <summary> calculate the flow of values </summary>
@@ -170,8 +179,11 @@ namespace ScriptEditor.Graph {
         static FunctionNode() {
             validCombos = new Dictionary<FunctionType, List<string>>();
 
-            validCombos.Add(FunctionType.Magnitude, new List<string>(
-                new string[] { VarType.Vector2.ToString(), VarType.Vector3.ToString(),
+            validCombos.Add(
+                FunctionType.Magnitude, new List<string>(
+                new string[] {
+                    VarType.Vector2.ToString(),
+                    VarType.Vector3.ToString(),
                     VarType.Vector4.ToString() }));
         }
 

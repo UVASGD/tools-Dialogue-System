@@ -29,7 +29,7 @@ namespace ScriptEditor.Graph {
 
         public ControlType SubType() { return conType; }
 
-        public /*abstract*/ void Construct() {
+        public virtual void Construct() {
 
         }
 
