@@ -24,6 +24,18 @@ namespace ScriptEditor.Graph {
         
         private VariableDictionary localVariables;
 
+        private int subStartIndex = 0;
+
+        public StartNode CurrentSubStart
+        {
+            get { return starts[subStartIndex]; }
+        }
+
+        public void SetSubStartIndex(int index)
+        {
+            subStartIndex = index;
+        }
+
         public void OnEnable() {
             //if (nodes == null) {
             //}
@@ -40,8 +52,8 @@ namespace ScriptEditor.Graph {
         public void AddNode(NodeBase n) {
             nodes.Add(n);
             compiled = false;
-            if(n as StartNode != null) {
-
+            if(n is StartNode) {
+                starts.Add(n as StartNode);
             }
         }
 

@@ -50,7 +50,7 @@ namespace ScriptEditor.Graph {
         /// <summary>
         /// Whether node has finished execution
         /// </summary>
-        public bool isFinishied { get { return finished; } }
+        public bool IsFinished { get { return finished; } }
 
         /// <summary> whether or not the node can be logically executed </summary>
         public bool IsExecutable { get {
