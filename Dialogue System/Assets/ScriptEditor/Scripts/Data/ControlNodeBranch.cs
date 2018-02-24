@@ -38,7 +38,7 @@ namespace ScriptEditor.Graph {
             outPins[1].Name = "False";
         }
 
-        public /*override*/ NodeBase GetNextNode() {
+        public override NodeBase GetNextNode() {
             // condition is based on default value or a lookup value
             bool condition = (bool)inPins[0].Value;
 
