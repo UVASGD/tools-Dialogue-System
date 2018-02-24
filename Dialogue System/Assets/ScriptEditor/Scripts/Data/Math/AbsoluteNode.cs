@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace ScriptEditor.Graph {
-    class AbsolueNode : MathNode {
+    class AbsoluteNode : MathNode {
 
         public override void Construct() {
             description = "Calculates the absolute value of the input node. Defaults to 0 if nothing is connected.";

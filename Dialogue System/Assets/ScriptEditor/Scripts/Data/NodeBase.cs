@@ -28,6 +28,8 @@ namespace ScriptEditor.Graph {
         public string  description;
         public bool isSelected;
 
+        private bool finished = false;
+
         /// <summary> whether or not more input pins can be added to node </summary>
         [SerializeField] protected NodeType nodeType;
 
@@ -44,7 +46,12 @@ namespace ScriptEditor.Graph {
         public List<NodeError> errors;
         public int MaxNodes { get { return Mathf.Max(inPins.Count, outPins.Count); } }
         public NodeType Node_Type { get { return nodeType; } }
-        
+
+        /// <summary>
+        /// Whether node has finished execution
+        /// </summary>
+        public bool isFinishied { get { return finished; } }
+
         /// <summary> whether or not the node can be logically executed </summary>
         public bool IsExecutable { get {
                 foreach (InputPin ip in inPins) if (ip.varType == VarType.Exec)
@@ -207,6 +214,16 @@ namespace ScriptEditor.Graph {
                         break;
                     }
             }
+        }
+
+        /// <summary> Return the next executable node </summary>
+        public virtual NodeBase GetNextNode() {
+            if (outPins.Count > 0) {
+                if (outPins[0].varType == VarType.Exec)
+                    return outPins[0].ConnectedInput.node;
+            }
+
+            return null;
         }
 
         /// <summary> add new pin with base variable type</summary>
