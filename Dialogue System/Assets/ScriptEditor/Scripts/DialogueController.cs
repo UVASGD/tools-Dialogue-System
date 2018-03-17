@@ -25,12 +25,23 @@ namespace ScriptEditor
                 if (node.IsFinished)
                 {
                     node = node.GetNextNode();
+                    if(node == null) {
+                        // finished graph!
+
+                        node = null;
+                        //dialogue.reset();
+                        dialogue = null;
+                    }
                 }
             }
         }
 
-        void StartDialogue(NodeGraph dialogue)
-        {
+        /// <summary>
+        /// Activate a dialogue script
+        /// </summary>
+        /// <param name="dialogue"></param>
+        void StartDialogue(NodeGraph dialogue){
+            if (this.dialogue != null) return; // already running a script!
             this.dialogue = dialogue;
             this.node = dialogue.CurrentSubStart;
         }
