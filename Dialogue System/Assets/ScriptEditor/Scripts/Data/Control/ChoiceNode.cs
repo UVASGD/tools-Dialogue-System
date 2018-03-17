@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ScriptEditor.Graph
 {
-	public class ControlNodeChoice : ControlNode {
-		public ControlNodeChoice ()
+	public class ChoiceNode : ControlNode {
+        public List<string> choiceTexts;
+        public bool hideDisabledChoices;
+        public bool timed;
+        public float timerLength;
+        public int defaultChoice;
+
+		public ChoiceNode ()
 		{
 
 		}
-
-        // called everyframe
-        public override void Execute() {
-
-        }
 
         public override void Construct() {
             // set information
@@ -28,6 +30,12 @@ namespace ScriptEditor.Graph
             inPins[2].Default = true;
           }
 
-	}
+        // called everyframe
+        public override void Execute()
+        {
+
+        }
+
+    }
 }
 

@@ -2,9 +2,9 @@
 
 namespace ScriptEditor.Graph
 {
-	public class ControlNodeForLoop : ControlNode
+	public class ForLoopNode : ControlNode
 	{
-		public ControlNodeForLoop ()
+		public ForLoopNode ()
 		{
 		}
 		public override void Execute() {

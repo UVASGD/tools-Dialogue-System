@@ -2,9 +2,9 @@
 
 namespace ScriptEditor.Graph
 {
-	public class ControlNodeQuest : ControlNode
+	public class QuestNode : ControlNode
 	{
-		public ControlNodeQuest ()
+		public QuestNode ()
 		{
 		}
 		public override void Execute() {

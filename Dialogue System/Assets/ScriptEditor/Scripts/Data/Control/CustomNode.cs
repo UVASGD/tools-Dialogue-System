@@ -2,9 +2,9 @@
 
 namespace ScriptEditor.Graph
 {
-	public class ControlNodeCustom : ControlNode
+	public class CustomNode : ControlNode
 	{
-		public ControlNodeCustom ()
+		public CustomNode ()
 		{
 		}
 

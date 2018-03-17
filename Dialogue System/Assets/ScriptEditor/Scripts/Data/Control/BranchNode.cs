@@ -7,21 +7,16 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace ScriptEditor.Graph {
-    public class BranchNode : ControlNode {
-
-
-        public BranchNode() {
-
-
+namespace ScriptEditor.Graph
+{
+    public class BranchNode : ControlNode
+    {
+        public BranchNode()
+        {
         }
 
-        // called everyframe
-        public override void Execute() {
-
-        }
-
-        public override void Construct() {
+        public override void Construct()
+        {
             // set information
             name = "Branch";
             description = "Splits execution based on the value of the condition.";
@@ -33,20 +28,27 @@ namespace ScriptEditor.Graph {
             inPins[1].Default = true;
 
             outPins.Add(new OutputPin(this, VarType.Exec));
-            outPins.Add(new OutputPin(this, VarType.Exec));
             outPins[0].Name = "True";
+            outPins.Add(new OutputPin(this, VarType.Exec));
             outPins[1].Name = "False";
         }
 
-        public override NodeBase GetNextNode() {
+        // called everyframe
+        public override void Execute()
+        {
+
+        }
+
+        public override NodeBase GetNextNode()
+        {
             // condition is based on default value or a lookup value
             bool condition = (bool)inPins[0].Value;
 
             NodeBase output = null;
             OutputPin pin = outPins[condition ? 0 : 1];
-            if (pin.isConnected) 
+            if (pin.isConnected)
                 output = pin.ConnectedInput.node;
-            
+
             return output;
         }
     }

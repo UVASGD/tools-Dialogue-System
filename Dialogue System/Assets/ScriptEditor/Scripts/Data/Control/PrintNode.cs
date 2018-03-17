@@ -1,31 +1,35 @@
 ﻿using System;
+using UnityEngine;
 
-namespace ScriptEditor.Graph{
-	public class ControlNodePrint : ControlNode
-	{
-		public ControlNodePrint()
-		{
-		}
-		public override void Execute() {
+namespace ScriptEditor.Graph
+{
+    public class PrintNode : ControlNode
+    {
+        public Color color;
+        public bool printToConsole = true;
+        public bool printToScreen = false;
 
-		}
+        public PrintNode()
+        {
+        }
 
-		public override void Construct() {
-		//set information
-		name = "Print Text";
-        description = "Prints text to a console";
-		// Create Pins
-		inPins.Add(new InputPin(this, VarType.Exec));
-        inPins.Add(new InputPin(this, VarType.String));
-        inPins.Add(new InputPin(this, VarType.Bool));
-        inPins.Add(new InputPin(this, VarType.Bool));
-        inPins[1].Name = "In String";
-        inPins[1].Default = "Hello World";
-        inPins[2].Name = "Print to Screen";
-        inPins[3].Name = "Print to Console";
-        inPins[3].Default = true;
+        public override void Construct()
+        {
+            //set information
+            name = "Print Text";
+            description = "Prints text to a console";
+            // Create Pins
+            inPins.Add(new InputPin(this, VarType.Exec));
+            inPins.Add(new InputPin(this, VarType.String));
+            inPins[1].Name = "Text";
+            inPins[1].Default = "Hello World";
 
-        outPins.Add(new OutputPin(this, VarType.Exec));
-		}
-	}
+            outPins.Add(new OutputPin(this, VarType.Exec));
+        }
+
+        public override void Execute()
+        {
+
+        }
+    }
 }

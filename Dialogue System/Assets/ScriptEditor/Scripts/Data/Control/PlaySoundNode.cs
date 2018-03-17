@@ -1,9 +1,9 @@
 ﻿using System;
 
 namespace ScriptEditor.Graph{
-public class ControlNodePlaySound : ControlNode
+public class PlaySoundNode : ControlNode
 {
-	public ControlNodePlaySound()
+	public PlaySoundNode()
 	{
 	}
 
