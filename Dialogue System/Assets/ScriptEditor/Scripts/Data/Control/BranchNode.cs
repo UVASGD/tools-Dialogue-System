@@ -22,21 +22,21 @@ namespace ScriptEditor.Graph
             description = "Splits execution based on the value of the condition.";
 
             // Create pins
-            inPins.Add(new InputPin(this, VarType.Exec));
-            inPins.Add(new InputPin(this, VarType.Bool));
+            inPins.Add(new EventInputPin(this));
+            inPins.Add(new ValueInputPin(this, VarType.Bool));
             inPins[1].Name = "Condition";
             inPins[1].Default = true;
 
-            outPins.Add(new OutputPin(this, VarType.Exec));
+            outPins.Add(new EventOutputPin(this));
             outPins[0].Name = "True";
-            outPins.Add(new OutputPin(this, VarType.Exec));
+            outPins.Add(new EventOutputPin(this));
             outPins[1].Name = "False";
         }
 
         // called everyframe
         public override void Execute()
         {
-
+            finished = true;
         }
 
         public override NodeBase GetNextNode()

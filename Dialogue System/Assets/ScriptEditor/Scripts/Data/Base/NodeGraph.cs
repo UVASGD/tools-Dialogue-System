@@ -23,16 +23,15 @@ namespace ScriptEditor.Graph {
         public bool ContainsVariable (string varName) { return localVariables.getVariable(varName) != null; }
         
         private VariableDictionary localVariables;
-
         private int subStartIndex = 0;
+        private bool errFound = false;
 
-        public StartNode CurrentSubStart
-        {
+        public bool hasErrors { get { return errFound; } }
+        public StartNode CurrentSubStart{
             get { return starts[subStartIndex]; }
         }
 
-        public void SetSubStartIndex(int index)
-        {
+        public void SetSubStartIndex(int index){
             subStartIndex = index;
         }
 
@@ -43,6 +42,7 @@ namespace ScriptEditor.Graph {
 
         public void Initialize() {
             localVariables = new VariableDictionary();
+            starts = new List<StartNode>();
             if (nodes.Any())
                 foreach(var n in nodes) {
                     n.Initialize();
@@ -51,14 +51,26 @@ namespace ScriptEditor.Graph {
 
         public void AddNode(NodeBase n) {
             nodes.Add(n);
-            compiled = false;
-            if(n is StartNode) {
+            ResetCompiledStatus();
+            if (n is StartNode) {
                 starts.Add(n as StartNode);
             }
         }
 
         public void ConnectPins(InputPin ip, OutputPin op) {
-            compiled = false;
+            ResetCompiledStatus();
+
+            if (ip.isConnected && ip.varType==VarType.Exec) {
+                OutputPin oldOutput = ip.ConnectedOutput;
+                oldOutput.ConnectedInput = null;
+                oldOutput.isConnected = false;
+            }
+
+            if (op.isConnected && ip.varType != VarType.Exec) {
+                InputPin oldInput = op.ConnectedInput;
+                oldInput.ConnectedOutput = null;
+                oldInput.isConnected = false;
+            }
 
             ip.isConnected = op.isConnected = true;
 
@@ -66,6 +78,29 @@ namespace ScriptEditor.Graph {
             //op.ConnectedInputID = ip.node.inPins.IndexOf(ip);
             op.ConnectedInput = ip;
         }
+
+        // these functions are necessary since not all pins can be serialized
+        public InputPin InputFromID(string ID) {
+            string [] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            return nodes[int.Parse(dat[0])].inPins[int.Parse(dat[1])];
+        }
+
+        public string IDFromInput(InputPin ip) {
+            if(ip == null) return null;
+            return nodes.IndexOf(ip.node)+":"+ip.node.inPins.IndexOf(ip);
+        }
+
+        public OutputPin OutputFromID(string ID) {
+            string[] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            return nodes[int.Parse(dat[0])].outPins[int.Parse(dat[1])];
+        }
+
+        public string IDFromOutput(OutputPin op) {
+            if (op == null) return null;
+            return nodes.IndexOf(op.node) + ":" + op.node.outPins.IndexOf(op);
+        }
+
+
 
         public Stack<NodeBase> lookupStack, compileStack;
         public bool foundEnd;
@@ -96,12 +131,28 @@ namespace ScriptEditor.Graph {
                     if (node.errors.Count == 1 && node.errors[0] ==
                         new NodeError(NodeError.ErrorType.NotConnected))
                         continue; // ignore isolated nodes 
-                    compiled = false;
+                    errFound = true;
                     break;
                 }
+
+            if(!errFound) {
+                compiled = true;
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// clear all errors from recent compilation
+        /// </summary>
+        public void ResetCompiledStatus() {
+            if (!compiled) return;
+            compiled = false;
+            //foreach (NodeBase n in nodes)
+            //    n.errors.Clear();
+        }
+
         private static float errMargin = 20f;
         public void DrawGraph(Event e, Rect viewRect) {
             if (nodes.Any()) {
@@ -204,7 +255,7 @@ namespace ScriptEditor.Graph {
                 NodeBase.RemoveConnection(pin);
             nodes.Remove(node);
             DestroyImmediate(node, true);
-            compiled = false;
+            ResetCompiledStatus();
         }
 
         /// <summary>  Brings the selected node to the front in draw order </summary>

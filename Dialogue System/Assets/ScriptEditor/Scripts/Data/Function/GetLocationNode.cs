@@ -11,8 +11,8 @@ namespace ScriptEditor.Graph {
             name = "Get Location";
 
             // set input and output pins
-            inPins.Add(new InputPin(this, nT));
-            outPins.Add(new OutputPin(this, VarType.Vector3));
+            inPins.Add(new ValueInputPin(this, nT));
+           outPins.Add(new ValueOutputPin(this, VarType.Vector3));
             Resize();
         }
 

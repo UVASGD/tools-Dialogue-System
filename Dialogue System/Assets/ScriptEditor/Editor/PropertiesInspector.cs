@@ -116,6 +116,11 @@ namespace ScriptEditor.EditorScripts.Inspector {
     [CustomEditor(typeof(NodeGraph))]
     public class NodeGraphE : Editor {
         public override void OnInspectorGUI() {
+            if (PropertiesInspector.defaultGUI) {
+                base.OnInspectorGUI();
+                return;
+            }
+
             NodeGraph graph = (NodeGraph)target;
             EditorGUILayout.LabelField(graph.Name, EditorStyles.boldLabel);
         }

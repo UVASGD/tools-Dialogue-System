@@ -28,9 +28,10 @@ namespace ScriptEditor.Graph {
         public string  description;
         public bool isSelected;
 
-        private bool finished = false;
+        /// <summary> is the node finished executing </summary>
+        protected bool finished = false;
 
-        /// <summary> whether or not more input pins can be added to node </summary>
+        /// <summary> whether or not more input pins can be added to node is ultimately defined by its type </summary>
         [SerializeField] protected NodeType nodeType;
 
         public bool multiplePins = false;
@@ -106,8 +107,7 @@ namespace ScriptEditor.Graph {
             get {
                 switch (nodeType) {
                     case NodeType.Control:
-                        return Enum.GetName(typeof(ControlNode.ControlType),
-                            ((ControlNode)this).SubType());
+                        return this.GetType().ToString();
                     case NodeType.Function:
                         return Enum.GetName(typeof(FunctionNode.FunctionType),
                             ((FunctionNode)this).SubType());
@@ -150,7 +150,7 @@ namespace ScriptEditor.Graph {
         /// <summary>
         /// Resize the body of node. Necessary when number of pins changes or the width of text to be displayed changes.
         /// </summary>
-        protected virtual void Resize() {
+        public virtual void Resize() {
             GUIStyle style = skin.label;
             float nameWidth = style.CalcSize(new GUIContent(LongestInName)).x +
                 style.CalcSize(new GUIContent(LongestOutName)).x;
@@ -230,7 +230,7 @@ namespace ScriptEditor.Graph {
         public virtual void AddInputPin() {
             if (multiplePins && inPins.Count < 16) {
                 //ScriptableObject.Instantiate<InputPin>();
-                inPins.Add(new InputPin(this, inPins[0].varType));
+                inPins.Add(new ValueInputPin(this, inPins[0].varType));
                 Resize();
             }
         }
@@ -277,13 +277,13 @@ namespace ScriptEditor.Graph {
             if (parentGraph.compileStack.Contains(this)) {
                 ControlNode cn;
                 if ((cn = this as ControlNode) != null) {
-                    if (cn.SubType() != ControlNode.ControlType.Branch &&
-                        cn.SubType() != ControlNode.ControlType.Choice) {
+                    if (cn.GetType() != typeof(BranchNode) &&
+                        cn.GetType() != typeof(ChoiceNode)) {
                         errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                         return;
                     } else {
                         // branch must be controlled by variable to prevent infinite loop!
-                        if (cn.SubType() == ControlNode.ControlType.Branch &&
+                        if (cn.GetType() == typeof(BranchNode) &&
                             !cn.inPins[1].isConnected) {
                             errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                             return;
@@ -464,7 +464,7 @@ namespace ScriptEditor.Graph {
         public static void RemoveConnection(object p) {
             NodePin pin = (NodePin)p;
             pin.isConnected = false;
-            pin.node.parentGraph.compiled = false;
+            pin.node.parentGraph.ResetCompiledStatus();
 
             if (pin.GetType().Equals(typeof(OutputPin))) {
                 // find InputPin from ID

@@ -19,7 +19,7 @@ namespace ScriptEditor.Graph {
 
         public virtual void Construct() {
             base.SetName("Start");
-            outPins.Add(new OutputPin(this, VarType.Exec));
+            outPins.Add(new EventOutputPin(this));
             Resize();
         }
 
@@ -36,7 +36,7 @@ namespace ScriptEditor.Graph {
         /// <summary>
         /// Resize the body of node. Necessary when number of pins changes or the width of text to be displayed changes.
         /// </summary>
-        protected override void Resize() {
+        public override void Resize() {
             body = new Rect(0, 0, Width, 77);
             outPins[0].bounds.position = new Vector2(body.width - NodePin.margin.x -
                 NodePin.pinSize.x, 30);
@@ -49,7 +49,7 @@ namespace ScriptEditor.Graph {
     public class SubStartNode : StartNode {
         public override void Construct() {
             base.SetName("Sub Start");
-            outPins.Add(new OutputPin(this, VarType.Exec));
+            outPins.Add(new EventOutputPin(this));
             Resize();
         }
 

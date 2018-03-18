@@ -16,9 +16,9 @@ namespace ScriptEditor.Graph
             name = "For Loop";
             description = "Loops through execution based on index, from start to finish.";
             // Create pins
-			inPins.Add(new InputPin(this, VarType.Exec));
-            inPins.Add(new InputPin(this, VarType.Integer));
-            inPins.Add(new InputPin(this, VarType.Integer));
+			inPins.Add(new EventInputPin(this));
+            inPins.Add(new ValueInputPin(this, VarType.Integer));
+            inPins.Add(new ValueInputPin(this, VarType.Integer));
             inPins[1].Name = "First";
             inPins[1].Description = "Initial value of the index";
             inPins[1].Default = 0;
@@ -26,9 +26,9 @@ namespace ScriptEditor.Graph
             inPins[2].Description = "Final value of the index";
             inPins[2].Default = 0;
 
-            outPins.Add(new OutputPin(this, VarType.Exec));
-            outPins.Add(new OutputPin(this, VarType.Integer));
-            outPins.Add(new OutputPin(this, VarType.Exec));
+            outPins.Add(new EventOutputPin(this));
+           outPins.Add(new ValueOutputPin(this, VarType.Integer));
+            outPins.Add(new EventOutputPin(this));
             outPins[0].Name = "Loop Body";
             outPins[0].Description = "The sequence of actions to execute during the loop";
             outPins[1].Name = "Index";
