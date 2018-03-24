@@ -127,7 +127,6 @@ namespace ScriptEditor.EditorScripts {
             //}
 
             // toolTip
-            //***high priority for optimization
             if (window.nodeCreateView == null) {
                 if (window.toolTipView == null) {
                     if (node != null) {
@@ -188,10 +187,8 @@ namespace ScriptEditor.EditorScripts {
             if (e.type == EventType.MouseDrag)
                 window.toolTipView = null;
 
-            #region OptimizeMe
             // right click a thing
             // show a context menu
-            //***high priority for optimization
             if (window.nodeCreateView == null && e.type == EventType.ContextClick) {
                 GenericMenu menu = new GenericMenu();
                 if (graph != null) {
@@ -314,7 +311,6 @@ namespace ScriptEditor.EditorScripts {
                     }
                 }
             }
-            #endregion
 
         }
         #endregion
