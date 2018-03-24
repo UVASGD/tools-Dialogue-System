@@ -12,7 +12,7 @@ namespace ScriptEditor.Graph {
     /// <summary>
     /// Node that executes a basic function
     /// </summary>
-    public abstract class ControlNode : NodeBase {
+    public class ControlNode : NodeBase {
         
         /// <summary> Defines which PinTypes can be cast to  which other PinTypes </summary>
         public static Dictionary<string, List<string>> castables;
@@ -24,7 +24,7 @@ namespace ScriptEditor.Graph {
             Custom
         }
 
-        public abstract void Construct();
+        public virtual void Construct() { }
 
         /// <summary> If choice node, adds a choice to the control </summary>
         public override void AddInputPin() {

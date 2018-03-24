@@ -40,7 +40,7 @@ namespace ScriptEditor.EditorScripts {
             }
         }
 
-        /// <summary> Unimpleented. Create graph from file. </summary>
+        /// <summary> Unimplemented. Create graph from file. </summary>
         public static void LoadScript(string path) {
             NodeGraph graph;
 
@@ -86,7 +86,6 @@ namespace ScriptEditor.EditorScripts {
             if (graph != null) {
                 switch (type) {
                     case NodeType.Control:
-                        Debug.Log("Rock bottom");
                         switch ((ControlNode.ControlType)var) {
                             case ControlNode.ControlType.Branch: res = ScriptableObject.CreateInstance<BranchNode>(); break;
                             case ControlNode.ControlType.Choice: res = ScriptableObject.CreateInstance<ChoiceNode>(); break;
@@ -102,6 +101,7 @@ namespace ScriptEditor.EditorScripts {
                             case ControlNode.ControlType.SetDialogueScript: res = ScriptableObject.CreateInstance<SetDialogueScriptNode>(); break;
                             case ControlNode.ControlType.SetSubStart: res = ScriptableObject.CreateInstance<SetSubStartNode>(); break;
                         }
+
                         res.Initialize();
                         ((ControlNode)res).Construct();
                         break;
@@ -125,6 +125,7 @@ namespace ScriptEditor.EditorScripts {
                         break;
                 }
 
+                Debug.Log("Piano Keys");
                 InitNode(res, graph, pos);
             }
 
@@ -205,10 +206,15 @@ namespace ScriptEditor.EditorScripts {
         /// <param name="graph"></param>
         /// <param name="pos"></param>
         private static void InitNode(NodeBase res, NodeGraph graph, Vector2 pos) {
+            Debug.Log("Outer space: " + res);
             res.Resize();
+            Debug.Log("Spongebob movie: " + res);
             res.SetPos(pos);
+            Debug.Log("that one island bottom: " + res);
             res.parentGraph = graph;
+            Debug.Log("Bikini bottom: " + res);
             graph.AddNode(res);
+            Debug.Log("Rock bottom: " + res);
             AssetDatabase.AddObjectToAsset(res, graph);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

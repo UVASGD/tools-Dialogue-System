@@ -161,37 +161,38 @@ namespace ScriptEditor.Graph {
             // widen body based on disconnected, changeable inputs
             // for types with multiple inputs, this offset is based only on widest field
             Vector2 inputWidths = Vector2.zero;
-            foreach (NodePin pin in AllPins) {
-                if (!pin.isConnected) {
-                    switch (pin.varType) {
-                        case VarType.Bool: // checkbox
-                            break;
-                        case VarType.Integer: // int field
-                            break;
-                        case VarType.Float: // float field
-                            break;
-                        case VarType.String: // text field
-                            break;
-                        case VarType.Vector2: // 2 float fields
-                            break;
-                        case VarType.Vector3: // 3 float fields
-                            break;
-                        case VarType.Vector4: // 4 float fields
-                            break;
-                        case VarType.Color: // box showing color
-                            break;
-                    }
-                }
-            }
+            //foreach (NodePin pin in AllPins) {
+            //    if (!pin.isConnected) {
+            //        switch (pin.varType) {
+            //            case VarType.Bool: // checkbox
+            //                break;
+            //            case VarType.Integer: // int field
+            //                break;
+            //            case VarType.Float: // float field
+            //                break;
+            //            case VarType.String: // text field
+            //                break;
+            //            case VarType.Vector2: // 2 float fields
+            //                break;
+            //            case VarType.Vector3: // 3 float fields
+            //                break;
+            //            case VarType.Vector4: // 4 float fields
+            //                break;
+            //            case VarType.Color: // box showing color
+            //                break;
+            //        }
+            //    }
+            //}
 
             body.size += inputWidths;
 
             // set pin visual information
             foreach (NodePin pin in AllPins) {
-                float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
+                  float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
                 float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) :
                     inPins.IndexOf((InputPin)pin);
 
+                //float x, y; x = y = 9;
                 pin.bounds.position = new Vector2(x, Top + NodePin.margin.y + y * NodePin.Top);
             }
         }
@@ -465,8 +466,8 @@ namespace ScriptEditor.Graph {
             NodePin pin = (NodePin)p;
             pin.isConnected = false;
             pin.node.parentGraph.ResetCompiledStatus();
-
-            if (pin.GetType().Equals(typeof(OutputPin))) {
+            
+            if (pin is OutputPin) {
                 // find InputPin from ID
                 //InputFromID(((OutputPin)pin).ConnectedInputID).isSelected = false;
                 //InputFromID(((OutputPin)pin).ConnectedInputID).ConnectedOutput = null;

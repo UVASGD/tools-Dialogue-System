@@ -121,7 +121,7 @@ namespace ScriptEditor.Graph {
         }
 
         /// <summary> is the NodePin an InputPin? </summary>
-        public bool isInput { get { return GetType().Equals(typeof(InputPin)); } }
+        public bool isInput { get { return this is InputPin; } }
 
         /// <summary> color respective of the type of the pin </summary>
         public Color _Color {
