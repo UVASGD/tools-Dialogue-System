@@ -121,7 +121,7 @@ namespace ScriptEditor.Graph {
         }
 
         /// <summary> is the NodePin an InputPin? </summary>
-        public bool isInput { get { return GetType().Equals(typeof(InputPin)); } }
+        public bool isInput { get { return this is InputPin; } }
 
         /// <summary> color respective of the type of the pin </summary>
         public Color _Color {
@@ -141,6 +141,7 @@ namespace ScriptEditor.Graph {
                 }
             }
         }
+        
 
 #if UNITY_EDITOR
         public bool Contains(Vector2 pos) {
@@ -175,6 +176,7 @@ namespace ScriptEditor.Graph {
 
             // draw bezier curve from output pin to input pin
             try {
+                Debug.Log("Planetarium: "+this.GetType());
                 Vector3 start = (isInput) ? ((InputPin)this).ConnectedOutput.Center :
                     this.Center;
                 Vector3 end = (isInput) ? this.Center : 
@@ -184,74 +186,21 @@ namespace ScriptEditor.Graph {
                 float offset = Mathf.Max(Mathf.Abs(start.x - end.x) / 1.75f, 1);
                 startTangent = new Vector2(start.x + offset, start.y);
                 endTangent = new Vector2(end.x - offset, end.y);
-                //Debug.Log(start + " | " + end + "\n" + startTangent + " | " + endTangent);
+                // Debug.Log(start + " | " + end + "\n" + startTangent + " | " + endTangent);
                 Handles.BeginGUI();
                 {
                     Handles.color = Color.white;
                     Handles.DrawBezier(start, end, startTangent, endTangent, this._Color, null, 2);
                 } Handles.EndGUI();
-            } catch {
+            } catch (Exception e) {
                 Debug.Log("Unable to draw: " + this);
-                //Debug.Log("ConnO: " + ConnectedOutput);
+                Debug.Log(e);
             }
         }
 #endif  
     }
 
-    /// <summary> Input pin. If disconnected, a constant can be provided </summary>
-    [Serializable]
-    public class InputPin : NodePin {
-        public OutputPin ConnectedOutput = null;
 
-        [SerializeField] private object defaultVal;
-        /// <summary> Default value of the input when pin is constructed </summary>
-        public object Default {
-            get { return defaultVal; }
-            set {
-                if (value != null) {
-                    switch (varType) {
-                        case VarType.Bool: defaultVal = (bool)value; break;
-                        case VarType.Float: defaultVal = (float)value; break;
-                        case VarType.Integer: defaultVal = (int)value; break;
-                        case VarType.String: defaultVal = (string)value; break;
-                        case VarType.Vector2: defaultVal = (Vector2)value; break;
-                        case VarType.Vector3: defaultVal = (Vector3)value; break;
-                        case VarType.Vector4: defaultVal = (Vector4)value; break;
-                        case VarType.Color: defaultVal = (Color)value; break;
-                    }
-                    val = defaultVal;
-                }
-            }
-        }
 
-        public InputPin(NodeBase n, object val) : base(n, val) {
-            Default = val;
-        }
-        public InputPin(NodeBase n, VarType t) : base(n, t) { }
-
-        public override string ConName() {
-            return ConnectedOutput.node.name;
-        }
-        public override string ToString() {
-            return "(IN) Node: " + node.STName + " | " + varType + "\n" + node.description;
-        }
-    }
-
-    /// <summary> Output connection. Must always have a value, even if disconnected </summary>
-    [Serializable]
-    public class OutputPin : NodePin {
-        //public int ConnectedInputID = -1;
-        public InputPin ConnectedInput = null;
-        //public bool isConnected { get { return ConnectedInputID != -1; } }
-
-        public OutputPin(NodeBase n, object val) : base(n, val) { }
-        public OutputPin(NodeBase n, VarType t) : base(n, t) { }
-
-        public override string ConName() {
-            return "???";
-        }
-        public override string ToString() {
-            return "(OUT) Node: " + (node == null ? "???" : node.STName) + " | " + varType;
-        }
-    }
+    
 }

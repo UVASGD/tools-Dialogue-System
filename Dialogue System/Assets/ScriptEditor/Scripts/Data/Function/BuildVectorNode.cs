@@ -10,28 +10,28 @@ namespace ScriptEditor.Graph {
             string type = "Vector2";
 
             // set input and output pins
-            outPins.Add(new OutputPin(this,nT));
+           outPins.Add(new ValueOutputPin(this,nT));
             switch (nT) {
                 case VarType.Vector2:
-                    inPins.Add(new InputPin(this, VarType.Float));
-                    inPins.Add(new InputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
                     inPins[0].Name = "x";
                     inPins[1].Name = "y";
                     break;
                 case VarType.Vector3:
                     type = "Vector3";
-                    inPins.Add(new InputPin(this, VarType.Float));
-                    inPins.Add(new InputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
                     inPins[0].Name = "x";
                     inPins[1].Name = "y";
                     inPins[2].Name = "z";
                     break;
                 case VarType.Vector4:
                     type = "Color";
-                    inPins.Add(new InputPin(this, VarType.Float));
-                    inPins.Add(new InputPin(this, VarType.Float));
-                    inPins.Add(new InputPin(this, VarType.Float));
-                    inPins.Add(new InputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
+                    inPins.Add(new ValueInputPin(this, VarType.Float));
                     inPins[0].Name = "r";
                     inPins[1].Name = "g";
                     inPins[2].Name = "b";

@@ -9,6 +9,7 @@ namespace ScriptEditor.Graph
 		}
 
 		public override void Execute() {
+            finished = true;
 
         }
 
@@ -17,8 +18,8 @@ namespace ScriptEditor.Graph
             name = "Custom";
             description = "Calls a custom function";
             // Create pins
-			inPins.Add(new InputPin(this, VarType.Exec));
-            outPins.Add(new OutputPin(this, VarType.Exec));
+			inPins.Add(new EventInputPin(this));
+            outPins.Add(new EventOutputPin(this));
           }
 	}
 }

@@ -19,17 +19,17 @@ namespace ScriptEditor.Graph
             name = "Print Text";
             description = "Prints text to a console";
             // Create Pins
-            inPins.Add(new InputPin(this, VarType.Exec));
-            inPins.Add(new InputPin(this, VarType.String));
+            inPins.Add(new EventInputPin(this));
+            inPins.Add(new ValueInputPin(this, VarType.String));
             inPins[1].Name = "Text";
             inPins[1].Default = "Hello World";
 
-            outPins.Add(new OutputPin(this, VarType.Exec));
+            outPins.Add(new EventOutputPin(this));
         }
 
         public override void Execute()
         {
-
+            finished = true;
         }
     }
 }

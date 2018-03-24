@@ -8,17 +8,17 @@ namespace ScriptEditor.Graph
 		{
 		}
 		public override void Execute() {
-
-		}
+            finished = true;
+        }
 
 		public override void Construct() {
 		//set information
 		name = "Quest";
         description = "Defines a quest and shit";
 		// Create Pins
-		inPins.Add(new InputPin(this, VarType.Exec));
+		inPins.Add(new EventInputPin(this));
 
-        outPins.Add(new OutputPin(this, VarType.Exec));
+        outPins.Add(new EventOutputPin(this));
 		}
 	}
 }

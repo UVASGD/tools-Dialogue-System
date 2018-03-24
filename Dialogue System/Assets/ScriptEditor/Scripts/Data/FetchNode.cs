@@ -12,7 +12,7 @@ namespace ScriptEditor.Graph {
 
         public void Construct(object variable) {
             base.SetName(GetVarName(variable));
-            outPins.Add(new OutputPin(this, variable));
+           outPins.Add(new ValueOutputPin(this, variable));
             Resize();
         }
 

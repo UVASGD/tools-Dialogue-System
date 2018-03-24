@@ -67,9 +67,12 @@ namespace ScriptEditor.EditorScripts {
             //GUILayout.FlexibleSpace();
             //vanishingPoint = EditorGUILayout.Vector2Field("vanishing point", vanishingPoint);
 
+            //***Not highest priority
             headerView.DrawView(headerBox,
                             new Rect(0, 0, 1, 1),
                             e, graph);
+
+            //***Not highest priority
             statusView.DrawView(new Rect(0, position.height - headerBox.height, position.width, headerBox.height),
                             new Rect(0, 1, 1, 1),
                             e, graph);

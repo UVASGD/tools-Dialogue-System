@@ -28,9 +28,10 @@ namespace ScriptEditor.Graph {
         public string  description;
         public bool isSelected;
 
-        private bool finished = false;
+        /// <summary> is the node finished executing </summary>
+        protected bool finished = false;
 
-        /// <summary> whether or not more input pins can be added to node </summary>
+        /// <summary> whether or not more input pins can be added to node is ultimately defined by its type </summary>
         [SerializeField] protected NodeType nodeType;
 
         public bool multiplePins = false;
@@ -40,7 +41,7 @@ namespace ScriptEditor.Graph {
         public const float Top = 56;
         public const float Bottom = 23 + NodePin.padding;
         protected const float Width = 175;
-
+        
         public List<OutputPin> outPins;
         public List<InputPin> inPins;
         public List<NodeError> errors;
@@ -52,7 +53,7 @@ namespace ScriptEditor.Graph {
         /// </summary>
         public bool IsFinished { get { return finished; } }
 
-        /// <summary> whether or not the node can be logically executed </summary>
+        /// <summary>[unused] whether or not the node can be logically executed </summary>
         public bool IsExecutable { get {
                 foreach (InputPin ip in inPins) if (ip.varType == VarType.Exec)
                         return true;
@@ -106,8 +107,7 @@ namespace ScriptEditor.Graph {
             get {
                 switch (nodeType) {
                     case NodeType.Control:
-                        return Enum.GetName(typeof(ControlNode.ControlType),
-                            ((ControlNode)this).SubType());
+                        return this.GetType().ToString();
                     case NodeType.Function:
                         return Enum.GetName(typeof(FunctionNode.FunctionType),
                             ((FunctionNode)this).SubType());
@@ -150,7 +150,7 @@ namespace ScriptEditor.Graph {
         /// <summary>
         /// Resize the body of node. Necessary when number of pins changes or the width of text to be displayed changes.
         /// </summary>
-        protected virtual void Resize() {
+        public virtual void Resize() {
             GUIStyle style = skin.label;
             float nameWidth = style.CalcSize(new GUIContent(LongestInName)).x +
                 style.CalcSize(new GUIContent(LongestOutName)).x;
@@ -161,37 +161,38 @@ namespace ScriptEditor.Graph {
             // widen body based on disconnected, changeable inputs
             // for types with multiple inputs, this offset is based only on widest field
             Vector2 inputWidths = Vector2.zero;
-            foreach (NodePin pin in AllPins) {
-                if (!pin.isConnected) {
-                    switch (pin.varType) {
-                        case VarType.Bool: // checkbox
-                            break;
-                        case VarType.Integer: // int field
-                            break;
-                        case VarType.Float: // float field
-                            break;
-                        case VarType.String: // text field
-                            break;
-                        case VarType.Vector2: // 2 float fields
-                            break;
-                        case VarType.Vector3: // 3 float fields
-                            break;
-                        case VarType.Vector4: // 4 float fields
-                            break;
-                        case VarType.Color: // box showing color
-                            break;
-                    }
-                }
-            }
+            //foreach (NodePin pin in AllPins) {
+            //    if (!pin.isConnected) {
+            //        switch (pin.varType) {
+            //            case VarType.Bool: // checkbox
+            //                break;
+            //            case VarType.Integer: // int field
+            //                break;
+            //            case VarType.Float: // float field
+            //                break;
+            //            case VarType.String: // text field
+            //                break;
+            //            case VarType.Vector2: // 2 float fields
+            //                break;
+            //            case VarType.Vector3: // 3 float fields
+            //                break;
+            //            case VarType.Vector4: // 4 float fields
+            //                break;
+            //            case VarType.Color: // box showing color
+            //                break;
+            //        }
+            //    }
+            //}
 
             body.size += inputWidths;
 
             // set pin visual information
             foreach (NodePin pin in AllPins) {
-                float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
+                  float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
                 float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) :
                     inPins.IndexOf((InputPin)pin);
 
+                //float x, y; x = y = 9;
                 pin.bounds.position = new Vector2(x, Top + NodePin.margin.y + y * NodePin.Top);
             }
         }
@@ -230,7 +231,7 @@ namespace ScriptEditor.Graph {
         public virtual void AddInputPin() {
             if (multiplePins && inPins.Count < 16) {
                 //ScriptableObject.Instantiate<InputPin>();
-                inPins.Add(new InputPin(this, inPins[0].varType));
+                inPins.Add(new ValueInputPin(this, inPins[0].varType));
                 Resize();
             }
         }
@@ -277,13 +278,13 @@ namespace ScriptEditor.Graph {
             if (parentGraph.compileStack.Contains(this)) {
                 ControlNode cn;
                 if ((cn = this as ControlNode) != null) {
-                    if (cn.SubType() != ControlNode.ControlType.Branch &&
-                        cn.SubType() != ControlNode.ControlType.Choice) {
+                    if (cn.GetType() != typeof(BranchNode) &&
+                        cn.GetType() != typeof(ChoiceNode)) {
                         errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                         return;
                     } else {
                         // branch must be controlled by variable to prevent infinite loop!
-                        if (cn.SubType() == ControlNode.ControlType.Branch &&
+                        if (cn.GetType() == typeof(BranchNode) &&
                             !cn.inPins[1].isConnected) {
                             errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                             return;
@@ -464,9 +465,9 @@ namespace ScriptEditor.Graph {
         public static void RemoveConnection(object p) {
             NodePin pin = (NodePin)p;
             pin.isConnected = false;
-            pin.node.parentGraph.compiled = false;
-
-            if (pin.GetType().Equals(typeof(OutputPin))) {
+            pin.node.parentGraph.ResetCompiledStatus();
+            
+            if (pin is OutputPin) {
                 // find InputPin from ID
                 //InputFromID(((OutputPin)pin).ConnectedInputID).isSelected = false;
                 //InputFromID(((OutputPin)pin).ConnectedInputID).ConnectedOutput = null;

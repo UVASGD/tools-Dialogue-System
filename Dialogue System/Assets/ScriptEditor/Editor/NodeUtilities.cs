@@ -30,6 +30,7 @@ namespace ScriptEditor.EditorScripts {
 
                 ScriptEditorWindow sc = EditorWindow.GetWindow<ScriptEditorWindow>();
                 if (sc != null) {
+                    
                     CreateNode(graph, NodeType.Event, false, new Vector2(sc.workView.center.x - 170 / 2f,
                         sc.workView.center.y - 90 / 2f));
                     CreateNode(graph, NodeType.Event, true, new Vector2(sc.workView.center.x + 170 / 2f,
@@ -39,7 +40,7 @@ namespace ScriptEditor.EditorScripts {
             }
         }
 
-        /// <summary> Unimpleented. Create graph from file. </summary>
+        /// <summary> Unimplemented. Create graph from file. </summary>
         public static void LoadScript(string path) {
             NodeGraph graph;
 
@@ -85,9 +86,24 @@ namespace ScriptEditor.EditorScripts {
             if (graph != null) {
                 switch (type) {
                     case NodeType.Control:
-                        res = ScriptableObject.CreateInstance<ControlNode>();
+                        switch ((ControlNode.ControlType)var) {
+                            case ControlNode.ControlType.Branch: res = ScriptableObject.CreateInstance<BranchNode>(); break;
+                            case ControlNode.ControlType.Choice: res = ScriptableObject.CreateInstance<ChoiceNode>(); break;
+                            case ControlNode.ControlType.Custom: res = ScriptableObject.CreateInstance<CustomNode>(); break;
+                            case ControlNode.ControlType.Delay: res = ScriptableObject.CreateInstance<DelayNode>(); break;
+                            case ControlNode.ControlType.Dialogue: res = ScriptableObject.CreateInstance<DialogueNode>(); break;
+                            case ControlNode.ControlType.ForLoop: res = ScriptableObject.CreateInstance<ForLoopNode>(); break;
+                            case ControlNode.ControlType.Music: res = ScriptableObject.CreateInstance<MusicNode>(); break;
+                            case ControlNode.ControlType.PlaySound: res = ScriptableObject.CreateInstance<PlaySoundNode>(); break;
+                            case ControlNode.ControlType.Print: res = ScriptableObject.CreateInstance<PrintNode>(); break;
+                            case ControlNode.ControlType.Quest: res = ScriptableObject.CreateInstance<QuestNode>(); break;
+                            case ControlNode.ControlType.Sequence: res = ScriptableObject.CreateInstance<SequenceNode>(); break;
+                            case ControlNode.ControlType.SetDialogueScript: res = ScriptableObject.CreateInstance<SetDialogueScriptNode>(); break;
+                            case ControlNode.ControlType.SetSubStart: res = ScriptableObject.CreateInstance<SetSubStartNode>(); break;
+                        }
+
                         res.Initialize();
-                        ((ControlNode)res).Construct((ControlNode.ControlType) var);
+                        ((ControlNode)res).Construct();
                         break;
                     case NodeType.Event:
                         int i = 1;
@@ -109,6 +125,7 @@ namespace ScriptEditor.EditorScripts {
                         break;
                 }
 
+                Debug.Log("Piano Keys");
                 InitNode(res, graph, pos);
             }
 
@@ -171,10 +188,10 @@ namespace ScriptEditor.EditorScripts {
         /// <param name="pos"></param>
         /// <returns></returns>
         public static NodeBase CreateNode(NodeGraph graph, VarType input, VarType output, Vector2 pos) {
-            ControlNode res = null;
+            CastNode res = null;
 
             if (graph != null) {
-                res = ScriptableObject.CreateInstance<ControlNode>();
+                res = ScriptableObject.CreateInstance<CastNode>();
                 res.Initialize();
                 res.Construct(input, output);
                 InitNode(res, graph, pos);
@@ -189,9 +206,15 @@ namespace ScriptEditor.EditorScripts {
         /// <param name="graph"></param>
         /// <param name="pos"></param>
         private static void InitNode(NodeBase res, NodeGraph graph, Vector2 pos) {
+            Debug.Log("Outer space: " + res);
+            res.Resize();
+            Debug.Log("Spongebob movie: " + res);
             res.SetPos(pos);
+            Debug.Log("that one island bottom: " + res);
             res.parentGraph = graph;
+            Debug.Log("Bikini bottom: " + res);
             graph.AddNode(res);
+            Debug.Log("Rock bottom: " + res);
             AssetDatabase.AddObjectToAsset(res, graph);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

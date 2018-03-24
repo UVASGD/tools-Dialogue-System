@@ -206,6 +206,7 @@ namespace ScriptEditor.EditorScripts {
                 EditorGUILayout.BeginVertical();
                 {
                     if (showDialogues = EditorGUILayout.Foldout(showDialogues, "Dialogue")) {
+                        Debug.Log("In my sack");
                         foreach (ControlNode.ControlType cT in ControlNode.dialogControls) {
                             if (size.y < 400) size.y += 10;
                             if (GUILayout.Button(cT.ToString(), skin.GetStyle("NodeCreationButton"))) {
@@ -283,6 +284,7 @@ namespace ScriptEditor.EditorScripts {
 
                     break;
                 case NodeType.Control:
+                    Debug.Log("I control the world");
                     if ((ControlNode.ControlType)subType != ControlNode.ControlType.Cast)
                         node = NodeUtilities.CreateNode(GraphObj, nT, subType, mouseLoc);
                     break;

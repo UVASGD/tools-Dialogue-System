@@ -30,7 +30,7 @@ namespace ScriptEditor.Graph {
         }
 
         public OpType SubType() { return op; }
-        
+
         public virtual void Construct() {
 
         }
@@ -134,32 +134,32 @@ namespace ScriptEditor.Graph {
                 case OpType.Multiply:
                 case OpType.Divide:
                     for (int i = 0; i < inCount; i++) {
-                        InputPin p = new InputPin(this, nT);
+                        ValueInputPin p = new ValueInputPin(this, nT);
                         inPins.Add(p);
                     }
-                    outPins.Add(new OutputPin(this, nT));
+                    outPins.Add(new ValueOutputPin(this, nT));
                     multiplePins = true;
                     break;
                 case OpType.Abs:
                 case OpType.SQRT:
-                    inPins.Add(new InputPin(this, nT));
-                    outPins.Add(new OutputPin(this, nT));
+                    inPins.Add(new ValueInputPin(this, nT));
+                    outPins.Add(new ValueOutputPin(this, nT));
                     break;
                 case OpType.POW:
-                    inPins.Add(new InputPin(this, nT));
-                    inPins.Add(new InputPin(this, nT));
-                    outPins.Add(new OutputPin(this, nT));
+                    inPins.Add(new ValueInputPin(this, nT));
+                    inPins.Add(new ValueInputPin(this, nT));
+                    outPins.Add(new ValueOutputPin(this, nT));
                     break;
                 case OpType.Not:
-                    inPins.Add(new InputPin(this, VarType.Bool));
-                    outPins.Add(new OutputPin(this, VarType.Bool));
+                    inPins.Add(new ValueInputPin(this, VarType.Bool));
+                    outPins.Add(new ValueOutputPin(this, VarType.Bool));
                     break;
                 case OpType.And:
                 case OpType.Or:
                 case OpType.Xor:
                     for (int i = 0; i < inCount; i++)
-                        inPins.Add(new InputPin(this, VarType.Bool));
-                    outPins.Add(new OutputPin(this, VarType.Bool));
+                        inPins.Add(new ValueInputPin(this, VarType.Bool));
+                    outPins.Add(new ValueOutputPin(this, VarType.Bool));
                     multiplePins = true;
                     break;
                 case OpType.EqualTo:
@@ -167,13 +167,13 @@ namespace ScriptEditor.Graph {
                 case OpType.GreaterOrEqual:
                 case OpType.LessThan:
                 case OpType.LessOrEqual:
-                    inPins.Add(new InputPin(this, nT));
-                    inPins.Add(new InputPin(this, nT));
-                    outPins.Add(new OutputPin(this, VarType.Bool));
+                    inPins.Add(new ValueInputPin(this, nT));
+                    inPins.Add(new ValueInputPin(this, nT));
+                    outPins.Add(new ValueOutputPin(this, VarType.Bool));
                     break;
 
             }
-            
+
             if (multiplePins) description += " Maximum pins allowed is 16.";
             Resize();
         }
@@ -182,10 +182,10 @@ namespace ScriptEditor.Graph {
         /// Resize the body of node. Necessary when number of pins changes or the width of text to be displayed changes.
         /// </summary>
         const float margin = 22;
-        protected override void Resize() {
+        public override void Resize() {
             float outH = baseBox.y;
             float inH = NodePin.padding + inPins.Count * NodePin.Top;
-            
+
             float txtW = 4 * margin + NodePin.pinSize.x +
                 skin.GetStyle("NodeMathSelected").CalcSize(new GUIContent(splashText)).x;
 
@@ -194,11 +194,11 @@ namespace ScriptEditor.Graph {
             // disconnected input sizes
 
             boxSize = new Vector2(body.width - 2 * Left, body.height - Header - Bottom);
-            
+
             // relocate pins
-            foreach(NodePin pin in AllPins) {
+            foreach (NodePin pin in AllPins) {
                 Vector2 pos = Vector2.zero;
-                if(pin.GetType().Equals(typeof(OutputPin))){
+                if (pin.GetType().Equals(typeof(OutputPin))) {
                     pos.x = body.width - margin - NodePin.pinSize.x;
                     pos.y = Center.y - NodePin.pinSize.y / 2f;
                 } else {
@@ -241,12 +241,12 @@ namespace ScriptEditor.Graph {
             if (multiplePins) {
                 if (inPins.Count < 16)
                     if (GUI.Button(new Rect(body.position.x + boxSize.x + Left - bw - buttonLeft,
-                        body.position.y + Center.y - (boxSize.y / 4f + buttonTop + Header / 2f), bw, baseButton.y), 
+                        body.position.y + Center.y - (boxSize.y / 4f + buttonTop + Header / 2f), bw, baseButton.y),
                         "+ Add Pin"/*, skin.GetStyle("NodeMathButton")*/))
                         AddInputPin();
-                if(inPins.Count>2)
-                    if (GUI.Button(new Rect(body.position.x + boxSize.x + Left - bw - buttonLeft, 
-                        body.position.y + Center.y + (boxSize.y/4f + buttonTop + buttonTop - Header / 2f), bw, baseButton.y),  
+                if (inPins.Count > 2)
+                    if (GUI.Button(new Rect(body.position.x + boxSize.x + Left - bw - buttonLeft,
+                        body.position.y + Center.y + (boxSize.y / 4f + buttonTop + buttonTop - Header / 2f), bw, baseButton.y),
                         "- Remove Pin"/*, skin.GetStyle("NodeMathButton")*/))
                         RemovePin();
             }
@@ -262,11 +262,11 @@ namespace ScriptEditor.Graph {
         }
 
         /// <summary> first active inPin </summary>
-        private int Start (){
-                for (int i = 0; i < inPins.Count; i++)
-                    if (inPins[i].isConnected)
-                        return i;
-                return inPins.Count;
+        private int Start() {
+            for (int i = 0; i < inPins.Count; i++)
+                if (inPins[i].isConnected)
+                    return i;
+            return inPins.Count;
         }
 
         #region Override
@@ -443,7 +443,7 @@ namespace ScriptEditor.Graph {
             return type.ToString() + " Function";
         }
         #endregion
-        
+
         static MathNode() {
             validCombos = new Dictionary<OpType, List<string>>();
 
@@ -464,7 +464,7 @@ namespace ScriptEditor.Graph {
             pins.Add(VarType.Vector3.ToString());
             pins.Add(VarType.Vector4.ToString());
             validCombos.Add(OpType.Multiply, pins);
-            
+
 
             pins = new List<string>(new string[] {
                 VarType.Float.ToString(), VarType.Integer.ToString() });

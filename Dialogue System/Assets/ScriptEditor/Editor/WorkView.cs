@@ -94,6 +94,9 @@ namespace ScriptEditor.EditorScripts {
         }
 
         private bool shift=false;
+
+        /// <remarks>TODO: this function takes up most of Unity's OnGui call, leaving no time for anything else.
+        /// Please optimize! </remarks>
         public override void ProcessEvents(Event e) {
             base.ProcessEvents(e);
             Vector2 mousePos = e.mousePosition;
@@ -105,6 +108,7 @@ namespace ScriptEditor.EditorScripts {
             }
 
             // pan the view
+            //***Not highest priority for optimization
             if (body.Contains(e.mousePosition)) {
                 //pan += e.delta;
                 if (e.type == EventType.MouseDrag && e.button == 2) {
@@ -126,10 +130,10 @@ namespace ScriptEditor.EditorScripts {
             if (window.nodeCreateView == null) {
                 if (window.toolTipView == null) {
                     if (node != null) {
-                        if (pin == null && txtPin==null) {
+                        if (pin == null && txtPin == null) {
                             window.toolTipView = new NodeToolTipView(node, node.description);
                         } else {
-                            if (SelectedPin != null && pin!=null) {
+                            if (SelectedPin != null && pin != null) {
                                 // check if selected input pin can be cast to the highlighted output pin and vice versa
                                 // if check is valid, show a tooltip
                                 if (!SelectedPin.GetType().Equals(pin.GetType()) && pin.varType != SelectedPin.varType) {
@@ -151,15 +155,15 @@ namespace ScriptEditor.EditorScripts {
                         window.toolTipView = new NodeToolTipView(null, "Create New Node");
                     }
                 } else {
-                    if (pin != null) 
-                        if (!String.IsNullOrEmpty(pin.Description) && window.toolTipView.Parent != pin){
+                    if (pin != null)
+                        if (!String.IsNullOrEmpty(pin.Description) && window.toolTipView.Parent != pin) {
                             window.toolTipView = new NodeToolTipView(pin, pin.Description);
-                    }
+                        }
                 }
             }
 
             // hit escape
-            // desekect the current pin
+            // deselect the current pin
             if (e.keyCode == KeyCode.Escape) {
                 if (SelectedPin != null) SelectedPin = null;
             }
@@ -179,8 +183,8 @@ namespace ScriptEditor.EditorScripts {
                     Selection.activeObject = null;
                 }
             }
-
-            if(e.type == EventType.MouseDrag)
+            
+            if (e.type == EventType.MouseDrag)
                 window.toolTipView = null;
 
             // right click a thing
@@ -215,11 +219,11 @@ namespace ScriptEditor.EditorScripts {
                             }
 
                             // Promote input to variable Node
-                            if(!pin.isConnected && pin.isInput && pin.varType != VarType.Exec) {
+                            if (!pin.isConnected && pin.isInput && pin.varType != VarType.Exec) {
                                 menu.AddItem(new GUIContent("Promote to Variable"), false, PromoteVariable, pin);
                             }
                         }
-                        
+
                         // cut, copy, duplicate, delete
                         if (!node.GetType().Equals(typeof(StartNode))) {
                             menu.AddItem(new GUIContent("Cut Node"), false, CutNode, node);
@@ -235,7 +239,7 @@ namespace ScriptEditor.EditorScripts {
 
                         menu.ShowAsContext();
                         Event.current.Use();
-                    } else if(window.nodeCreateView== null) {
+                    } else if (window.nodeCreateView == null) {
                         // add node creation window
                         //Debug.Log("Right Clicked nowhere");
                         window.nodeCreateView = new NodeCreateView(mousePos, SelectedPin);
@@ -248,7 +252,8 @@ namespace ScriptEditor.EditorScripts {
             }
 
             // left click a pin
-            if(window.nodeCreateView == null && e.button == 0 &&
+            //***high priority for optimization
+            if (window.nodeCreateView == null && e.button == 0 &&
                 e.type == EventType.MouseDown) {
                 if (node != null) {
                     if (pin != null) {
@@ -259,7 +264,7 @@ namespace ScriptEditor.EditorScripts {
                                     if (pin.node != SelectedPin.node) {
                                         //if (pin.isConnected && pin.isInput && pin.varType==VarType.Exec)
                                         //    NodeBase.RemoveConnection(pin);
-                                        
+
                                         if (SelectedPin.isInput)
                                             graph.ConnectPins((InputPin)SelectedPin, (OutputPin)pin);
                                         else
@@ -281,7 +286,7 @@ namespace ScriptEditor.EditorScripts {
                                                 graph.ConnectPins((InputPin)SelectedPin, CN.outPins[0]);
                                                 graph.ConnectPins(CN.inPins[0], (OutputPin)pin);
                                             } else {
-                                                CN = (ControlNode)NodeUtilities.CreateNode(graph, SelectedPin.varType, 
+                                                CN = (ControlNode)NodeUtilities.CreateNode(graph, SelectedPin.varType,
                                                     pin.varType, e.mousePosition);
                                                 //CN.outPins[0].ConnectedInputID = pin.node.inPins.IndexOf((InputPin)pin);
                                                 //((OutputPin)SelectedPin).ConnectedInputID = 0;

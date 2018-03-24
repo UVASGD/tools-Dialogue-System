@@ -14,11 +14,12 @@ namespace ScriptEditor.EditorScripts {
         protected string title;
         protected GUISkin skin;
         protected NodeGraph graph;
-        protected ScriptEditorWindow window { get { return EditorWindow.GetWindow<ScriptEditorWindow>(); } }
+        protected ScriptEditorWindow window;
         public NodeCreatePopup NCPopup = null;
 
         public ViewBase(string title) {
             this.title = title;
+            this.window = EditorWindow.GetWindow<ScriptEditorWindow>();
             GetEditorSkin();
         }
 
