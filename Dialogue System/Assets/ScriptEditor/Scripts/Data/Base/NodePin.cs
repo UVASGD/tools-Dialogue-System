@@ -176,6 +176,7 @@ namespace ScriptEditor.Graph {
 
             // draw bezier curve from output pin to input pin
             try {
+                Debug.Log("Planetarium: "+this.GetType());
                 Vector3 start = (isInput) ? ((InputPin)this).ConnectedOutput.Center :
                     this.Center;
                 Vector3 end = (isInput) ? this.Center : 
@@ -185,7 +186,7 @@ namespace ScriptEditor.Graph {
                 float offset = Mathf.Max(Mathf.Abs(start.x - end.x) / 1.75f, 1);
                 startTangent = new Vector2(start.x + offset, start.y);
                 endTangent = new Vector2(end.x - offset, end.y);
-                Debug.Log(start + " | " + end + "\n" + startTangent + " | " + endTangent);
+                // Debug.Log(start + " | " + end + "\n" + startTangent + " | " + endTangent);
                 Handles.BeginGUI();
                 {
                     Handles.color = Color.white;

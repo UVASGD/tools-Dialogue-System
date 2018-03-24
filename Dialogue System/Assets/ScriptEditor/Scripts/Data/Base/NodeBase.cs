@@ -41,7 +41,7 @@ namespace ScriptEditor.Graph {
         public const float Top = 56;
         public const float Bottom = 23 + NodePin.padding;
         protected const float Width = 175;
-
+        
         public List<OutputPin> outPins;
         public List<InputPin> inPins;
         public List<NodeError> errors;
@@ -53,7 +53,7 @@ namespace ScriptEditor.Graph {
         /// </summary>
         public bool IsFinished { get { return finished; } }
 
-        /// <summary> whether or not the node can be logically executed </summary>
+        /// <summary>[unused] whether or not the node can be logically executed </summary>
         public bool IsExecutable { get {
                 foreach (InputPin ip in inPins) if (ip.varType == VarType.Exec)
                         return true;

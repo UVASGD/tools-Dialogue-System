@@ -6,9 +6,9 @@ using UnityEngine;
 namespace ScriptEditor.Graph {
     /// <summary> Output connection. Must always have a value, even if disconnected </summary>
     [Serializable]
-    public abstract class OutputPin : NodePin {
+    public class OutputPin : NodePin {
         //public int ConnectedInputID = -1;
-        public abstract InputPin ConnectedInput  { get; set; }
+        public virtual InputPin ConnectedInput  { get; set; }
         //public bool isConnected { get { return ConnectedInputID != -1; } }
 
         public OutputPin(NodeBase n, object val) : base(n, val) { }

@@ -6,8 +6,8 @@ using UnityEngine;
 namespace ScriptEditor.Graph {
     /// <summary> Input pin. If disconnected, a constant can be provided </summary>
     [Serializable]
-    public abstract class InputPin : NodePin {
-        public abstract OutputPin ConnectedOutput { get; set; }
+    public class InputPin : NodePin {
+        public virtual OutputPin ConnectedOutput { get; set; }
 
         [SerializeField] private object defaultVal;
         /// <summary> Default value of the input when pin is constructed </summary>

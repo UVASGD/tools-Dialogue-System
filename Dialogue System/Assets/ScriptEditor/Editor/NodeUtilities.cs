@@ -86,6 +86,7 @@ namespace ScriptEditor.EditorScripts {
             if (graph != null) {
                 switch (type) {
                     case NodeType.Control:
+                        Debug.Log("Rock bottom");
                         switch ((ControlNode.ControlType)var) {
                             case ControlNode.ControlType.Branch: res = ScriptableObject.CreateInstance<BranchNode>(); break;
                             case ControlNode.ControlType.Choice: res = ScriptableObject.CreateInstance<ChoiceNode>(); break;
