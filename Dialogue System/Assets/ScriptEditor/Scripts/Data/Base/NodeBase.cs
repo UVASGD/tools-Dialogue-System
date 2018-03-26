@@ -41,6 +41,7 @@ namespace ScriptEditor.Graph {
         public const float Top = 56;
         public const float Bottom = 23 + NodePin.padding;
         protected const float Width = 175;
+        protected bool setupCompleted = false;
         
         public List<OutputPin> outPins;
         public List<InputPin> inPins;
@@ -206,15 +207,20 @@ namespace ScriptEditor.Graph {
             //hideFlags = HideFlags.HideInHierarchy;
         }
 
-        /// <summary> begin logical execution of node </summary>
+        /// <summary> logical execution of node </summary>
         public virtual void Execute() {
-            foreach(OutputPin no in outPins) {
-                if (no.isConnected && no.varType == VarType.Exec) {
-                        // execute connected node
+            if (!setupCompleted) Setup();
+            Finalization();
+        }
 
-                        break;
-                    }
-            }
+        /// <summary> necessary setup for the beginning of logical execution </summary>
+        protected virtual void Setup() {
+            setupCompleted = true;
+        }
+
+        /// <summary> finish execution of node, prepare for next node </summary>
+        protected virtual void Finalization() {
+            finished = true;
         }
 
         /// <summary> Return the next executable node </summary>
@@ -288,7 +294,6 @@ namespace ScriptEditor.Graph {
                             !cn.inPins[1].isConnected) {
                             errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                             return;
-
                         }
                     }
                 } else {

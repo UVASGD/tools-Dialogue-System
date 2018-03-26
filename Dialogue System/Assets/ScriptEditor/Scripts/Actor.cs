@@ -15,9 +15,7 @@ public class Actor : MonoBehaviour {
 
     private DialogueController dc;
 
-    [SerializeField] int ID {
-        get { return gameObject.GetInstanceID(); }
-    }
+    public int ID { get { return gameObject.GetInstanceID(); } }
 
     public Actor() {
             
@@ -26,12 +24,12 @@ public class Actor : MonoBehaviour {
     public void Start() {
         dc = FindObjectOfType<DialogueController>();
         if (Script != null) {
-            Script = ScriptableObject.CreateInstance<NodeGraph>();
+           // create runtime instance if necessary
+           // Unity might already do this, but if not, do the thing pls
         }
     }
 
     public void ActivateScript() {
-        Debug.Log("I be ate: " +Script);
         if(Script!=null) dc.StartDialogue(Script);
     }
 

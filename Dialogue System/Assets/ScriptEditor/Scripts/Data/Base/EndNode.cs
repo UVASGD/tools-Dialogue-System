@@ -21,8 +21,13 @@ namespace ScriptEditor.Graph {
             description = "Finalizes script execution";
         }
 
+        // reset everything that is not "static"
         public override void Execute() {
-            base.Execute();
+            DialogueController dc = GameObject.FindObjectOfType<DialogueController>();
+            dc.isPlayerLocked = false;
+            dc.outputHeader.text = "";
+            dc.outputTextbox.text = "";
+            dc.speakerIcon.sprite = null;
         }
     }
 }

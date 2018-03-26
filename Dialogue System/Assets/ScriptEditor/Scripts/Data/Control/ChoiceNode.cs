@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ScriptEditor.Graph
 {
@@ -9,6 +10,12 @@ namespace ScriptEditor.Graph
         public bool timed;
         public float timerLength;
         public int defaultChoice;
+        public ChoiceOrientation choiceOrientation;
+
+
+        public enum ChoiceOrientation {
+            Radial, Vertical, Horizontal
+        }
 
 		public ChoiceNode ()
 		{
@@ -37,12 +44,24 @@ namespace ScriptEditor.Graph
             outPins[1].Name = "Choice 2";
             outPins[2].Name = "Choice 3";
             nodeType = NodeType.Dialog;
+
+            choiceTexts = new List<string>();
+            choiceTexts.Add("Default Choice");
+            for(int i=1; i<inPins.Count; i++)
+                choiceTexts.Add("Choice " + (i+1));
         }
 
         // called everyframe
-        public override void Execute()
-        {
-            finished = true;
+        public override void Execute(){
+            base.Execute();
+        }
+
+        protected override void Setup() {
+            DialogueController dc = GameObject.FindObjectOfType<DialogueController>();
+            dc.AddChoice(choiceTexts[0], true);
+            for (int i = 1; i<inPins.Count; i++) {
+                dc.AddChoice(choiceTexts[i], (bool)inPins[i].Value);
+            }
         }
 
     }
