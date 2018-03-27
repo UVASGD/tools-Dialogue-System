@@ -5,27 +5,26 @@ using UnityEngine;
 namespace ScriptEditor.Graph
 {
 	public class ChoiceNode : ControlNode {
+
         public List<string> choiceTexts;
         public bool hideDisabledChoices;
         public bool timed;
         public float timerLength;
         public int defaultChoice;
-        public ChoiceOrientation choiceOrientation;
-
-
+        public ChoiceOrientation choiceOrientation = ChoiceOrientation.VerticalFromBottom;
+        
         public enum ChoiceOrientation {
-            Radial, Vertical, Horizontal
+            Radial, VerticalFromTop, VerticalFromBottom,
+            HorizontalFromLeft, HorizontalFromRight
         }
 
-		public ChoiceNode ()
-		{
-
-		}
+		public ChoiceNode (){ }
 
         public override void Construct() {
             // set information
             name = "Choice";
             description = "Splits execution based on an on-screen decision.";
+
             // Create pins
 			multiplePins = true;
             inPins.Add(new EventInputPin(this));
@@ -57,11 +56,16 @@ namespace ScriptEditor.Graph
         }
 
         protected override void Setup() {
-            DialogueController dc = GameObject.FindObjectOfType<DialogueController>();
+            dc = GameObject.FindObjectOfType<DialogueController>();
             dc.AddChoice(choiceTexts[0], true);
             for (int i = 1; i<inPins.Count; i++) {
                 dc.AddChoice(choiceTexts[i], (bool)inPins[i].Value);
             }
+        }
+
+        protected override void Finalization() {
+            base.Finalization();
+            dc.ResetChoiceList();
         }
 
     }

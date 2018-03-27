@@ -34,6 +34,9 @@ namespace ScriptEditor.Graph {
         /// <summary> whether or not more input pins can be added to node is ultimately defined by its type </summary>
         [SerializeField] protected NodeType nodeType;
 
+        [RequiredInHierarchy(typeof(DialogueController))]
+        protected DialogueController dc;
+
         public bool multiplePins = false;
         public bool compiled = false;
         public NodeGraph parentGraph;

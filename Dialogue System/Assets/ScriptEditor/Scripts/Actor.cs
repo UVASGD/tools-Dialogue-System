@@ -13,6 +13,7 @@ public class Actor : MonoBehaviour {
     public NodeGraph Script;
     // public String Condition;
 
+    [RequiredInHierarchy(typeof(DialogueController))]
     private DialogueController dc;
 
     public int ID { get { return gameObject.GetInstanceID(); } }

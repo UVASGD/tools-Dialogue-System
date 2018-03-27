@@ -9,7 +9,7 @@ namespace ScriptEditor {
     public class DialogueController : MonoBehaviour {
         // ------------- canvas fields --------------
         /// <summary>Dialogue box window. Parent of all ialogue related GUI objects </summary>
-        [Tooltip("Dialogue box window. Parent of all ialogue related GUI objects")]
+        [Tooltip("Dialogue box window. Parent of all dialogue related GUI objects")]
         public Text dialogueArea;
         /// <summary> Dialogue textbox; body of the dialogue </summary>
         [Tooltip("Main body of the dialogue")]
@@ -70,10 +70,9 @@ namespace ScriptEditor {
                 // since these animations are made by us, this might not be necessary
             }
 
-            // hide the default choice button
-            if (choiceTemplate) {
-                
-            }
+            // hide shit
+            if (choiceTemplate) choiceTemplate.gameObject.SetActive(false);
+            if (continueIndicator) continueIndicator.gameObject.SetActive(false);
         }
         
         void Update() {
@@ -127,17 +126,25 @@ namespace ScriptEditor {
             if (!enabled && hideDisabled) return;
 
             // copy TEMPLATE button
-            choices.Add(GameObject.Instantiate(choiceTemplate));
+            choices.Add(Instantiate(choiceTemplate));
             int n = choices.Count - 1;
 
             // place new button at next index
             Vector3 offset = Vector2.zero;
+            float baseOffset = choiceTemplate.GetComponent<RectTransform>().rect.height
+                + 10f;
             switch (((ChoiceNode)node).choiceOrientation) {
-                case ChoiceNode.ChoiceOrientation.Vertical:
-                    offset = new Vector3(0, 10, 0);
+                case ChoiceNode.ChoiceOrientation.VerticalFromBottom:
+                    offset = new Vector3(0, baseOffset, 0);
                     break;
-                case ChoiceNode.ChoiceOrientation.Horizontal:
-                    offset = new Vector3(10, 0, 0);
+                case ChoiceNode.ChoiceOrientation.VerticalFromTop:
+                    offset = new Vector3(0, -baseOffset, 0);
+                    break;
+                case ChoiceNode.ChoiceOrientation.HorizontalFromLeft:
+                    offset = new Vector3(baseOffset, 0, 0);
+                    break;
+                case ChoiceNode.ChoiceOrientation.HorizontalFromRight:
+                    offset = new Vector3(-baseOffset, 0, 0);
                     break;
                 case ChoiceNode.ChoiceOrientation.Radial:
                     // complicated radial math
@@ -147,10 +154,26 @@ namespace ScriptEditor {
             choices[n].transform.position += n*offset;
 
             // set button grayed out
-            choices[n].enabled = enabled;
+            choices[n].interactable = enabled;
+            choices[n].gameObject.SetActive(true);
 
             // set button text
             choices[n].GetComponentInChildren<Text>().text = choice;
+
+            // set button click method
+            choices[n].onClick.AddListener(delegate { ChoiceClicked(n); });
+        }
+
+        // This might be a bit unsavory in terms of efficiency,
+        // since we basically create and delete choices everytime we reach
+        // ac ChoiceNode... could simplify this to show/hiding the ones we need
+        /// <summary> delete choice buttons </summary>
+        public void ResetChoiceList() {
+            foreach(Button c in choices) {
+                GameObject.Destroy(c.gameObject);
+            }
+
+            choices.Clear();
         }
 
         /// <summary>
@@ -159,6 +182,7 @@ namespace ScriptEditor {
         /// <param name="index"></param>
         public void ChoiceClicked(int index) {
             //((ChoiceNode)node).choice = index;
+            Debug.Log("Clicked[" + index + "]");
         }
 
         /// <summary>
@@ -170,11 +194,11 @@ namespace ScriptEditor {
             }
         }
 
+        /// <summary> Hide the dialogue from screen, start outro animation </summary>
         private void HideDialogueBox() {
             if (animator != null & dialogueAnimationType != DialogueAnimationType.Custom) {
                 animator.SetTrigger("Hide");
             }
-
         }
 
         static DialogueController() {

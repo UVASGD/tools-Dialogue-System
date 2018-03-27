@@ -21,7 +21,6 @@ namespace ScriptEditor.Graph
         private Vector2 Index;
         private Transform previousFocus, camera;
         private List<String> pages;
-        private DialogueController dc;
 
         private float speed;
 
@@ -92,7 +91,7 @@ namespace ScriptEditor.Graph
                 // change this to not be controlled by var?
                 if (inPins[2].isConnected) {
                     if ((bool)inPins[2].Value) {
-                        GameObject tmp = GameObject.Find("Main Camera");
+                        Camera tmp = Camera.main;
                         if (tmp != null) {
                             camera = tmp.transform;
                             previousFocus = camera.parent;
