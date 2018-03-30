@@ -59,16 +59,13 @@ namespace ScriptEditor {
         public static string MinimalizeWidthFull(string n, float width, GUIStyle style) {
             string res = "";
             string s; int i = 0;
-
-            //Debug.Log("["+ style.CalcSize(new GUIContent(n)).x + "|"+viewRect.width+"]"+ n);
+            
             if (style.CalcSize(new GUIContent(n)).x <= width) 
                 return n;
 
             do {
                 s = res + n[i] + "...";
                 float w = style.CalcSize(new GUIContent(s)).x;
-                Debug.Log("n[" + i + "]: " + n[i]);
-                //Debug.Log("[" + w + "] " + s);
                 if (w > width)
                     break;
                 res += n[i];

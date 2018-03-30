@@ -110,7 +110,7 @@ namespace ScriptEditor.Graph {
             // clear errors from previous compile
             foreach (NodeBase node in nodes) {
                 node.errors = new List<NodeError>();
-                node.errors.Add(new NodeError(NodeError.ErrorType.NotConnected));
+                //node.errors.Add(new NodeError(NodeError.ErrorType.NotConnected));
                 node.compiled = false;
             }
 
@@ -128,9 +128,9 @@ namespace ScriptEditor.Graph {
             // check if compiling node found any errors
             foreach(NodeBase node in nodes)
                 if (node.errors.Any()) {
-                    if (node.errors.Count == 1 && node.errors[0] ==
-                        new NodeError(NodeError.ErrorType.NotConnected))
-                        continue; // ignore isolated nodes 
+                    //if (node.errors.Count == 1 && node.errors[0] ==
+                    //    new NodeError(NodeError.ErrorType.NotConnected))
+                    //    continue; // ignore isolated nodes 
                     errFound = true;
                     break;
                 }

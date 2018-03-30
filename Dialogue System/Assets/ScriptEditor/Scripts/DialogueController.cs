@@ -57,6 +57,7 @@ namespace ScriptEditor {
         // ------------- global fields --------------
         /// <summary> use this to prevent the player from moving </summary>
         public bool isPlayerLocked = false;
+        public VariableDictionary sceneVariables, gameVariables;
 
         // ------------- hidden fields --------------
         private NodeGraph currentScript;
@@ -72,6 +73,8 @@ namespace ScriptEditor {
 
         // Use this for initialization
         void Start() {
+            sceneVariables = new VariableDictionary();
+            gameVariables = new VariableDictionary();
             audioSrc = GetComponent<AudioSource>();
             audioSrc.loop = false;
 

@@ -18,8 +18,8 @@ namespace ScriptEditor.Graph {
                         return "Missing Default";
                     case ErrorType.ConversionError:
                         return "Conversion Error";
-                    case ErrorType.NotConnected:
-                        return "Not Connected";
+                    //case ErrorType.NotConnected:
+                    //    return "Not Connected";
                     default:
                         return "NodeError";
                 }
@@ -41,8 +41,8 @@ namespace ScriptEditor.Graph {
                         return "Script must end somewhere!";
                     case ErrorType.NoDefault:
                         return "Node's default path must be connected!";
-                    case ErrorType.NotConnected:
-                        return "Node is not connected to anything. Will be ignored.";
+                    //case ErrorType.NotConnected:
+                    //    return "Node is not connected to anything. Will be ignored.";
                     default:
                         return "Some unknown compile error occured";
                 }
@@ -52,7 +52,8 @@ namespace ScriptEditor.Graph {
 
         /// <summary> type of possible compile error </summary>
         public enum ErrorType {
-            None, DependencyCycle, ConversionError, InfiniteLoop, NoEnd, NotConnected,
+            None, DependencyCycle, ConversionError, InfiniteLoop, NoEnd,
+            //NotConnected,
             NoDefault
         }
 
