@@ -7,7 +7,7 @@ using UnityEngine;
 namespace ScriptEditor.EditorScripts.Inspector {
 
     static class PropertiesInspector {
-        public static bool defaultGUI = true;
+        public static bool defaultGUI = false;
     }
 
 #region NodeInspect
@@ -99,16 +99,42 @@ namespace ScriptEditor.EditorScripts.Inspector {
         }
     }
 
-    [CustomEditor(typeof(ControlNode))]
-    public class ControlNodeE : Editor {
+    [CustomEditor(typeof(DialogueNode))]
+    public class DialogueNodeE : Editor {
+
+        //Vector2 scroll;
+
         public override void OnInspectorGUI() {
             if (PropertiesInspector.defaultGUI) {
                 base.OnInspectorGUI();
                 return;
             }
 
-            ControlNode node = (ControlNode)target;
-            EditorGUILayout.LabelField(node.name, EditorStyles.boldLabel);
+            DialogueNode node = (DialogueNode)target;
+            EditorGUILayout.LabelField("Text Body", node.name, EditorStyles.boldLabel);
+
+            //scroll = EditorGUILayout.BeginScrollView(scroll);
+            string tmp = EditorGUILayout.TextArea(node.text);
+            if (!tmp.Equals(node.text))
+                node.header = null;
+            node.text = tmp;
+            //EditorGUILayout.EndScrollView();
+
+            node.showName = EditorGUILayout.Toggle("Show Name", node.showName);
+
+            node.canSkip = EditorGUILayout.Toggle("Can Skip", node.canSkip);
+            if (node.canSkip) {
+                //GUILayout.BeginHorizontal();
+                node.autoSkip = EditorGUILayout.Toggle("Auto Skip", node.autoSkip, GUILayout.Width(75));
+                if (node.autoSkip)
+                    node.autoSkipDelay = EditorGUILayout.FloatField("Auto Skip Delay", 
+                        node.autoSkipDelay);
+                //GUILayout.EndHorizontal();
+            } else {
+                node.autoSkip = false;
+            }
+
+            node.hideOnExit = EditorGUILayout.Toggle("Hode On Exit", node.hideOnExit);
         }
     }
 #endregion

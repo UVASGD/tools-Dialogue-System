@@ -305,6 +305,13 @@ namespace ScriptEditor.Graph {
                 }
             }
 
+            // check for default connection
+            if(this is ChoiceNode) {
+                ChoiceNode c = ((ChoiceNode)this);
+                if (!c.outPins[c.defaultChoice].isConnected)
+                    errors.Add(new NodeError(NodeError.ErrorType.NoDefault));
+            }
+
             setCompiled();
             if (this as EndNode != null) parentGraph.foundEnd = true;
             Debug.Log("Compiling: " + this);
@@ -377,7 +384,21 @@ namespace ScriptEditor.Graph {
             this.viewRect = viewRect;
             ProcessEvents(e, viewRect);
 
-            GUI.Box(body, name,
+            string header = name;
+            if (this is DialogueNode) {
+                DialogueNode node = (DialogueNode) this;
+                if (!String.IsNullOrEmpty(node.text)) {
+                    // make sure this text simplification doesn't lag shit every draw call
+                    if (String.IsNullOrEmpty(node.header)) {
+                        node.header = Miscellaneous.MinimalizeWidthFull(node.text,
+                       body.width - 30, skin.label);
+                    }
+                    header = node.header;
+                }
+            }
+                   
+            GUI.Box(body, 
+                header,
                 isSelected ? skin.GetStyle("Node" + NTName + "Selected") :
                 skin.GetStyle("Node" + NTName + "Background"));
             DrawPins();
@@ -474,22 +495,19 @@ namespace ScriptEditor.Graph {
             NodePin pin = (NodePin)p;
             pin.isConnected = false;
             pin.node.parentGraph.ResetCompiledStatus();
-            
-            if (pin is OutputPin) {
-                // find InputPin from ID
-                //InputFromID(((OutputPin)pin).ConnectedInputID).isSelected = false;
-                //InputFromID(((OutputPin)pin).ConnectedInputID).ConnectedOutput = null;
-                ((OutputPin)pin).ConnectedInput.isConnected = false;
-                ((OutputPin)pin).ConnectedInput.ConnectedOutput = null;
-                ((OutputPin)pin).ConnectedInput = null;
-                //((OutputPin)pin).ConnectedInputID = -1;
 
-            } else {
-                ((InputPin)pin).ConnectedOutput.isConnected = false;
-                //((InputPin)pin).ConnectedOutput.ConnectedInputID = -1;
-                ((InputPin)pin).ConnectedOutput.ConnectedInput = null;
-                ((InputPin)pin).ConnectedOutput = null;
-            }
+            if (pin.isConnected) {
+                if (pin is OutputPin) {
+                    ((OutputPin)pin).ConnectedInput.isConnected = false;
+                    ((OutputPin)pin).ConnectedInput.ConnectedOutput = null;
+                    ((OutputPin)pin).ConnectedInput = null;
+
+                } else {
+                    ((InputPin)pin).ConnectedOutput.isConnected = false;
+                    ((InputPin)pin).ConnectedOutput.ConnectedInput = null;
+                    ((InputPin)pin).ConnectedOutput = null;
+                }
+            }   
         }
 
         public void DrawNodeStatus() {

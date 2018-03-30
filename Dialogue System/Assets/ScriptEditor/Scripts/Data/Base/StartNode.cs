@@ -43,6 +43,7 @@ namespace ScriptEditor.Graph {
             DialogueController dc = GameObject.FindObjectOfType<DialogueController>();
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             dc.isPlayerLocked = LockPlayer;
+            Finalization();
         }
 
         /// <summary>

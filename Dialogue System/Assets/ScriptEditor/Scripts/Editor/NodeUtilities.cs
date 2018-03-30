@@ -124,8 +124,7 @@ namespace ScriptEditor.EditorScripts {
                         }
                         break;
                 }
-
-                Debug.Log("Piano Keys");
+                
                 InitNode(res, graph, pos);
             }
 
@@ -206,15 +205,10 @@ namespace ScriptEditor.EditorScripts {
         /// <param name="graph"></param>
         /// <param name="pos"></param>
         private static void InitNode(NodeBase res, NodeGraph graph, Vector2 pos) {
-            Debug.Log("Outer space: " + res);
             res.Resize();
-            Debug.Log("Spongebob movie: " + res);
             res.SetPos(pos);
-            Debug.Log("that one island bottom: " + res);
             res.parentGraph = graph;
-            Debug.Log("Bikini bottom: " + res);
             graph.AddNode(res);
-            Debug.Log("Rock bottom: " + res);
             AssetDatabase.AddObjectToAsset(res, graph);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

@@ -35,7 +35,7 @@ namespace ScriptEditor.EditorScripts {
             } else {
                 title = GetTitle();
             }
-
+            
             GUI.DrawTextureWithTexCoords(new Rect(body.position+pan, body.size), backgroundTexture, new Rect(0,0, body.width / backgroundTexture.width,
                 body.height / backgroundTexture.height));
             GUI.Box(body, title, skin.GetStyle("WorkViewBackground"));
@@ -43,7 +43,7 @@ namespace ScriptEditor.EditorScripts {
                 graph.DrawGraph(e, body);
                 if (GUI.Button(new Rect(0,editorRect.y, 80, 25), "Compile"))
                     graph.Compile();
-                if (GUI.Button(new Rect(0, editorRect.y + 35, 80, 25), "Reseize"))
+                if (GUI.Button(new Rect(0, editorRect.y + 35, 80, 25), "Resize"))
                     foreach(NodeBase n in graph.nodes) n.Resize(true);
             }
 

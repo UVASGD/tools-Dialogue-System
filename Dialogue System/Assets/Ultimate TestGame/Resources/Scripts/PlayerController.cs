@@ -69,11 +69,10 @@ namespace ScriptEditor.Demo {
 
         #region Standard Asset Movement 
         private void FixedUpdate() {
-            if (dc.isPlayerLocked) return;
             // read inputs
-            float h = CrossPlatformInputManager.GetAxis("Horizontal");
-            float v = CrossPlatformInputManager.GetAxis("Vertical");
-            bool crouch = Input.GetKey(KeyCode.C);
+            float h = dc.isPlayerLocked ? 0 : CrossPlatformInputManager.GetAxis("Horizontal");
+            float v = dc.isPlayerLocked ? 0 : CrossPlatformInputManager.GetAxis("Vertical");
+            bool crouch = dc.isPlayerLocked ? false : Input.GetKey(KeyCode.C);
 
             // calculate move direction to pass to character
             if (Cam != null) {

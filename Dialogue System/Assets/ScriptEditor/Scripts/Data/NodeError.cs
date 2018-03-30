@@ -14,6 +14,8 @@ namespace ScriptEditor.Graph {
                         return "Infinite Execution Loop";
                     case ErrorType.NoEnd:
                         return "Start Without End";
+                    case ErrorType.NoDefault:
+                        return "Missing Default";
                     case ErrorType.ConversionError:
                         return "Conversion Error";
                     case ErrorType.NotConnected:
@@ -37,6 +39,8 @@ namespace ScriptEditor.Graph {
                         return "Execution may be caught in an infinite loop!";
                     case ErrorType.NoEnd:
                         return "Script must end somewhere!";
+                    case ErrorType.NoDefault:
+                        return "Node's default path must be connected!";
                     case ErrorType.NotConnected:
                         return "Node is not connected to anything. Will be ignored.";
                     default:
@@ -48,7 +52,8 @@ namespace ScriptEditor.Graph {
 
         /// <summary> type of possible compile error </summary>
         public enum ErrorType {
-            None, DependencyCycle, ConversionError, InfiniteLoop, NoEnd, NotConnected
+            None, DependencyCycle, ConversionError, InfiniteLoop, NoEnd, NotConnected,
+            NoDefault
         }
 
         public NodeError(ErrorType type) {

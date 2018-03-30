@@ -7,12 +7,22 @@ namespace ScriptEditor.Graph
 	public class ChoiceNode : ControlNode {
 
         public List<string> choiceTexts;
+        [Tooltip("If true, choices whose Condition is false will not be shown. Otherwise, these choices will be “greyed out”")]
         public bool hideDisabledChoices;
+        [Tooltip("Whether or not to limit how much time a player has to decide")]
         public bool timed;
-        public float timerLength;
+        [Tooltip("The amount of time in seconds to allow the player to make a decision before automatically choosing the default choice")]
+        public float timerLength = 20f;
+        [Tooltip("The default choice that is chosen when the Timer Length reaches 0 seconds. The default index is 0")]
         public int defaultChoice;
+        [Tooltip("How to orient the choices when displaying")]
         public ChoiceOrientation choiceOrientation = ChoiceOrientation.VerticalFromBottom;
-        
+
+        private int choice;
+        private float waitTime;
+
+        public float TotalTime { get { return waitTime; } }
+
         public enum ChoiceOrientation {
             Radial, VerticalFromTop, VerticalFromBottom,
             HorizontalFromLeft, HorizontalFromRight
@@ -52,15 +62,39 @@ namespace ScriptEditor.Graph
 
         // called everyframe
         public override void Execute(){
-            base.Execute();
+            if(!setupCompleted) Setup();
+
+            // time the user!!!
+            if (timed) {
+               waitTime += Time.deltaTime;
+                if(waitTime > timerLength) {
+                    // select default choice
+                    choice = 0;
+                }
+            }
+
+            if (choice > -1) Finalization();
+        }
+
+        /// <summary>
+        /// apply choice index
+        /// </summary>
+        /// <param name="c"></param>
+        public void Click(int c) {
+            choice = c;
         }
 
         protected override void Setup() {
             dc = GameObject.FindObjectOfType<DialogueController>();
             dc.AddChoice(choiceTexts[0], true);
             for (int i = 1; i<inPins.Count; i++) {
-                dc.AddChoice(choiceTexts[i], (bool)inPins[i].Value);
+                // only add the choice if the output has been connected
+                if(outPins[i].isConnected)
+                    dc.AddChoice(choiceTexts[i], (bool)inPins[i].Value);
             }
+
+            choice = -1;
+            waitTime = 0;
         }
 
         protected override void Finalization() {
@@ -68,6 +102,9 @@ namespace ScriptEditor.Graph
             dc.ResetChoiceList();
         }
 
+        public override NodeBase GetNextNode() {
+            return outPins[choice].ConnectedInput.node;
+        }
     }
 }
 

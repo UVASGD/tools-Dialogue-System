@@ -9,7 +9,6 @@ namespace ScriptEditor.Graph {
     public class InputPin : NodePin {
         public virtual OutputPin ConnectedOutput { get; set; }
 
-        [SerializeField] private object defaultVal;
         /// <summary> Default value of the input when pin is constructed </summary>
         public object Default {
             get { return defaultVal; }
@@ -17,7 +16,7 @@ namespace ScriptEditor.Graph {
                 if (value != null) {
                     switch (varType) {
                         case VarType.Bool: defaultVal = (bool)value; break;
-                        case VarType.Float: defaultVal = (float)value; break;
+                        case VarType.Float: defaultVal = (float)value; Debug.Log("Set Default Float: "+value); break;
                         case VarType.Integer: defaultVal = (int)value; break;
                         case VarType.String: defaultVal = (string)value; break;
                         case VarType.Vector2: defaultVal = (Vector2)value; break;

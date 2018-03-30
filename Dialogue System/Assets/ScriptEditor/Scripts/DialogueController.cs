@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 namespace ScriptEditor {
 
+    [RequireComponent(typeof(AudioSource))]
     public class DialogueController : MonoBehaviour {
         // ------------- canvas fields --------------
         /// <summary>Dialogue box window. Parent of all ialogue related GUI objects </summary>
         [Tooltip("Dialogue box window. Parent of all dialogue related GUI objects")]
-        public Text dialogueArea;
+        public GameObject dialogueArea;
         /// <summary> Dialogue textbox; body of the dialogue </summary>
         [Tooltip("Main body of the dialogue")]
         public Text outputTextbox;
@@ -25,7 +26,7 @@ namespace ScriptEditor {
         public Image speakerIcon;
         /// <summary> Button template for dialogue choices </summary>
         [Tooltip("Button template for dialogue choices")]
-        public Button choiceTemplate;
+        public GameObject choiceTemplate;
         /// <summary> </summary>
         [Tooltip("Debug Console")]
         public Text debugConsole;
@@ -34,6 +35,15 @@ namespace ScriptEditor {
         public DialogueAnimationType dialogueAnimationType = DialogueAnimationType.Sudden;
         [Tooltip("If the dialogue box should animate between separate dialogues")]
         public bool animateBetweenPages = false;
+
+        [Tooltip("Sound for clicking continue on a dialogue page")]
+        public AudioClip PressSound;
+        [Tooltip("Sound for showing text to screen")]
+        public AudioClip TextSound;
+        [Tooltip("Sound for showing the dialogue window")]
+        public AudioClip ShowDialogueSound;
+        [Tooltip("Sound for hiding the dialogue window")]
+        public AudioClip HideDialogueSound;
 
         /// <summary>
         /// How the dialogue pops in and out of view
@@ -49,11 +59,12 @@ namespace ScriptEditor {
         public bool isPlayerLocked = false;
 
         // ------------- hidden fields --------------
-        private NodeGraph dialogue;
-        private NodeBase node;
+        private NodeGraph currentScript;
+        public NodeBase currentNode;
         private bool isCanvasShown = false;
         private Animator animator;
-        private List<Button> choices;
+        private List<GameObject> choices;
+        private AudioSource audioSrc;
 
         // ------------- static fields ---------------
         /// <summary> node types that modify the canvas and must have it be shown </summary>
@@ -61,6 +72,9 @@ namespace ScriptEditor {
 
         // Use this for initialization
         void Start() {
+            audioSrc = GetComponent<AudioSource>();
+            audioSrc.loop = false;
+
             if (dialogueArea != null) {
                 // attach animator to area
                 // attach animation
@@ -76,21 +90,20 @@ namespace ScriptEditor {
         }
         
         void Update() {
-            if (node) {
-                node.Execute();
-                if (node.IsFinished) {
-                    node = node.GetNextNode();
-                    if (node == null) {
+            if (currentNode) {
+                currentNode.Execute();
+                if (currentNode.IsFinished) {
+                    currentNode = currentNode.GetNextNode();
+                    if (currentNode == null) {
                         // finished graph!
 
-                        node = null;
-                        dialogue = null;
+                        currentNode = null;
+                        currentScript = null;
                     } else {
-                        string t = node.GetType().ToString();
-                        t = t.Substring(t.LastIndexOf(".") + 1);
-                        Debug.Log("CanvasDependentNode? " + t);
-                        if (CanvasDependentNodes.Contains(t)){
+                        if (isCanvasDependent(currentNode)){
                             ShowDialogueBox();
+                        } else if(isCanvasShown){
+                            HideDialogueBox();
                         }
                     }
                 }
@@ -100,19 +113,19 @@ namespace ScriptEditor {
         /// <summary>
         /// Activate a dialogue script
         /// </summary>
-        /// <param name="dialogue"></param>
-        public void StartDialogue(NodeGraph dialogue) {
-            if (this.dialogue != null) return; // already running a script!
+        /// <param name="script"></param>
+        public void StartDialogue(NodeGraph script) {
+            if (this.currentScript != null) return; // already running a script!
             
             // check if script has compiled with no errors
-            if (dialogue.compiled) {
-                if (!dialogue.hasErrors) {
-                    this.dialogue = dialogue;
-                    this.node = dialogue.CurrentSubStart;
+            if (script.compiled) {
+                if (!script.hasErrors) {
+                    this.currentScript = script;
+                    this.currentNode = script.CurrentSubStart;
                 } else
-                    Debug.LogError("Script \"" + dialogue + "\" contains errors and therefore cannot be run.");
+                    Debug.LogError("Script \"" + script + "\" contains errors and therefore cannot be run.");
             } else {
-                Debug.LogError("Script \"" + dialogue + "\" has not been compiled and therefore cannot run.");
+                Debug.LogError("Script \"" + script + "\" has not been compiled and therefore cannot run.");
             }
         }
 
@@ -122,18 +135,19 @@ namespace ScriptEditor {
         /// </summary>
         /// <param name="choice"></param>
         public void AddChoice(string choice, bool enabled) {
-            bool hideDisabled = ((ChoiceNode)node).hideDisabledChoices;
-            if (!enabled && hideDisabled) return;
+            bool hideDisabled = ((ChoiceNode)currentNode).hideDisabledChoices;
+            if ((!enabled && hideDisabled) || !choiceTemplate) return;
+            if (!choiceTemplate.GetComponentInChildren<Button>()) return;
 
             // copy TEMPLATE button
             choices.Add(Instantiate(choiceTemplate));
             int n = choices.Count - 1;
+            Button button = choices[n].GetComponentInChildren<Button>();
 
             // place new button at next index
             Vector3 offset = Vector2.zero;
-            float baseOffset = choiceTemplate.GetComponent<RectTransform>().rect.height
-                + 10f;
-            switch (((ChoiceNode)node).choiceOrientation) {
+            float baseOffset = choiceTemplate.GetComponent<RectTransform>().rect.height + 10f;
+            switch (((ChoiceNode)currentNode).choiceOrientation) {
                 case ChoiceNode.ChoiceOrientation.VerticalFromBottom:
                     offset = new Vector3(0, baseOffset, 0);
                     break;
@@ -154,14 +168,14 @@ namespace ScriptEditor {
             choices[n].transform.position += n*offset;
 
             // set button grayed out
-            choices[n].interactable = enabled;
+            button.interactable = enabled;
             choices[n].gameObject.SetActive(true);
 
             // set button text
             choices[n].GetComponentInChildren<Text>().text = choice;
 
             // set button click method
-            choices[n].onClick.AddListener(delegate { ChoiceClicked(n); });
+            button.onClick.AddListener(delegate { ChoiceClicked(n); });
         }
 
         // This might be a bit unsavory in terms of efficiency,
@@ -169,20 +183,72 @@ namespace ScriptEditor {
         // ac ChoiceNode... could simplify this to show/hiding the ones we need
         /// <summary> delete choice buttons </summary>
         public void ResetChoiceList() {
-            foreach(Button c in choices) {
-                GameObject.Destroy(c.gameObject);
-            }
-
+            foreach(GameObject c in choices) Destroy(c);
             choices.Clear();
+        }
+
+        /// <summary>
+        /// returns the amount of time left on the choice node to use for display;
+        /// returns 0 if not currently on ChoiceNode or time is not being used
+        /// </summary>
+        public float GetChoiceTime() {
+            if (!(currentNode is ChoiceNode)) return 0;
+            ChoiceNode n = (ChoiceNode)currentNode;
+            return n.timed? n.timerLength - n.TotalTime : 0;
         }
 
         /// <summary>
         /// Input handler for selecting a choice button
         /// </summary>
-        /// <param name="index"></param>
-        public void ChoiceClicked(int index) {
+        /// <param name="c"></param>
+        public void ChoiceClicked(int c) {
             //((ChoiceNode)node).choice = index;
-            Debug.Log("Clicked[" + index + "]");
+            Debug.Log("Clicked[" + c + "]");
+        }
+
+        /// <summary>
+        /// continue or skip display of dialogue
+        /// </summary>
+        public void ContinueDialogue() {
+            //if (!(node is DialogueNode) && !(node is ChoiceNode)) return;
+            if (!isCanvasDependent(currentNode)) return;
+
+            audioSrc.clip = PressSound;
+            audioSrc.Play();
+
+            if(currentNode is DialogueNode) {
+                ((DialogueNode)currentNode).SoftSkip();
+            } else if(currentNode is ChoiceNode) {
+
+            }
+        }
+
+        /// <summary>
+        /// Skip dialogue immediately
+        /// </summary>
+        public void SkipDialogue() {
+            if (!isCanvasDependent(currentNode)) return;
+            if (!isCanvasDependent(currentNode)) return;
+
+            audioSrc.clip = PressSound;
+            audioSrc.Play();
+
+            if (currentNode is DialogueNode) {
+
+            } else if (currentNode is ChoiceNode) {
+
+            }
+        }
+
+        /// <summary>
+        /// if script is currently running, immediately stop
+        /// </summary>
+        public void ForceQuit() {
+
+        }
+
+        public AudioSource GetAudioSrc() {
+            return audioSrc;
         }
 
         /// <summary>
@@ -190,7 +256,10 @@ namespace ScriptEditor {
         /// </summary>
         private void ShowDialogueBox() {
             if(animator!=null & dialogueAnimationType != DialogueAnimationType.Custom) {
+                isCanvasShown = true;
                 animator.SetTrigger("Show");
+                audioSrc.clip = ShowDialogueSound;
+                audioSrc.Play();
             }
         }
 
@@ -198,7 +267,16 @@ namespace ScriptEditor {
         private void HideDialogueBox() {
             if (animator != null & dialogueAnimationType != DialogueAnimationType.Custom) {
                 animator.SetTrigger("Hide");
+                audioSrc.clip = HideDialogueSound;
+                audioSrc.Play();
             }
+        }
+
+        private static bool isCanvasDependent(NodeBase node) {
+            string t = node.GetType().ToString();
+            t = t.Substring(t.LastIndexOf(".") + 1);
+            Debug.Log("CanvasDependentNode? " + t);
+            return CanvasDependentNodes.Contains(t);
         }
 
         static DialogueController() {

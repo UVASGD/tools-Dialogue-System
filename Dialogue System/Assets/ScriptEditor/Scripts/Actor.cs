@@ -7,7 +7,7 @@ using ScriptEditor;
 using ScriptEditor.Graph;
 
 
-[DisallowMultipleComponent]
+[DisallowMultipleComponent, Serializable]
 public class Actor : MonoBehaviour {
     public String Name;
     public NodeGraph Script;

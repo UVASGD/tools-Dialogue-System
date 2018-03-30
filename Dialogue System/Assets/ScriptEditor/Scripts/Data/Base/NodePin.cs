@@ -13,6 +13,7 @@ namespace ScriptEditor.Graph {
         [SerializeField] public NodeBase node;
         [SerializeField] public VarType varType;
         [SerializeField] public Rect bounds;
+        [SerializeField] public object defaultVal;
 
         [SerializeField] protected object val;
 
@@ -172,15 +173,13 @@ namespace ScriptEditor.Graph {
         }
 
         public void DrawConnection() {
-            if (!isConnected) return;
+            if (!isConnected || isInput) return;
 
             // draw bezier curve from output pin to input pin
             try {
-                Debug.Log("Planetarium: "+this.GetType());
-                Vector3 start = (isInput) ? ((InputPin)this).ConnectedOutput.Center :
-                    this.Center;
-                Vector3 end = (isInput) ? this.Center : 
-                    ((OutputPin)this).ConnectedInput.Center;
+                //Debug.Log("Planetarium: "+this.GetType());
+                Vector3 start = this.Center;
+                Vector3 end = ((OutputPin)this).ConnectedInput.Center;
                 Vector2 startTangent, endTangent;
 
                 float offset = Mathf.Max(Mathf.Abs(start.x - end.x) / 1.75f, 1);
