@@ -7,32 +7,29 @@ namespace ScriptEditor.Graph {
     /// <summary> Input pin. If disconnected, a constant can be provided </summary>
     [Serializable]
     public class InputPin : NodePin {
+        [SerializeField] protected PinValue val;
+
         public virtual OutputPin ConnectedOutput { get; set; }
+
+        public object Value
+        {
+            get { return val.Value; }
+            set { val.Value = value; }
+        }
 
         /// <summary> Default value of the input when pin is constructed </summary>
         public object Default {
-            get { return defaultVal; }
-            set {
-                if (value != null) {
-                    switch (varType) {
-                        case VarType.Bool: defaultVal = (bool)value; break;
-                        case VarType.Float: defaultVal = (float)value; Debug.Log("Set Default Float: "+value); break;
-                        case VarType.Integer: defaultVal = (int)value; break;
-                        case VarType.String: defaultVal = (string)value; break;
-                        case VarType.Vector2: defaultVal = (Vector2)value; break;
-                        case VarType.Vector3: defaultVal = (Vector3)value; break;
-                        case VarType.Vector4: defaultVal = (Vector4)value; break;
-                        case VarType.Color: defaultVal = (Color)value; break;
-                    }
-                    val = defaultVal;
-                }
-            }
+            get { return Value; }
+            set { Value = value; }
         }
 
-        public InputPin(NodeBase n, object val) : base(n, val) {
-            Default = val;
+        public InputPin(NodeBase n, VarType t, object val) : this(n, t) {
+            Value = val;
         }
-        public InputPin(NodeBase n, VarType t) : base(n, t) { }
+
+        public InputPin(NodeBase n, VarType t) : base(n, t) {
+            val = new PinValue(t);
+        }
 
         public override string ConName() {
             return ConnectedOutput.node.name;
@@ -48,7 +45,6 @@ namespace ScriptEditor.Graph {
     /// </summary>
     [Serializable]
     public class EventInputPin : InputPin {
-        public EventInputPin(NodeBase n, object val) : base(n, val) { }
         public EventInputPin(NodeBase n) : base(n, VarType.Exec) { }
 
         private string cOutput = null;
@@ -64,7 +60,7 @@ namespace ScriptEditor.Graph {
     /// </summary>
     [Serializable]
     public class ValueInputPin : InputPin {
-        public ValueInputPin(NodeBase n, object val) : base(n, val) { }
+        public ValueInputPin(NodeBase n, VarType t, object val) : base(n, t, val) { }
         public ValueInputPin(NodeBase n, VarType t) : base(n, t) { }
 
         private OutputPin cOutput = null;

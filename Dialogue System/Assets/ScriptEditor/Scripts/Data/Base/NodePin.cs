@@ -13,41 +13,7 @@ namespace ScriptEditor.Graph {
         [SerializeField] public NodeBase node;
         [SerializeField] public VarType varType;
         [SerializeField] public Rect bounds;
-        [SerializeField] public object defaultVal;
 
-        [SerializeField] protected object val;
-
-        public object Value {
-            get {
-                if(val!=null)return val;
-                if (isInput)
-                    Debug.Log("Pin Val is null... Default: \"" + ((InputPin)this).Default+"\"");
-                switch (varType) {
-                    case VarType.Bool: return val = false;
-                    case VarType.Float: return val = 0;
-                    case VarType.Integer: return val = 0;
-                    case VarType.String: return val = "";
-                    case VarType.Vector2: return val = Vector2.zero;
-                    case VarType.Vector3: return val = Vector3.zero;
-                    case VarType.Vector4: return val = Vector4.zero;
-                    case VarType.Color: return val = Color.white;
-                }
-                return "";
-            }
-            set {
-                if (value != null)
-                    switch (varType) {
-                        case VarType.Bool: val = (bool)value; break;
-                        case VarType.Float: val = (float)value; break;
-                        case VarType.Integer: val = (int)value; break;
-                        case VarType.String: val = (string)value; break;
-                        case VarType.Vector2: val = (Vector2)value; break;
-                        case VarType.Vector3: val = (Vector3)value; break;
-                        case VarType.Vector4: val = (Vector4)value; break;
-                        case VarType.Color: val = (Color)value; break;
-                    }
-            }
-        }
 
         public string StyleName {
             get {
@@ -85,24 +51,10 @@ namespace ScriptEditor.Graph {
         public static float Top { get { return margin.y + padding; } }
 
 
-        public NodePin(NodeBase n, object val) : this(n, GetVarType(val)) {
-            Value = val;
-            // set name of node to name of variable
-        }
-
         public NodePin(NodeBase n, VarType varType) {
             this.varType = varType;
             node = n;
             bounds = new Rect(Vector2.zero, pinSize);
-
-            switch (varType) {
-                case VarType.Bool: val = false;break;
-                case VarType.Integer:
-                case VarType.Float: val = 0; break;
-                case VarType.Vector2: val = Vector2.zero; break;
-                case VarType.Vector3: val = Vector3.zero; break;
-                case VarType.Vector4: val = Vector4.zero; break;
-            }
         }
 
         /// <summary> returns the name of the base connected node </summary>

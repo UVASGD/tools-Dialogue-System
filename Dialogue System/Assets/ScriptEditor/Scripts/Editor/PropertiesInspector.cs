@@ -12,54 +12,6 @@ namespace ScriptEditor.EditorScripts.Inspector {
 
 #region NodeInspect
 
-[CustomEditor(typeof(FetchNode))]
-    public class FetchNodeE : Editor {
-        public override void OnInspectorGUI() {
-            if (PropertiesInspector.defaultGUI) {
-                base.OnInspectorGUI();
-                return;
-            }
-
-            FetchNode node = (FetchNode)target;
-            EditorGUILayout.LabelField(node.name, EditorStyles.boldLabel);
-            object retVal=null;
-            switch (node.VarType) {
-                case VarType.Actor:
-                    retVal = EditorGUILayout.ObjectField("Actor: ", (Actor)node.OutVal,
-                        typeof(Actor), false);
-                    break;
-                //case ConnectType.Bool:
-                //    EditorGUILayout.DoubleField("Value: ", (Actor)node.outVal,
-                //        typeof(Actor), false);
-                //    break;
-                case VarType.Float:
-                    retVal = EditorGUILayout.FloatField("Value: ", (float)node.OutVal);
-                    break;
-                case VarType.Integer:
-                    retVal = EditorGUILayout.IntField("Value: ", (int)node.OutVal);
-                    break;
-                //case ConnectType.Object:
-                //    retVal = EditorGUILayout.ObjectField("Value: ", node.outVal,
-                //        node.outVal.GetType(), false);
-                //    break;
-                case VarType.Vector2:
-                    retVal = EditorGUILayout.Vector2Field("Value: ", (Vector2)node.OutVal);
-                    break;
-                case VarType.Vector3:
-                    retVal = EditorGUILayout.Vector2Field("Value: ", (Vector3)node.OutVal);
-                    break;
-                case VarType.Vector4:
-                    retVal = EditorGUILayout.Vector2Field("Value: ", (Vector4)node.OutVal);
-                    break;
-            }
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Value: ");
-            EditorGUILayout.LabelField(retVal!=null? retVal.ToString():"null");
-            EditorGUILayout.EndHorizontal();
-        }
-    }
-
     [CustomEditor(typeof(MathNode))]
     public class FunctionNodeE : Editor {
         public override void OnInspectorGUI() {

@@ -155,24 +155,7 @@ namespace ScriptEditor.Graph {
         public override void Lookup(bool compileTime) {
             base.Lookup(compileTime);
             switch (funcType) {
-                case FunctionType.Magnitude:
-                    switch (outPins[0].varType) {
-                        case VarType.Vector2:
-                            outPins[0].Value = (inPins[0].isConnected) ?
-                                ((Vector2)inPins[0].Value).magnitude
-                                : 0;
-                            break;
-                        case VarType.Vector3:
-                            outPins[0].Value = (inPins[0].isConnected) ?
-                                ((Vector3)inPins[0].Value).magnitude
-                                : 0;
-                            break;
-                        case VarType.Vector4:
-                            outPins[0].Value = (inPins[0].isConnected) ?
-                                ((Vector4)inPins[0].Value).magnitude
-                                : 0;
-                            break;
-                    }
+                default:
                     break;
             }
         }

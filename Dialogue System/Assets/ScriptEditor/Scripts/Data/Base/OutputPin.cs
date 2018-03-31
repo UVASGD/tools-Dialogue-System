@@ -11,7 +11,6 @@ namespace ScriptEditor.Graph {
         public virtual InputPin ConnectedInput  { get; set; }
         //public bool isConnected { get { return ConnectedInputID != -1; } }
 
-        public OutputPin(NodeBase n, object val) : base(n, val) { }
         public OutputPin(NodeBase n, VarType t) : base(n, t) { }
 
         public override string ConName() {
@@ -28,7 +27,6 @@ namespace ScriptEditor.Graph {
     /// </summary>
     [Serializable]
     public class ValueOutputPin : OutputPin {
-        public ValueOutputPin(NodeBase n, object val) : base(n, val) { }
         public ValueOutputPin(NodeBase n, VarType t) : base(n, t) { }
 
         private string cInput = null;
@@ -44,7 +42,6 @@ namespace ScriptEditor.Graph {
     /// </summary>
     [Serializable]
     public class EventOutputPin : OutputPin {
-        public EventOutputPin(NodeBase n, object val) : base(n, val) { }
         public EventOutputPin(NodeBase n) : base(n, VarType.Exec) { }
 
         private InputPin cInput = null;

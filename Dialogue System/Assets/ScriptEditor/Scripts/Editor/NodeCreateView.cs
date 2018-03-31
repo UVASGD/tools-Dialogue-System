@@ -113,8 +113,7 @@ namespace ScriptEditor.EditorScripts {
         }
 
         private void Promote() {
-            Variable var = new Variable(varName, pinToAttach.varType, 
-                pinToAttach.isInput?null:pinToAttach.Value, scope);
+            Variable var = new Variable(varName, pinToAttach.varType, null, scope);
 
             // put variable into appropiate dictionary
             if (scope == Variable.VarScope.Local) {
