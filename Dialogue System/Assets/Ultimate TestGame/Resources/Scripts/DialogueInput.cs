@@ -18,7 +18,7 @@ namespace ScriptEditor.Demo {
 
         // Update is called once per frame
         void Update() {
-            if (dc.currentNode) {
+            if (dc.canTakeInput) {
                 if (buttonCooldown > 0) buttonCooldown -= Time.deltaTime;
                 if (Input.GetButton("Interact") && buttonCooldown <=0) {
                     dc.ContinueDialogue();

@@ -44,7 +44,7 @@ namespace ScriptEditor.Demo {
                     currentNPC.ActivateScript();
             }
 
-            if (!Jump) {
+            if (!Jump && !dc.isPlayerLocked) {
                 Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
         }

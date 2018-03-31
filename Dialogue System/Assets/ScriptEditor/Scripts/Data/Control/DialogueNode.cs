@@ -44,6 +44,7 @@ namespace ScriptEditor.Graph
         }
 
         public DialogueNode(){
+
         }
 
         public override void Construct()
@@ -76,6 +77,7 @@ namespace ScriptEditor.Graph
         /// continue or skip display of dialogue
         /// </summary>
         public void SoftSkip() {
+            if (!setupCompleted) return;
             if (Index.y < MaxCharLength && canSkip) {
                 pleaseContinue = true;
                 Index.y = MaxCharLength;
@@ -88,7 +90,7 @@ namespace ScriptEditor.Graph
             if (!setupCompleted) Setup();
 
             if (!pleaseContinue) {
-                Debug.Log("Outputting Text");
+                Debug.Log("Outputting Text: "+Index);
                 dc.outputTextbox.text = pages[(int)Index.x].Substring(0, (int)Index.y);
                 
                 Index.y += speed;

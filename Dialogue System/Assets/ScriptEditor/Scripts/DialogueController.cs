@@ -45,6 +45,12 @@ namespace ScriptEditor {
         [Tooltip("Sound for hiding the dialogue window")]
         public AudioClip HideDialogueSound;
 
+        public bool canTakeInput { get {
+                if (currentNode!=null)
+                    return isCanvasDependent(currentNode);
+                return false;
+            } }
+
         /// <summary>
         /// How the dialogue pops in and out of view
         /// </summary>
@@ -61,7 +67,7 @@ namespace ScriptEditor {
 
         // ------------- hidden fields --------------
         private NodeGraph currentScript;
-        public NodeBase currentNode;
+        private NodeBase currentNode;
         private bool isCanvasShown = false;
         private Animator animator;
         private List<GameObject> choices;
@@ -280,6 +286,7 @@ namespace ScriptEditor {
         }
 
         private static bool isCanvasDependent(NodeBase node) {
+            if (node==null) return false;
             string t = node.GetType().ToString();
             t = t.Substring(t.LastIndexOf(".") + 1);
             return CanvasDependentNodes.Contains(t);

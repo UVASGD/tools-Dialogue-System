@@ -67,7 +67,7 @@ namespace ScriptEditor.EditorScripts.Inspector {
 
             //scroll = EditorGUILayout.BeginScrollView(scroll);
             string tmp = EditorGUILayout.TextArea(node.text);
-            if (!tmp.Equals(node.text))
+            if (tmp != node.text)
                 node.header = null;
             node.text = tmp;
             //EditorGUILayout.EndScrollView();

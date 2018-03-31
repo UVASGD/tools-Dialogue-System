@@ -44,7 +44,8 @@ namespace ScriptEditor.Graph {
         public const float Top = 56;
         public const float Bottom = 23 + NodePin.padding;
         protected const float Width = 175;
-        protected bool setupCompleted = false;
+        protected bool _set = false;
+        protected bool setupCompleted { get { return _set; } set { Debug.Log("djidjiedjijed"); _set = value; } }
         
         public List<OutputPin> outPins;
         public List<InputPin> inPins;
