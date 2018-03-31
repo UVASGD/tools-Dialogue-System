@@ -13,6 +13,7 @@ namespace ScriptEditor.EditorScripts {
         public WorkView workView;
         public HeaderView headerView;
         public StatusView statusView;
+        public VariablesView variablesView;
         public NodeCreateView nodeCreateView;
         public VariableCreateView varCreateView;
         public NodeToolTipView toolTipView;
@@ -45,19 +46,21 @@ namespace ScriptEditor.EditorScripts {
         //Vector3 vanishingPoint = new Vector2(0, 19.12f); public float zoomScale = 1;
 
         void OnGUI() {
-            if (workView == null || headerView == null || statusView == null) {
+            if (workView == null || headerView == null || statusView == null || variablesView == null) {
                 CreateViews();
                 return;
             }
 
             Event e = Event.current;
-            Rect headerBox = new Rect(0, 0, position.width, 17.5f);Matrix4x4 oldMatrix = GUI.matrix;
+
+            float varPercent = .25f;
+            Rect headerBox = new Rect(position.width * varPercent, 0, position.width * (1 - varPercent), 17.5f);Matrix4x4 oldMatrix = GUI.matrix;
 
             //Scale  gui matrix
             //Matrix4x4 Translation = Matrix4x4.TRS(vanishingPoint, Quaternion.identity, Vector3.one);
             //Matrix4x4 Scale = Matrix4x4.Scale(new Vector3(zoomScale, zoomScale, 1.0f));
             //GUI.matrix = Translation * Scale * Translation.inverse;
-            workView.DrawView(new Rect(0,headerBox.height, position.width, position.height-2*headerBox.height), 
+            workView.DrawView(new Rect(position.width*varPercent, headerBox.height, position.width * (1-varPercent), position.height-2*headerBox.height), 
                             new Rect(/*zoomScale, zoomScale,  1/zoomScale, 1/zoomScale*/ 1,1,1,1),
                             e, graph);
             //reset the matrix
@@ -73,9 +76,14 @@ namespace ScriptEditor.EditorScripts {
                             e, graph);
 
             //***Not highest priority
-            statusView.DrawView(new Rect(0, position.height - headerBox.height, position.width, headerBox.height),
+            statusView.DrawView(new Rect(position.width * varPercent, position.height - headerBox.height, position.width*0.25f, headerBox.height),
+                            new Rect(0, 1, 1, 1),
+                            e, graph); 
+
+            variablesView.DrawView(new Rect(0, position.height - headerBox.height, position.width, position.height),
                             new Rect(0, 1, 1, 1),
                             e, graph);
+
             if (nodeCreateView != null)
                 nodeCreateView.DrawView(new Rect(nodeCreateView.mouseLoc, nodeCreateView.size),
                     new Rect(1, 1, 1, 1), e, graph);
@@ -95,12 +103,14 @@ namespace ScriptEditor.EditorScripts {
                 instance.workView = new WorkView();
                 instance.headerView = new HeaderView();
                 instance.statusView = new StatusView();
+                instance.variablesView = new VariablesView();
             } else {
                 instance = GetWindow<ScriptEditorWindow>();
                 instance.titleContent = new GUIContent("Script Editor");
                 instance.workView = new WorkView();
                 instance.headerView = new HeaderView();
                 instance.statusView = new StatusView();
+                instance.variablesView = new VariablesView();
             }
         }
 
