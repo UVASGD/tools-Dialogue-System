@@ -134,12 +134,12 @@ namespace ScriptEditor.Graph
             src.clip = dc.TextSound;
 
             pages = new List<string>();
+            pages.AddRange(text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries));
 
             string o = "";
             foreach (string s in pages) o += s + "\n";
             Debug.Log(o);
 
-            pages.AddRange(text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries));
             Index = Vector2.zero;
             Actor actor = null;
 
@@ -183,7 +183,7 @@ namespace ScriptEditor.Graph
                 }
             }
 
-
+            setupCompleted = true;
         }
 
         protected override void Finalization() {

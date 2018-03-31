@@ -78,7 +78,11 @@ namespace ScriptEditor {
             audioSrc = GetComponent<AudioSource>();
             audioSrc.loop = false;
 
+
             if (dialogueArea != null) {
+                //DEBUG
+                animator = GameObject.Find("Canvas").GetComponent<Animator>();
+
                 // attach animator to area
                 // attach animation
 
@@ -121,15 +125,15 @@ namespace ScriptEditor {
             if (this.currentScript != null) return; // already running a script!
             
             // check if script has compiled with no errors
-            if (script.compiled) {
-                if (!script.hasErrors) {
+            //if (script.compiled) {
+                //if (!script.hasErrors) {
                     this.currentScript = script;
                     this.currentNode = script.CurrentSubStart;
-                } else
-                    Debug.LogError("Script \"" + script + "\" contains errors and therefore cannot be run.");
-            } else {
-                Debug.LogError("Script \"" + script + "\" has not been compiled and therefore cannot run.");
-            }
+                //} else
+                //    Debug.LogError("Script \"" + script + "\" contains errors and therefore cannot be run.");
+            //} else {
+            //    Debug.LogError("Script \"" + script + "\" has not been compiled and therefore cannot run.");
+            //}
         }
 
         /// <summary>
@@ -278,7 +282,6 @@ namespace ScriptEditor {
         private static bool isCanvasDependent(NodeBase node) {
             string t = node.GetType().ToString();
             t = t.Substring(t.LastIndexOf(".") + 1);
-            Debug.Log("CanvasDependentNode? " + t);
             return CanvasDependentNodes.Contains(t);
         }
 
