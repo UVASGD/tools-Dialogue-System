@@ -35,7 +35,7 @@ namespace ScriptEditor.Graph
             inPins[4].Description = "The maximum distance the song can be heard";
             inPins[4].Default = 100;
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
         }
     }
 }

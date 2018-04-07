@@ -101,7 +101,7 @@ namespace ScriptEditor.Graph {
                     outPins[2].Name = "z";
                     break;
                 case FunctionType.SplitColor:
-                    inPins.Add(new ValueInputPin(this, VarType.Vector4));
+                    inPins.Add(new ValueInputPin(this, VarType.Color));
 
                    outPins.Add(new ValueOutputPin(this, VarType.Float));
                    outPins.Add(new ValueOutputPin(this, VarType.Float));
@@ -130,7 +130,7 @@ namespace ScriptEditor.Graph {
                     inPins[2].Name = "z";
                     break;
                 case FunctionType.BuildColor:
-                   outPins.Add(new ValueOutputPin(this, VarType.Vector4));
+                   outPins.Add(new ValueOutputPin(this, VarType.Color));
 
                     inPins.Add(new ValueInputPin(this, VarType.Float));
                     inPins.Add(new ValueInputPin(this, VarType.Float));
@@ -167,7 +167,7 @@ namespace ScriptEditor.Graph {
                 new string[] {
                     VarType.Vector2.ToString(),
                     VarType.Vector3.ToString(),
-                    VarType.Vector4.ToString() }));
+                    VarType.Color.ToString() }));
         }
 
     }

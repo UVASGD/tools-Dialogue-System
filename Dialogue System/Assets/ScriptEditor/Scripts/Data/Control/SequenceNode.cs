@@ -22,8 +22,8 @@ namespace ScriptEditor.Graph
         inPins[1].Name = "Index";
         inPins[1].Description = "The index at which to split execution";
 
-        outPins.Add(new EventOutputPin(this));
-        outPins.Add(new EventOutputPin(this));
+        outPins.Add(new ExecOutputPin(this));
+        outPins.Add(new ExecOutputPin(this));
         outPins[1].Name = "Then 1";
         outPins[1].Name = "Then 2";
 		}

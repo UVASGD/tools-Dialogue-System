@@ -19,7 +19,7 @@ namespace ScriptEditor.Graph
             // Create pins
             inPins.Add(new EventInputPin(this));
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
         }
 
         public override void Execute() {

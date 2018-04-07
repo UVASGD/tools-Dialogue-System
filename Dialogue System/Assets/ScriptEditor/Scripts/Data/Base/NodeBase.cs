@@ -70,7 +70,7 @@ namespace ScriptEditor.Graph {
             get {
                 foreach (InputPin ip in inPins)
                     if (ip.varType == VarType.Exec)
-                        return !ip.isConnected;
+                        return !ip.IsConnected;
                 return false;
             }
         }
@@ -272,7 +272,7 @@ namespace ScriptEditor.Graph {
             //Debug.Log("Look up "+this);
             parentGraph.lookupStack.Push(this);
             foreach(InputPin ip in inPins) {
-                if (ip.varType!=VarType.Exec && ip.isConnected) {
+                if (ip.varType!=VarType.Exec && ip.IsConnected) {
                     // recurse
                     ip.ConnectedOutput.node.Lookup(compileTime);
                 }
@@ -295,7 +295,7 @@ namespace ScriptEditor.Graph {
                     } else {
                         // branch must be controlled by variable to prevent infinite loop!
                         if (cn.GetType() == typeof(BranchNode) &&
-                            !cn.inPins[1].isConnected) {
+                            !cn.inPins[1].IsConnected) {
                             errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                             return;
                         }
@@ -309,7 +309,7 @@ namespace ScriptEditor.Graph {
             // check for default connection
             if(this is ChoiceNode) {
                 ChoiceNode c = ((ChoiceNode)this);
-                if (!c.outPins[c.defaultChoice].isConnected)
+                if (!c.outPins[c.defaultChoice].IsConnected)
                     errors.Add(new NodeError(NodeError.ErrorType.NoDefault));
             }
 
@@ -318,7 +318,7 @@ namespace ScriptEditor.Graph {
             Debug.Log("Compiling: " + this);
             parentGraph.compileStack.Push(this);
             foreach(OutputPin op in outPins) {
-                if (op.isConnected)
+                if (op.IsConnected)
                     if (op.varType == VarType.Exec) {
                         //Debug.Log("OP.CO.NO: " + op.ConnectedInput.node);
                         op.ConnectedInput.node.Compile();
@@ -326,7 +326,7 @@ namespace ScriptEditor.Graph {
             }
 
             foreach(InputPin ip in inPins) {
-                if (ip.varType != VarType.Exec && ip.isConnected) {
+                if (ip.varType != VarType.Exec && ip.IsConnected) {
                     if (!ip.ConnectedOutput.node.Ignorable)
                         ip.ConnectedOutput.node.Lookup(true);
                 }
@@ -419,7 +419,7 @@ namespace ScriptEditor.Graph {
 
                 // casting error? wtf, C#
                 Vector2 offset = new Vector2(txt.size.x-15, 0);
-                    if (!pin.isConnected && pin.isInput) {
+                    if (!pin.IsConnected && pin.isInput) {
                     //Debug.Log("Pin: " + pin + "\nVal: " + pin.Value);
                         switch (pin.varType) {
                             case VarType.Bool: // checkbox
@@ -445,10 +445,6 @@ namespace ScriptEditor.Graph {
                             case VarType.Vector3: // 3 float fields
                                 //pin.Value = (Vector3)EditorGUI.Vector3Field(new Rect(txt.position + offset, new Vector2(85, 20)),
                                 //    "", (Vector3)pin.Value);
-                                break;
-                            case VarType.Vector4: // 4 float fields
-                                //pin.Value = (Vector4)EditorGUI.Vector2Field(new Rect(txt.position + offset, new Vector2(105, 20)),
-                                //    "", (Vector2)pin.Value);
                                 break;
                             case VarType.Color: // box showing color
                                 //pin.Value = (Color) EditorGUI.ColorField(new Rect(txt.position + offset, new Vector2(65, 20)),
@@ -494,17 +490,17 @@ namespace ScriptEditor.Graph {
 
         public static void RemoveConnection(object p) {
             NodePin pin = (NodePin)p;
-            pin.isConnected = false;
+            pin.IsConnected = false;
             pin.node.parentGraph.ResetCompiledStatus();
 
-            if (pin.isConnected) {
+            if (pin.IsConnected) {
                 if (pin is OutputPin) {
-                    ((OutputPin)pin).ConnectedInput.isConnected = false;
+                    ((OutputPin)pin).ConnectedInput.IsConnected = false;
                     ((OutputPin)pin).ConnectedInput.ConnectedOutput = null;
                     ((OutputPin)pin).ConnectedInput = null;
 
                 } else {
-                    ((InputPin)pin).ConnectedOutput.isConnected = false;
+                    ((InputPin)pin).ConnectedOutput.IsConnected = false;
                     ((InputPin)pin).ConnectedOutput.ConnectedInput = null;
                     ((InputPin)pin).ConnectedOutput = null;
                 }

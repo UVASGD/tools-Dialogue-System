@@ -26,7 +26,7 @@ namespace ScriptEditor.Graph {
                     inPins[1].Name = "y";
                     inPins[2].Name = "z";
                     break;
-                case VarType.Vector4:
+                case VarType.Color:
                     type = "Color";
                     inPins.Add(new ValueInputPin(this, VarType.Float));
                     inPins.Add(new ValueInputPin(this, VarType.Float));

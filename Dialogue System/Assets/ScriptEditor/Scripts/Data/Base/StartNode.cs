@@ -29,7 +29,7 @@ namespace ScriptEditor.Graph {
 
         public virtual void Construct() {
             base.SetName("Start");
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             Resize();
         }
 
@@ -71,7 +71,7 @@ namespace ScriptEditor.Graph {
     public class SubStartNode : StartNode {
         public override void Construct() {
             base.SetName("Sub Start");
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             Resize();
         }
 

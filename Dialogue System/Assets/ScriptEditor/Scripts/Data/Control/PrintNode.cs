@@ -24,7 +24,7 @@ namespace ScriptEditor.Graph
             inPins[1].Name = "Text";
             inPins[1].Default = "Hello World";
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
         }
 
         public override void Execute()

@@ -9,12 +9,12 @@ namespace ScriptEditor.Graph {
     public abstract class NodePin {
 
         [SerializeField] public string Name, Description;
-        [SerializeField] public bool isConnected = false;
         [SerializeField] public NodeBase node;
         [SerializeField] public VarType varType;
         [SerializeField] public Rect bounds;
 
-
+        public virtual bool IsConnected { get; set; }
+        
         public string StyleName {
             get {
                 string color = "";
@@ -24,7 +24,6 @@ namespace ScriptEditor.Graph {
                     case VarType.Vector2:
                     case VarType.Vector3:
                     case VarType.Color:
-                    case VarType.Vector4: color = "Yellow"; break;
                     case VarType.Float: color = "Green"; break;
                     case VarType.Integer: color = "Cyan"; break;
                     case VarType.Object: color = "Blue"; break;
@@ -32,7 +31,7 @@ namespace ScriptEditor.Graph {
                     case VarType.Exec: color = "White"; break;
                 }
 
-                return "Pin" + color + (this.isConnected ? "Closed" : "Open");
+                return "Pin" + color + (this.IsConnected ? "Closed" : "Open");
             }
         }
 
@@ -69,7 +68,6 @@ namespace ScriptEditor.Graph {
             if (variable.GetType().Equals(typeof(GameObject))) return VarType.Actor; //TODO
             if (variable.GetType().Equals(typeof(Vector2))) return VarType.Vector2;
             if (variable.GetType().Equals(typeof(Vector3))) return VarType.Vector3;
-            if (variable.GetType().Equals(typeof(Vector4))) return VarType.Vector4;
             return VarType.Object;
         }
 
@@ -89,7 +87,6 @@ namespace ScriptEditor.Graph {
                     case VarType.Vector2:
                     case VarType.Vector3:
                     case VarType.Color:
-                    case VarType.Vector4: return Color.yellow;
                     default: return Color.blue;
                 }
             }
@@ -125,7 +122,7 @@ namespace ScriptEditor.Graph {
         }
 
         public void DrawConnection() {
-            if (!isConnected || isInput) return;
+            if (!IsConnected || isInput) return;
 
             // draw bezier curve from output pin to input pin
             try {

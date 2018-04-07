@@ -22,7 +22,7 @@ namespace ScriptEditor.Graph
             inPins[1].Name = "Actor";
             inPins[1].Description = "The Actor whose script will be changed";
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
         }
 
         public override void Execute() {

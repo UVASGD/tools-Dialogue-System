@@ -57,6 +57,11 @@ namespace ScriptEditor.EditorScripts {
             }
         }
 
+        public static void UpdateGraph(NodeGraph graph) {
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
         /// <summary> Delete passed graph on file </summary>
         /// <param name="graph"></param>
         public static void DeleteScript(NodeGraph graph) {

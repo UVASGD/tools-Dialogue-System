@@ -10,9 +10,9 @@ namespace ScriptEditor.Graph {
         [SerializeField] protected PinValue val;
 
         public virtual OutputPin ConnectedOutput { get; set; }
+        public override bool IsConnected { get { return ConnectedOutput != null; } }
 
-        public object Value
-        {
+        public object Value {
             get { return val.Value; }
             set { val.Value = value; }
         }

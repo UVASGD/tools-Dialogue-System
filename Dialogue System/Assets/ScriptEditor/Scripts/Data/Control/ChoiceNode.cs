@@ -45,9 +45,9 @@ namespace ScriptEditor.Graph
             inPins[2].Name = "Condition 3";
             inPins[2].Default = true;
 
-            outPins.Add(new EventOutputPin(this));
-            outPins.Add(new EventOutputPin(this));
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             outPins[0].Name = "Default";
             outPins[0].Description = "What happens if no choice is available or selected.";
             outPins[1].Name = "Choice 2";
@@ -89,7 +89,7 @@ namespace ScriptEditor.Graph
             dc.AddChoice(choiceTexts[0], true);
             for (int i = 1; i<inPins.Count; i++) {
                 // only add the choice if the output has been connected
-                if(outPins[i].isConnected)
+                if(outPins[i].IsConnected)
                     dc.AddChoice(choiceTexts[i], (bool)inPins[i].Value);
             }
 

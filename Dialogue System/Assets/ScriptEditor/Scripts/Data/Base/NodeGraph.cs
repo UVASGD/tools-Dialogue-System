@@ -60,19 +60,15 @@ namespace ScriptEditor.Graph {
         public void ConnectPins(InputPin ip, OutputPin op) {
             ResetCompiledStatus();
 
-            if (ip.isConnected && ip.varType==VarType.Exec) {
-                OutputPin oldOutput = ip.ConnectedOutput;
-                oldOutput.ConnectedInput = null;
-                oldOutput.isConnected = false;
+            // limit pin connections per type
+            // executions can only have one output, but multiple inputs
+            if (op.IsConnected && op.varType==VarType.Exec) {
+               op.ConnectedInput.ConnectedOutput = null;
             }
 
-            if (op.isConnected && ip.varType != VarType.Exec) {
-                InputPin oldInput = op.ConnectedInput;
-                oldInput.ConnectedOutput = null;
-                oldInput.isConnected = false;
+            if (ip.IsConnected && ip.varType != VarType.Exec) {
+                ip.ConnectedOutput.ConnectedInput = null;
             }
-
-            ip.isConnected = op.isConnected = true;
 
             ip.ConnectedOutput = op;
             //op.ConnectedInputID = ip.node.inPins.IndexOf(ip);

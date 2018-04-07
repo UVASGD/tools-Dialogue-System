@@ -19,7 +19,7 @@ namespace ScriptEditor.Graph
             description = "Calls a custom function";
             // Create pins
 			inPins.Add(new EventInputPin(this));
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
           }
 	}
 }

@@ -69,7 +69,7 @@ namespace ScriptEditor.Graph
             inPins.Add(new ValueInputPin(this, VarType.Object));
             inPins[4].Name = "User Data";
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             nodeType = NodeType.Dialog;
         }
         
@@ -145,7 +145,7 @@ namespace ScriptEditor.Graph
             Index = Vector2.zero;
             Actor actor = null;
 
-            if (inPins[1].isConnected) {
+            if (inPins[1].IsConnected) {
                 actor = (Actor)inPins[1].Value;
             }
             
@@ -173,7 +173,7 @@ namespace ScriptEditor.Graph
             // focus on speaker
             if(actor != null) {
                 // change this to not be controlled by var?
-                if (inPins[2].isConnected) {
+                if (inPins[2].IsConnected) {
                     if ((bool)inPins[2].Value) {
                         Camera tmp = Camera.main;
                         if (tmp != null) {

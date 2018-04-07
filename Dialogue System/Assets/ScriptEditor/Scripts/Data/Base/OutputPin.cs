@@ -9,7 +9,7 @@ namespace ScriptEditor.Graph {
     public class OutputPin : NodePin {
         //public int ConnectedInputID = -1;
         public virtual InputPin ConnectedInput  { get; set; }
-        //public bool isConnected { get { return ConnectedInputID != -1; } }
+        public override bool IsConnected { get { return ConnectedInput != null; } }
 
         public OutputPin(NodeBase n, VarType t) : base(n, t) { }
 
@@ -41,8 +41,8 @@ namespace ScriptEditor.Graph {
     /// connecteded inputs are necessary for easily finding the node withing the graph
     /// </summary>
     [Serializable]
-    public class EventOutputPin : OutputPin {
-        public EventOutputPin(NodeBase n) : base(n, VarType.Exec) { }
+    public class ExecOutputPin : OutputPin {
+        public ExecOutputPin(NodeBase n) : base(n, VarType.Exec) { }
 
         private InputPin cInput = null;
 

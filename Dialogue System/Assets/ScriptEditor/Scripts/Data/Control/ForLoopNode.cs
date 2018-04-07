@@ -26,9 +26,9 @@ namespace ScriptEditor.Graph
             inPins[2].Description = "Final value of the index";
             inPins[2].Default = 0;
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
            outPins.Add(new ValueOutputPin(this, VarType.Integer));
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             outPins[0].Name = "Loop Body";
             outPins[0].Description = "The sequence of actions to execute during the loop";
             outPins[1].Name = "Index";

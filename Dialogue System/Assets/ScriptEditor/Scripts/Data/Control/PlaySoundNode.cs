@@ -25,7 +25,7 @@ namespace ScriptEditor.Graph {
             inPins[2].Default = false;
             inPins[3].Name = "Location";
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             nodeType = NodeType.Dialog;
         }
     }

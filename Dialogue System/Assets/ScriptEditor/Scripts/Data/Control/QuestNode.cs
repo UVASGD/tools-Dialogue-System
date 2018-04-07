@@ -18,7 +18,7 @@ namespace ScriptEditor.Graph
 		// Create Pins
 		inPins.Add(new EventInputPin(this));
 
-        outPins.Add(new EventOutputPin(this));
+        outPins.Add(new ExecOutputPin(this));
 		}
 	}
 }

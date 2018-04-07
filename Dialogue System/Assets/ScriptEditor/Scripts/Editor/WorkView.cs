@@ -40,12 +40,16 @@ namespace ScriptEditor.EditorScripts {
                 body.height / backgroundTexture.height));
             GUI.Box(body, title, skin.GetStyle("WorkViewBackground"));
             if (graph != null) {
+                float btnH = 25, btnMY = 10;
                 graph.DrawGraph(e, body);
-                if (GUI.Button(new Rect(0,editorRect.y, 80, 25), "Compile"))
+                if (GUI.Button(new Rect(0,editorRect.y+btnMY, 80, btnH), "Compile"))
                     graph.Compile();
-                EditorGUILayout.Toggle("Has Compiled: ", graph.compiled);
-                if (GUI.Button(new Rect(0, editorRect.y + 35, 80, 25), "Resize"))
+                GUI.Toggle(new Rect(100, editorRect.y + btnMY, 200, btnH), graph.compiled, "Has Compiled: ");
+                if (GUI.Button(new Rect(0, editorRect.y + btnH + 2 * btnMY, 80, btnH), "Save"))
+                    NodeUtilities.UpdateGraph(graph);
+                if (GUI.Button(new Rect(0, editorRect.y + 2 * (btnH + 2 * btnMY), 80, btnH), "Resize"))
                     foreach(NodeBase n in graph.nodes) n.Resize(true);
+
             }
 
             if (SelectedPin != null) {
@@ -199,7 +203,7 @@ namespace ScriptEditor.EditorScripts {
                             // pin connection menu
 
                             //break all connections
-                            if (pin.isConnected) {
+                            if (pin.IsConnected) {
                                 menu.AddItem(new GUIContent("Break Connection"), false, NodeBase.RemoveConnection, pin);
                                 {
                                     //break individual Conections
@@ -220,7 +224,7 @@ namespace ScriptEditor.EditorScripts {
                             }
 
                             // Promote input to variable Node
-                            if (!pin.isConnected && pin.isInput && pin.varType != VarType.Exec) {
+                            if (!pin.IsConnected && pin.isInput && pin.varType != VarType.Exec) {
                                 menu.AddItem(new GUIContent("Promote to Variable"), false, PromoteVariable, pin);
                             }
                         }

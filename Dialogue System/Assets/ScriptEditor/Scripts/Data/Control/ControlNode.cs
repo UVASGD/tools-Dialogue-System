@@ -35,11 +35,11 @@ namespace ScriptEditor.Graph {
                         inPins[inPins.Count - 1].Name = "Condition " + (inPins.Count - 1);
                         inPins[inPins.Count - 1].Default = true;
 
-                        outPins.Add(new EventOutputPin(this));
+                        outPins.Add(new ExecOutputPin(this));
                         outPins[outPins.Count - 1].Name = "Choice " + (inPins.Count - 1);
                         break;
                     case "SequenceNode":
-                        outPins.Add(new EventOutputPin(this));
+                        outPins.Add(new ExecOutputPin(this));
                         outPins[outPins.Count - 1].Name = "Then " + (inPins.Count - 2);
 
                         break;
@@ -97,9 +97,9 @@ namespace ScriptEditor.Graph {
             castables.Add(VarType.String.ToString(), new List<string>(new string[] {
             VarType.Float.ToString(), VarType.Integer.ToString(), VarType.Bool.ToString()}));
             castables.Add(VarType.Vector2.ToString(), new List<string>(new string[] {
-            VarType.Vector3.ToString(), VarType.Vector4.ToString()}));
+            VarType.Vector3.ToString(), VarType.Color.ToString()}));
             castables.Add(VarType.Vector3.ToString(), new List<string>(new string[] {
-                VarType.Vector4.ToString()}));
+                VarType.Color.ToString()}));
             ;
         }
     }

@@ -264,7 +264,7 @@ namespace ScriptEditor.Graph {
         /// <summary> first active inPin </summary>
         private int Start() {
             for (int i = 0; i < inPins.Count; i++)
-                if (inPins[i].isConnected)
+                if (inPins[i].IsConnected)
                     return i;
             return inPins.Count;
         }
@@ -453,7 +453,7 @@ namespace ScriptEditor.Graph {
             pins.Add(VarType.String.ToString());
             pins.Add(VarType.Vector2.ToString());
             pins.Add(VarType.Vector3.ToString());
-            pins.Add(VarType.Vector4.ToString());
+            pins.Add(VarType.Color.ToString());
             validCombos.Add(OpType.Add, pins);
             validCombos.Add(OpType.Subtract, pins);
 
@@ -462,7 +462,7 @@ namespace ScriptEditor.Graph {
             pins.Add(VarType.Integer.ToString());
             pins.Add(VarType.Vector2.ToString());
             pins.Add(VarType.Vector3.ToString());
-            pins.Add(VarType.Vector4.ToString());
+            pins.Add(VarType.Color.ToString());
             validCombos.Add(OpType.Multiply, pins);
 
 

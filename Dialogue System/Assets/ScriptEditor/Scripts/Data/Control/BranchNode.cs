@@ -27,9 +27,9 @@ namespace ScriptEditor.Graph
             inPins[1].Name = "Condition";
             inPins[1].Default = true;
 
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             outPins[0].Name = "True";
-            outPins.Add(new EventOutputPin(this));
+            outPins.Add(new ExecOutputPin(this));
             outPins[1].Name = "False";
         }
 
@@ -46,7 +46,7 @@ namespace ScriptEditor.Graph
 
             NodeBase output = null;
             OutputPin pin = outPins[condition ? 0 : 1];
-            if (pin.isConnected)
+            if (pin.IsConnected)
                 output = pin.ConnectedInput.node;
 
             return output;
