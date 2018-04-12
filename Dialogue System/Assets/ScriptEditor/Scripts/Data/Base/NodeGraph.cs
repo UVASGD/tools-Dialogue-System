@@ -78,6 +78,7 @@ namespace ScriptEditor.Graph {
         // these functions are necessary (but not used) since not all pins can be serialized
         // TODO: indices are not immutable, so this string may not be valid
         public InputPin InputFromID(string ID) {
+            if (String.IsNullOrEmpty(ID)) return null;
             string [] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
             return nodes[int.Parse(dat[0])].InPins[int.Parse(dat[1])];
         }
@@ -88,11 +89,11 @@ namespace ScriptEditor.Graph {
         }
 
         public OutputPin OutputFromID(string ID) {
-            if (ID == null) return null;
+            if (String.IsNullOrEmpty(ID)) return null;
             string[] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            //Debug.LogWarning("PDOP_ID: " + ID/*+"\nN: "+nodes[x]+"\nOP: " +(nodes[x]!=null?nodes[x].OutPins.ToString():"FAILURE")*/);
             int x = int.Parse(dat[0]), y = int.Parse(dat[1]);
 
-            Debug.LogWarning("PDOP_ID: " + ID+"\nN: "+nodes[x]+"\nOP: " +(nodes[x]!=null?nodes[x].OutPins.ToString():"FAILURE"));
             return nodes[x].OutPins[y];
         }
 

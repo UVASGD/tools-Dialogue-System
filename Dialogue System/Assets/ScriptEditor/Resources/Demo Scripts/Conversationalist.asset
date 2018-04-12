@@ -13,17 +13,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Conversationalist
   nodes:
-  - {fileID: 114951307005545984}
-  - {fileID: 114365023788872892}
-  - {fileID: 114129637664842766}
+  - {fileID: 114537232041109672}
+  - {fileID: 114570613596774282}
+  - {fileID: 114503105063254198}
   starts:
-  - {fileID: 114365023788872892}
+  - {fileID: 114570613596774282}
   compiled: 0
   SelectedNode: {fileID: 0}
   wantsConnection: 0
   showProperties: 0
   foundEnd: 0
---- !u!114 &114129637664842766
+--- !u!114 &114503105063254198
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -40,10 +40,199 @@ MonoBehaviour:
   multiplePins: 0
   compiled: 0
   parentGraph: {fileID: 11400000}
+  execOutPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114503105063254198}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 163
+      y: 69
+      width: 23
+      height: 17
+    cInput:
+      Name: 
+      Description: 
+      parentNode: {fileID: 0}
+      varType: 0
+      bounds:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      val:
+        boolVal: 0
+        intVal: 0
+        floatVal: 0
+        stringVal: 
+        vector2Val: {x: 0, y: 0}
+        vector3Val: {x: 0, y: 0, z: 0}
+        colorVal: {r: 0, g: 0, b: 0, a: 0}
+        actorVal: {fileID: 0}
+        Type: 0
+      cOutput: 
+  valOutPins: []
+  execInPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114503105063254198}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 69
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 0
+    cOutput: 
+  valInPins:
+  - Name: Speaker
+    Description: The Actor who speaks the text. Can be left empty
+    parentNode: {fileID: 114503105063254198}
+    varType: 10
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 98
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 10
+    cOutput:
+      Name: 
+      Description: 
+      parentNode: {fileID: 0}
+      varType: 0
+      bounds:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      cInput: 
+    totalConnections: 0
+  - Name: Focus on
+    Description: Whether or not the main camera should focus on the conversant
+    parentNode: {fileID: 114503105063254198}
+    varType: 1
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 127
+      width: 23
+      height: 17
+    val:
+      boolVal: 1
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 1
+    cOutput:
+      Name: 
+      Description: 
+      parentNode: {fileID: 0}
+      varType: 0
+      bounds:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      cInput: 
+    totalConnections: 0
+  - Name: Speed
+    Description: How fast the text is displayed
+    parentNode: {fileID: 114503105063254198}
+    varType: 3
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 156
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 1
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 3
+    cOutput:
+      Name: 
+      Description: 
+      parentNode: {fileID: 0}
+      varType: 0
+      bounds:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      cInput: 
+    totalConnections: 0
+  - Name: User Data
+    Description: 
+    parentNode: {fileID: 114503105063254198}
+    varType: 9
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 185
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 9
+    cOutput:
+      Name: 
+      Description: 
+      parentNode: {fileID: 0}
+      varType: 0
+      bounds:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      cInput: 
+    totalConnections: 0
   body:
     serializedVersion: 2
-    x: 541
-    y: 212
+    x: 566
+    y: 132
     width: 211
     height: 240
   viewRect:
@@ -62,38 +251,7 @@ MonoBehaviour:
   hideOnExit: 0
   icon: {fileID: 0}
   header: 
---- !u!114 &114365023788872892
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce8e7bbb27beaff489d04f0b42f0f7c5, type: 3}
-  m_Name: Start
-  m_EditorClassIdentifier: 
-  description: Begins root script execution
-  isSelected: 0
-  nodeType: 5
-  multiplePins: 0
-  compiled: 0
-  parentGraph: {fileID: 11400000}
-  body:
-    serializedVersion: 2
-    x: 370
-    y: 121
-    width: 175
-    height: 77
-  viewRect:
-    serializedVersion: 2
-    x: 0
-    y: 17.5
-    width: 1224
-    height: 357
-  skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
-  LockPlayer: 1
---- !u!114 &114951307005545984
+--- !u!114 &114537232041109672
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -110,16 +268,108 @@ MonoBehaviour:
   multiplePins: 0
   compiled: 0
   parentGraph: {fileID: 11400000}
+  execOutPins: []
+  valOutPins: []
+  execInPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114537232041109672}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 30
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 0
+    cOutput: 
+  valInPins: []
   body:
     serializedVersion: 2
-    x: 697
-    y: 151
+    x: 740.5
+    y: 221
     width: 175
     height: 77
   viewRect:
     serializedVersion: 2
     x: 0
     y: 17.5
-    width: 1224
-    height: 357
+    width: 1311
+    height: 299
   skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
+--- !u!114 &114570613596774282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce8e7bbb27beaff489d04f0b42f0f7c5, type: 3}
+  m_Name: Start
+  m_EditorClassIdentifier: 
+  description: Begins root script execution
+  isSelected: 0
+  nodeType: 5
+  multiplePins: 0
+  compiled: 0
+  parentGraph: {fileID: 11400000}
+  execOutPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114570613596774282}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 127
+      y: 30
+      width: 23
+      height: 17
+    cInput:
+      Name: 
+      Description: 
+      parentNode: {fileID: 0}
+      varType: 0
+      bounds:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0
+        height: 0
+      val:
+        boolVal: 0
+        intVal: 0
+        floatVal: 0
+        stringVal: 
+        vector2Val: {x: 0, y: 0}
+        vector3Val: {x: 0, y: 0, z: 0}
+        colorVal: {r: 0, g: 0, b: 0, a: 0}
+        actorVal: {fileID: 0}
+        Type: 0
+      cOutput: 
+  valOutPins: []
+  execInPins: []
+  valInPins: []
+  body:
+    serializedVersion: 2
+    x: 269.5
+    y: 204
+    width: 175
+    height: 77
+  viewRect:
+    serializedVersion: 2
+    x: 0
+    y: 17.5
+    width: 1311
+    height: 299
+  skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
+  LockPlayer: 1

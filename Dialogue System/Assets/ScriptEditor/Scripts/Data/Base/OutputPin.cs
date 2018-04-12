@@ -49,6 +49,7 @@ namespace ScriptEditor.Graph {
         public override InputPin ConnectedInput {
             get { return cInput; }
             set {
+                Debug.Log("cInput ef EOP is got set");
                 cInput = (ExecInputPin) value;
             }
         }

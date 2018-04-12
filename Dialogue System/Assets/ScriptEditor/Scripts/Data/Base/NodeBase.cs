@@ -51,7 +51,7 @@ namespace ScriptEditor.Graph {
         public List<OutputPin> OutPins { get {
                 List<OutputPin> sol = execOutPins.Cast<OutputPin>()
                     .Concat<OutputPin>(valOutPins.Cast<OutputPin>()).ToList();
-                Debug.Log("pomat: " + sol);
+                //.Log("pomat: " + sol);
                 return sol;
             } }
         public List<ExecOutputPin> EOP { get { return execOutPins; } }
