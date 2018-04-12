@@ -8,9 +8,8 @@ namespace ScriptEditor.Graph
         {
         }
 
-        public override void Execute()
-        {
-
+        public override void Execute() {
+            base.Execute();
         }
 
         public override void Construct()
@@ -19,23 +18,27 @@ namespace ScriptEditor.Graph
             name = "Play Music";
             description = "Sets the bgm of the scene";
             // Create Pins
-            inPins.Add(new EventInputPin(this));
-            inPins.Add(new ValueInputPin(this, VarType.String));
-            inPins.Add(new ValueInputPin(this, VarType.Bool));
-            inPins.Add(new ValueInputPin(this, VarType.Vector3));
-            inPins.Add(new ValueInputPin(this, VarType.Float));
-            inPins[1].Name = "Path to Song";
-            inPins[1].Description = "Path to what song to play. (e.g. Assets/Resources/Music/Main Theme)";
-            inPins[1].Default = "Assets/";
-            inPins[2].Name = "Loop";
-            inPins[2].Default = false;
-            inPins[3].Name = "Location";
-            inPins[3].Description = "The location to play the song in World Coordinates";
-            inPins[4].Name = "Range";
-            inPins[4].Description = "The maximum distance the song can be heard";
-            inPins[4].Default = 100;
+            execInPins.Add(new ExecInputPin(this));
+            valInPins.Add(new ValueInputPin(this, VarType.String));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins.Add(new ValueInputPin(this, VarType.Vector3));
+            valInPins.Add(new ValueInputPin(this, VarType.Float));
+            valInPins[0].Name = "Path to Song";
+            valInPins[0].Description = "Path to what song to play. (e.g. Assets/Resources/Music/Main Theme)";
+            valInPins[0].Default = "Assets/";
+            valInPins[1].Name = "Loop";
+            valInPins[1].Default = false;
+            valInPins[2].Name = "Location";
+            valInPins[2].Description = "The location to play the song in World Coordinates";
+            valInPins[3].Name = "Range";
+            valInPins[3].Description = "The maximum distance the song can be heard";
+            valInPins[3].Default = 100;
 
-            outPins.Add(new ExecOutputPin(this));
+            execOutPins.Add(new ExecOutputPin(this));
+        }
+
+        protected override void Setup() {
+
         }
     }
 }

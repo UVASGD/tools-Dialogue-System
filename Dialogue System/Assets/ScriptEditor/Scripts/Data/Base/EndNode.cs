@@ -6,13 +6,13 @@ namespace ScriptEditor.Graph {
 
         public virtual void Construct() {
             base.SetName("End");
-            inPins.Add(new EventInputPin(this));
+            execInPins.Add(new ExecInputPin(this));
             Resize();
         }
 
         public override void Resize() {
             body = new Rect(0, 0, Width, 77);
-            inPins[0].bounds.position = new Vector2(NodePin.margin.x, 30);
+            execInPins[0].bounds.position = new Vector2(NodePin.margin.x, 30);
         }
 
         public override void Initialize() {

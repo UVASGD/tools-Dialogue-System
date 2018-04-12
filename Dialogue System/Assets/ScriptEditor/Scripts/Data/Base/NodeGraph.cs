@@ -75,25 +75,30 @@ namespace ScriptEditor.Graph {
             op.ConnectedInput = ip;
         }
 
-        // these functions are necessary since not all pins can be serialized
+        // these functions are necessary (but not used) since not all pins can be serialized
+        // TODO: indices are not immutable, so this string may not be valid
         public InputPin InputFromID(string ID) {
             string [] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-            return nodes[int.Parse(dat[0])].inPins[int.Parse(dat[1])];
+            return nodes[int.Parse(dat[0])].InPins[int.Parse(dat[1])];
         }
 
         public string IDFromInput(InputPin ip) {
             if(ip == null) return null;
-            return nodes.IndexOf(ip.node)+":"+ip.node.inPins.IndexOf(ip);
+            return nodes.IndexOf(ip.parentNode)+":"+ip.parentNode.InPins.IndexOf(ip);
         }
 
         public OutputPin OutputFromID(string ID) {
+            if (ID == null) return null;
             string[] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-            return nodes[int.Parse(dat[0])].outPins[int.Parse(dat[1])];
+            int x = int.Parse(dat[0]), y = int.Parse(dat[1]);
+
+            Debug.LogWarning("PDOP_ID: " + ID+"\nN: "+nodes[x]+"\nOP: " +(nodes[x]!=null?nodes[x].OutPins.ToString():"FAILURE"));
+            return nodes[x].OutPins[y];
         }
 
         public string IDFromOutput(OutputPin op) {
             if (op == null) return null;
-            return nodes.IndexOf(op.node) + ":" + op.node.outPins.IndexOf(op);
+            return nodes.IndexOf(op.parentNode) + ":" + op.parentNode.OutPins.IndexOf(op);
         }
 
 

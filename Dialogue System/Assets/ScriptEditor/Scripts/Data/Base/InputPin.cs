@@ -32,10 +32,10 @@ namespace ScriptEditor.Graph {
         }
 
         public override string ConName() {
-            return ConnectedOutput.node.name;
+            return ConnectedOutput.parentNode.name;
         }
         public override string ToString() {
-            return "(IN) Node: " + node.STName + " | " + varType + "\n" + node.description;
+            return "(IN) Node: " + parentNode.STName + " | " + varType + "\n" + parentNode.description;
         }
     }
 
@@ -44,14 +44,14 @@ namespace ScriptEditor.Graph {
     /// the node graph is built in the script editor
     /// </summary>
     [Serializable]
-    public class EventInputPin : InputPin {
-        public EventInputPin(NodeBase n) : base(n, VarType.Exec) { }
+    public class ExecInputPin : InputPin {
+        public ExecInputPin(NodeBase n) : base(n, VarType.Exec) { }
 
-        private string cOutput = null;
+        [SerializeField] private string cOutput = null;
 
         public override OutputPin ConnectedOutput {
-            get { return this.node.parentGraph.OutputFromID(cOutput); }
-            set { cOutput = this.node.parentGraph.IDFromOutput(value); }
+            get { return this.parentNode.parentGraph.OutputFromID(cOutput); }
+            set { cOutput = this.parentNode.parentGraph.IDFromOutput(value); }
         }
     }
 
@@ -63,11 +63,15 @@ namespace ScriptEditor.Graph {
         public ValueInputPin(NodeBase n, VarType t, object val) : base(n, t, val) { }
         public ValueInputPin(NodeBase n, VarType t) : base(n, t) { }
 
-        private OutputPin cOutput = null;
+        [SerializeField] private ValueOutputPin cOutput = null;
+        [SerializeField] private int totalConnections = 0;
 
         public override OutputPin ConnectedOutput {
             get { return cOutput; }
-            set { cOutput = value; }
+            set {
+                totalConnections += value == null ? -1 : 1;
+                cOutput = (ValueOutputPin) value;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -47,10 +48,29 @@ namespace ScriptEditor.Graph {
         protected bool _set = false;
         protected bool setupCompleted { get { return _set; } set { Debug.Log("djidjiedjijed"); _set = value; } }
         
-        public List<OutputPin> outPins;
-        public List<InputPin> inPins;
+        public List<OutputPin> OutPins { get {
+                List<OutputPin> sol = execOutPins.Cast<OutputPin>()
+                    .Concat<OutputPin>(valOutPins.Cast<OutputPin>()).ToList();
+                Debug.Log("pomat: " + sol);
+                return sol;
+            } }
+        public List<ExecOutputPin> EOP { get { return execOutPins; } }
+        public List<ValueOutputPin> VOP { get { return valOutPins; } }
+        [SerializeField] protected List<ExecOutputPin> execOutPins;
+        [SerializeField] protected List<ValueOutputPin> valOutPins;
+
+        public List<InputPin> InPins { get {
+                return execInPins.Cast<InputPin>()
+                    .Concat<InputPin>(valInPins.Cast<InputPin>()).ToList();
+            } }
+        public List<ExecInputPin> EIP { get { return execInPins; } }
+        public List<ValueInputPin> VIP { get { return valInPins; } }
+        [SerializeField] protected List<ExecInputPin> execInPins;
+        [SerializeField] protected List<ValueInputPin> valInPins;
+
         public List<NodeError> errors;
-        public int MaxNodes { get { return Mathf.Max(inPins.Count, outPins.Count); } }
+        public int MaxNodes { get { return Mathf.Max(execInPins.Count+ valInPins.Count,
+            execOutPins.Count + valOutPins.Count); } }
         public NodeType Node_Type { get { return nodeType; } }
 
         /// <summary>
@@ -60,16 +80,13 @@ namespace ScriptEditor.Graph {
 
         /// <summary>[unused] whether or not the node can be logically executed </summary>
         public bool IsExecutable { get {
-                foreach (InputPin ip in inPins) if (ip.varType == VarType.Exec)
-                        return true;
-                return false;
+                return (execInPins.Count == 0 && execOutPins.Count == 0);
             } }
 
         ///<summary> whether or not the executable pin's output can be ignored; true only when exec input is disconnected </summary>
         public bool Ignorable {
             get {
-                foreach (InputPin ip in inPins)
-                    if (ip.varType == VarType.Exec)
+                foreach (InputPin ip in execInPins)
                         return !ip.IsConnected;
                 return false;
             }
@@ -79,7 +96,7 @@ namespace ScriptEditor.Graph {
         public string LongestInName {
             get {
                 string res = "";
-                foreach (InputPin i in inPins)
+                foreach (InputPin i in InPins)
                     if (!String.IsNullOrEmpty(i.Name))
                         res = (i.Name.Length > res.Length) ? i.Name : res;
                 return res;
@@ -90,7 +107,7 @@ namespace ScriptEditor.Graph {
         public string LongestOutName {
             get {
                 string res = "";
-                foreach (OutputPin o in outPins)
+                foreach (OutputPin o in OutPins)
                     if (!String.IsNullOrEmpty(o.Name))
                         res = (o.Name.Length > res.Length) ? o.Name : res;
                 return res;
@@ -99,8 +116,8 @@ namespace ScriptEditor.Graph {
 
         /// <summary> all input and output pins attached to node </summary>
         public List<NodePin> AllPins { get {
-                List<NodePin> pins = new List<NodePin>(outPins.ToArray());
-                pins.AddRange(inPins.ToArray());
+                List<NodePin> pins = new List<NodePin>(OutPins.ToArray());
+                pins.AddRange(InPins.ToArray());
                 return pins;
             } }
 
@@ -192,6 +209,8 @@ namespace ScriptEditor.Graph {
             body.size += inputWidths;
 
             // set pin visual information
+            List<InputPin> inPins = InPins;
+            List<OutputPin> outPins = OutPins;
             foreach (NodePin pin in AllPins) {
                   float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
                 float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) :
@@ -205,8 +224,11 @@ namespace ScriptEditor.Graph {
         /// <summary> makes the node ready for display and value storage </summary>
         public virtual void Initialize() {
             GetEditorSkin();
-            inPins = new List<InputPin>();
-            outPins = new List<OutputPin>();
+            execInPins = new List<ExecInputPin>();
+            valInPins = new List<ValueInputPin>();
+            execOutPins = new List<ExecOutputPin>();
+            valOutPins = new List<ValueOutputPin>();
+
             errors = new List<NodeError>();
             //hideFlags = HideFlags.HideInHierarchy;
         }
@@ -229,9 +251,8 @@ namespace ScriptEditor.Graph {
 
         /// <summary> Return the next executable node </summary>
         public virtual NodeBase GetNextNode() {
-            if (outPins.Count > 0) {
-                if (outPins[0].varType == VarType.Exec)
-                    return outPins[0].ConnectedInput.node;
+            if (execOutPins.Count > 0) {
+                    return execOutPins[0].ConnectedInput.parentNode;
             }
 
             return null;
@@ -239,18 +260,18 @@ namespace ScriptEditor.Graph {
 
         /// <summary> add new pin with base variable type</summary>
         public virtual void AddInputPin() {
-            if (multiplePins && inPins.Count < 16) {
+            if (multiplePins && InPins.Count < 16) {
                 //ScriptableObject.Instantiate<InputPin>();
-                inPins.Add(new ValueInputPin(this, inPins[0].varType));
+                valInPins.Add(new ValueInputPin(this, valInPins[0].varType));
                 Resize();
             }
         }
 
-        /// <summary> remove last input pin</summary>
+        /// <summary> remove last value input pin</summary>
         public virtual void RemovePin() {
-            if (multiplePins && inPins.Count > 2) {
-                InputPin pin = inPins[inPins.Count - 1];
-                inPins.Remove(pin);
+            if (multiplePins && valInPins.Count > 2) {
+                ValueInputPin pin = valInPins[valInPins.Count - 1];
+                valInPins.Remove(pin);
                 RemoveConnection(pin);
                 Resize();
             }
@@ -271,10 +292,10 @@ namespace ScriptEditor.Graph {
             setCompiled();
             //Debug.Log("Look up "+this);
             parentGraph.lookupStack.Push(this);
-            foreach(InputPin ip in inPins) {
+            foreach(InputPin ip in InPins) {
                 if (ip.varType!=VarType.Exec && ip.IsConnected) {
                     // recurse
-                    ip.ConnectedOutput.node.Lookup(compileTime);
+                    ip.ConnectedOutput.parentNode.Lookup(compileTime);
                 }
             }
             parentGraph.lookupStack.Pop();
@@ -295,7 +316,7 @@ namespace ScriptEditor.Graph {
                     } else {
                         // branch must be controlled by variable to prevent infinite loop!
                         if (cn.GetType() == typeof(BranchNode) &&
-                            !cn.inPins[1].IsConnected) {
+                            !cn.valInPins[1].IsConnected) {
                             errors.Add(new NodeError(NodeError.ErrorType.InfiniteLoop));
                             return;
                         }
@@ -309,7 +330,7 @@ namespace ScriptEditor.Graph {
             // check for default connection
             if(this is ChoiceNode) {
                 ChoiceNode c = ((ChoiceNode)this);
-                if (!c.outPins[c.defaultChoice].IsConnected)
+                if (!c.execOutPins[c.defaultChoice].IsConnected)
                     errors.Add(new NodeError(NodeError.ErrorType.NoDefault));
             }
 
@@ -317,19 +338,16 @@ namespace ScriptEditor.Graph {
             if (this as EndNode != null) parentGraph.foundEnd = true;
             Debug.Log("Compiling: " + this);
             parentGraph.compileStack.Push(this);
-            foreach(OutputPin op in outPins) {
-                if (op.IsConnected)
-                    if (op.varType == VarType.Exec) {
-                        //Debug.Log("OP.CO.NO: " + op.ConnectedInput.node);
-                        op.ConnectedInput.node.Compile();
-                    }
+            foreach(OutputPin op in execOutPins) {
+                if (op.IsConnected) {
+                    //Debug.Log("OP.CO.NO: " + op.ConnectedInput.node);
+                    op.ConnectedInput.parentNode.Compile();
+                }
             }
 
-            foreach(InputPin ip in inPins) {
-                if (ip.varType != VarType.Exec && ip.IsConnected) {
-                    if (!ip.ConnectedOutput.node.Ignorable)
-                        ip.ConnectedOutput.node.Lookup(true);
-                }
+            foreach(InputPin ip in valInPins) {
+                if (ip.IsConnected && !ip.ConnectedOutput.parentNode.Ignorable)
+                        ip.ConnectedOutput.parentNode.Lookup(true);
             }
             parentGraph.compileStack.Pop();
         }
@@ -484,14 +502,16 @@ namespace ScriptEditor.Graph {
         /// </summary>
         /// <param name="pin"></param>
         public void RemoveAllPins () {
-            outPins = new List<OutputPin>();
-            inPins = new List<InputPin>();
+            execInPins = new List<ExecInputPin>();
+            valInPins = new List<ValueInputPin>();
+            execOutPins = new List<ExecOutputPin>();
+            valOutPins = new List<ValueOutputPin>();
         }
 
         public static void RemoveConnection(object p) {
             NodePin pin = (NodePin)p;
             pin.IsConnected = false;
-            pin.node.parentGraph.ResetCompiledStatus();
+            pin.parentNode.parentGraph.ResetCompiledStatus();
 
             if (pin.IsConnected) {
                 if (pin is OutputPin) {

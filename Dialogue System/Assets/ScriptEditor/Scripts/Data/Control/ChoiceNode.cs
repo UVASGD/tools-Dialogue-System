@@ -37,26 +37,26 @@ namespace ScriptEditor.Graph
 
             // Create pins
 			multiplePins = true;
-            inPins.Add(new EventInputPin(this));
-            inPins.Add(new ValueInputPin(this, VarType.Bool));
-            inPins.Add(new ValueInputPin(this, VarType.Bool));
-            inPins[1].Name = "Condition 2";
-            inPins[1].Default = true;
-            inPins[2].Name = "Condition 3";
-            inPins[2].Default = true;
+            execInPins.Add(new ExecInputPin(this));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins[0].Name = "Condition 2";
+            valInPins[0].Default = true;
+            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins[1].Name = "Condition 3";
+            valInPins[1].Default = true;
 
-            outPins.Add(new ExecOutputPin(this));
-            outPins.Add(new ExecOutputPin(this));
-            outPins.Add(new ExecOutputPin(this));
-            outPins[0].Name = "Default";
-            outPins[0].Description = "What happens if no choice is available or selected.";
-            outPins[1].Name = "Choice 2";
-            outPins[2].Name = "Choice 3";
+            execOutPins.Add(new ExecOutputPin(this));
+            execOutPins[0].Name = "Default Choice";
+            execOutPins[0].Description = "What happens if no choice is available or selected.";
+            execOutPins.Add(new ExecOutputPin(this));
+            execOutPins[1].Name = "Choice 2";
+            execOutPins.Add(new ExecOutputPin(this));
+            execOutPins[2].Name = "Choice 3";
             nodeType = NodeType.Dialog;
 
             choiceTexts = new List<string>();
             choiceTexts.Add("Default Choice");
-            for(int i=1; i<inPins.Count; i++)
+            for(int i=1; i< execOutPins.Count; i++)
                 choiceTexts.Add("Choice " + (i+1));
         }
 
@@ -87,10 +87,10 @@ namespace ScriptEditor.Graph
         protected override void Setup() {
             dc = GameObject.FindObjectOfType<DialogueController>();
             dc.AddChoice(choiceTexts[0], true);
-            for (int i = 1; i<inPins.Count; i++) {
+            for (int i = 1; i<valInPins.Count; i++) {
                 // only add the choice if the output has been connected
-                if(outPins[i].IsConnected)
-                    dc.AddChoice(choiceTexts[i], (bool)inPins[i].Value);
+                if(execOutPins[i-1].IsConnected)
+                    dc.AddChoice(choiceTexts[i], (bool)valInPins[i].Value);
             }
 
             choice = -1;
@@ -103,7 +103,7 @@ namespace ScriptEditor.Graph
         }
 
         public override NodeBase GetNextNode() {
-            return outPins[choice].ConnectedInput.node;
+            return execOutPins[choice].ConnectedInput.parentNode;
         }
     }
 }

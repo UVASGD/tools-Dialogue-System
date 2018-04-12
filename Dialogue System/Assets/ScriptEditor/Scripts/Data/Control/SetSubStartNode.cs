@@ -17,9 +17,9 @@ namespace ScriptEditor.Graph
             name = "Set Sub Start";
             description = "Changes where the dialogue script starts the next time it is activated";
             // Create pins
-            inPins.Add(new EventInputPin(this));
+            execInPins.Add(new ExecInputPin(this));
 
-            outPins.Add(new ExecOutputPin(this));
+            execOutPins.Add(new ExecOutputPin(this));
         }
 
         public override void Execute() {

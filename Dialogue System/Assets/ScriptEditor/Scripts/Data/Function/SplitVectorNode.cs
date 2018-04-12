@@ -10,33 +10,33 @@ namespace ScriptEditor.Graph {
             string type = "Vector2";
 
             // set input and output pins
-            inPins.Add(new ValueInputPin(this, nT));
+            valInPins.Add(new ValueInputPin(this, nT));
             switch (nT) {
                 case VarType.Vector2:
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                    outPins[0].Name = "x";
-                    outPins[1].Name = "y";
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valOutPins[0].Name = "x";
+                    valOutPins[1].Name = "y";
                     break;
                 case VarType.Vector3:
                     type = "Vector3";
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                    outPins[0].Name = "x";
-                    outPins[1].Name = "y";
-                    outPins[2].Name = "z";
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valOutPins[0].Name = "x";
+                    valOutPins[1].Name = "y";
+                    valOutPins[2].Name = "z";
                     break;
                 case VarType.Color:
                     type = "Color";
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                    outPins[0].Name = "r";
-                    outPins[1].Name = "g";
-                    outPins[2].Name = "b";
-                    outPins[3].Name = "a";
-                    outPins[3].Description = "Color transparency";
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valOutPins[0].Name = "r";
+                    valOutPins[1].Name = "g";
+                    valOutPins[2].Name = "b";
+                    valOutPins[3].Name = "a";
+                    valOutPins[3].Description = "Color transparency";
                     break;
             }
 

@@ -14,18 +14,18 @@ namespace ScriptEditor.Graph {
             name = "Play Sound at Location";
             description = "";
             // Create Pins
-            inPins.Add(new EventInputPin(this));
-            inPins.Add(new ValueInputPin(this, VarType.String));
-            inPins.Add(new ValueInputPin(this, VarType.Bool));
-            inPins.Add(new ValueInputPin(this, VarType.Vector3));
-            inPins[1].Name = "Path to Sound";
-            inPins[1].Description = "Path to what sound to play. (e.g. Assets/Resources/Sounds/Jump)";
-            inPins[1].Default = "Assets/";
-            inPins[2].Name = "Loop";
-            inPins[2].Default = false;
-            inPins[3].Name = "Location";
+            execInPins.Add(new ExecInputPin(this));
+            valInPins.Add(new ValueInputPin(this, VarType.String));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins.Add(new ValueInputPin(this, VarType.Vector3));
+            valInPins[0].Name = "Path to Sound";
+            valInPins[0].Description = "Path to what sound to play. (e.g. Assets/Resources/Sounds/Jump)";
+            valInPins[0].Default = "Assets/";
+            valInPins[1].Name = "Loop";
+            valInPins[1].Default = false;
+            valInPins[2].Name = "Location";
 
-            outPins.Add(new ExecOutputPin(this));
+            execOutPins.Add(new ExecOutputPin(this));
             nodeType = NodeType.Dialog;
         }
     }

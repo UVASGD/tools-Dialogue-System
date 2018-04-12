@@ -135,31 +135,31 @@ namespace ScriptEditor.Graph {
                 case OpType.Divide:
                     for (int i = 0; i < inCount; i++) {
                         ValueInputPin p = new ValueInputPin(this, nT);
-                        inPins.Add(p);
+                        valInPins.Add(p);
                     }
-                    outPins.Add(new ValueOutputPin(this, nT));
+                    valOutPins.Add(new ValueOutputPin(this, nT));
                     multiplePins = true;
                     break;
                 case OpType.Abs:
                 case OpType.SQRT:
-                    inPins.Add(new ValueInputPin(this, nT));
-                    outPins.Add(new ValueOutputPin(this, nT));
+                    valInPins.Add(new ValueInputPin(this, nT));
+                    valOutPins.Add(new ValueOutputPin(this, nT));
                     break;
                 case OpType.POW:
-                    inPins.Add(new ValueInputPin(this, nT));
-                    inPins.Add(new ValueInputPin(this, nT));
-                    outPins.Add(new ValueOutputPin(this, nT));
+                    valInPins.Add(new ValueInputPin(this, nT));
+                    valInPins.Add(new ValueInputPin(this, nT));
+                    valOutPins.Add(new ValueOutputPin(this, nT));
                     break;
                 case OpType.Not:
-                    inPins.Add(new ValueInputPin(this, VarType.Bool));
-                    outPins.Add(new ValueOutputPin(this, VarType.Bool));
+                    valInPins.Add(new ValueInputPin(this, VarType.Bool));
+                    valOutPins.Add(new ValueOutputPin(this, VarType.Bool));
                     break;
                 case OpType.And:
                 case OpType.Or:
                 case OpType.Xor:
                     for (int i = 0; i < inCount; i++)
-                        inPins.Add(new ValueInputPin(this, VarType.Bool));
-                    outPins.Add(new ValueOutputPin(this, VarType.Bool));
+                        valInPins.Add(new ValueInputPin(this, VarType.Bool));
+                    valOutPins.Add(new ValueOutputPin(this, VarType.Bool));
                     multiplePins = true;
                     break;
                 case OpType.EqualTo:
@@ -167,9 +167,9 @@ namespace ScriptEditor.Graph {
                 case OpType.GreaterOrEqual:
                 case OpType.LessThan:
                 case OpType.LessOrEqual:
-                    inPins.Add(new ValueInputPin(this, nT));
-                    inPins.Add(new ValueInputPin(this, nT));
-                    outPins.Add(new ValueOutputPin(this, VarType.Bool));
+                    valInPins.Add(new ValueInputPin(this, nT));
+                    valInPins.Add(new ValueInputPin(this, nT));
+                    valOutPins.Add(new ValueOutputPin(this, VarType.Bool));
                     break;
 
             }
@@ -184,7 +184,7 @@ namespace ScriptEditor.Graph {
         const float margin = 22;
         public override void Resize() {
             float outH = baseBox.y;
-            float inH = NodePin.padding + inPins.Count * NodePin.Top;
+            float inH = NodePin.padding + valInPins.Count * NodePin.Top;
 
             float txtW = 4 * margin + NodePin.pinSize.x +
                 skin.GetStyle("NodeMathSelected").CalcSize(new GUIContent(splashText)).x;
@@ -203,8 +203,8 @@ namespace ScriptEditor.Graph {
                     pos.y = Center.y - NodePin.pinSize.y / 2f;
                 } else {
                     pos.x = margin;
-                    pos.y = inPins.Count == 1 ? Center.y - NodePin.pinSize.y / 2f :
-                        Center.y - NodePin.Top * (inPins.Count / 2f - inPins.IndexOf((InputPin)pin));
+                    pos.y = valInPins.Count == 1 ? Center.y - NodePin.pinSize.y / 2f :
+                        Center.y - NodePin.Top * (valInPins.Count / 2f - valInPins.IndexOf((ValueInputPin)pin));
                 }
                 pin.bounds.position = pos;
                 //Debug.Log(pin + ": " + pos);
@@ -239,12 +239,12 @@ namespace ScriptEditor.Graph {
             float bw = Mathf.Max(baseButton.x, skin.GetStyle("NodeMathButton")
                 .CalcSize(new GUIContent("- Remove Pin")).x);
             if (multiplePins) {
-                if (inPins.Count < 16)
+                if (valInPins.Count < 16)
                     if (GUI.Button(new Rect(body.position.x + boxSize.x + Left - bw - buttonLeft,
                         body.position.y + Center.y - (boxSize.y / 4f + buttonTop + Header / 2f), bw, baseButton.y),
                         "+ Add Pin"/*, skin.GetStyle("NodeMathButton")*/))
                         AddInputPin();
-                if (inPins.Count > 2)
+                if (valInPins.Count > 2)
                     if (GUI.Button(new Rect(body.position.x + boxSize.x + Left - bw - buttonLeft,
                         body.position.y + Center.y + (boxSize.y / 4f + buttonTop + buttonTop - Header / 2f), bw, baseButton.y),
                         "- Remove Pin"/*, skin.GetStyle("NodeMathButton")*/))
@@ -263,10 +263,10 @@ namespace ScriptEditor.Graph {
 
         /// <summary> first active inPin </summary>
         private int Start() {
-            for (int i = 0; i < inPins.Count; i++)
-                if (inPins[i].IsConnected)
+            for (int i = 0; i < valInPins.Count; i++)
+                if (valInPins[i].IsConnected)
                     return i;
-            return inPins.Count;
+            return valInPins.Count;
         }
 
         #region Override
@@ -278,123 +278,123 @@ namespace ScriptEditor.Graph {
             //int start = Start();
             //switch (op) {
             //    case OpType.Abs:
-            //        switch (outPins[0].varType) {
+            //        switch (valOutPins[0].varType) {
             //            case VarType.Integer:
             //            case VarType.Float:
-            //                outPins[0].Value = inPins[0].isConnected ?
-            //                    (Mathf.Abs((float)inPins[0].Value)) : 0;
+            //                valOutPins[0].Value = valInPins[0].isConnected ?
+            //                    (Mathf.Abs((float)valInPins[0].Value)) : 0;
             //                break;
             //            case VarType.Vector2:
-            //                if (inPins[0].isConnected) {
-            //                    Vector2 tmp = (Vector2)inPins[0].Value;
-            //                    outPins[0].Value = new Vector2(Mathf.Abs(tmp.x),
+            //                if (valInPins[0].isConnected) {
+            //                    Vector2 tmp = (Vector2)valInPins[0].Value;
+            //                    valOutPins[0].Value = new Vector2(Mathf.Abs(tmp.x),
             //                                             Mathf.Abs(tmp.y));
-            //                } else outPins[0].Value = Vector2.zero;
+            //                } else valOutPins[0].Value = Vector2.zero;
             //                break;
             //        }
             //        break;
             //    case OpType.Add:
-            //        switch (outPins[0].varType) {
+            //        switch (valOutPins[0].varType) {
             //            case VarType.Integer:
             //            case VarType.Float:
-            //                outPins[0].Value = 0;
-            //                foreach (InputPin p in inPins) {
-            //                    outPins[0].Value = (float)outPins[0].Value + (p.isConnected ? (float)p.Value : 0);
+            //                valOutPins[0].Value = 0;
+            //                foreach (InputPin p in valInPins) {
+            //                    valOutPins[0].Value = (float)valOutPins[0].Value + (p.isConnected ? (float)p.Value : 0);
             //                }
             //                break;
             //            case VarType.String:
-            //                outPins[0].Value = "";
-            //                foreach (InputPin p in inPins) {
-            //                    outPins[0].Value = (string)outPins[0].Value + (p.isConnected ? (string)p.Value : "");
+            //                valOutPins[0].Value = "";
+            //                foreach (InputPin p in valInPins) {
+            //                    valOutPins[0].Value = (string)valOutPins[0].Value + (p.isConnected ? (string)p.Value : "");
             //                }
             //                break;
             //            case VarType.Vector2:
-            //                outPins[0].Value = Vector2.zero;
-            //                foreach (InputPin p in inPins) {
-            //                    outPins[0].Value = (Vector2)outPins[0].Value + (p.isConnected ? (Vector2)p.Value : Vector2.zero);
+            //                valOutPins[0].Value = Vector2.zero;
+            //                foreach (InputPin p in valInPins) {
+            //                    valOutPins[0].Value = (Vector2)valOutPins[0].Value + (p.isConnected ? (Vector2)p.Value : Vector2.zero);
             //                }
             //                break;
             //            case VarType.Vector3:
-            //                outPins[0].Value = Vector3.zero;
-            //                foreach (InputPin p in inPins) {
-            //                    outPins[0].Value = (Vector3)outPins[0].Value + (p.isConnected ? (Vector3)p.Value : Vector3.zero);
+            //                valOutPins[0].Value = Vector3.zero;
+            //                foreach (InputPin p in valInPins) {
+            //                    valOutPins[0].Value = (Vector3)valOutPins[0].Value + (p.isConnected ? (Vector3)p.Value : Vector3.zero);
             //                }
             //                break;
             //            case VarType.Vector4:
-            //                outPins[0].Value = Vector4.zero;
-            //                foreach (InputPin p in inPins) {
-            //                    outPins[0].Value = (Vector4)outPins[0].Value + (p.isConnected ? (Vector4)p.Value : Vector4.zero);
+            //                valOutPins[0].Value = Vector4.zero;
+            //                foreach (InputPin p in valInPins) {
+            //                    valOutPins[0].Value = (Vector4)valOutPins[0].Value + (p.isConnected ? (Vector4)p.Value : Vector4.zero);
             //                }
             //                break;
             //        }
             //        break;
             //    case OpType.Subtract:
-            //        if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
-            //        switch (outPins[0].varType) {
+            //        if (start < valInPins.Count) valOutPins[0].Value = valInPins[start].Value;
+            //        switch (valOutPins[0].varType) {
             //            case VarType.Integer:
             //            case VarType.Float:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    outPins[0].Value = (float)outPins[0].Value - (inPins[i].isConnected ? (float)inPins[i].Value : 0);
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    valOutPins[0].Value = (float)valOutPins[0].Value - (valInPins[i].isConnected ? (float)valInPins[i].Value : 0);
             //                }
             //                break;
             //            case VarType.Vector2:
-            //                for (int i = 1; i < inPins.Count; i++) {
-            //                    outPins[0].Value = (Vector2)outPins[0].Value - (inPins[i].isConnected ? (Vector2)inPins[i].Value : Vector2.zero);
+            //                for (int i = 1; i < valInPins.Count; i++) {
+            //                    valOutPins[0].Value = (Vector2)valOutPins[0].Value - (valInPins[i].isConnected ? (Vector2)valInPins[i].Value : Vector2.zero);
             //                }
             //                break;
             //            case VarType.Vector3:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    outPins[0].Value = (Vector3)outPins[0].Value - (inPins[i].isConnected ? (Vector3)inPins[i].Value : Vector3.zero);
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    valOutPins[0].Value = (Vector3)valOutPins[0].Value - (valInPins[i].isConnected ? (Vector3)valInPins[i].Value : Vector3.zero);
             //                }
             //                break;
             //            case VarType.Vector4:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    outPins[0].Value = (Vector4)outPins[0].Value - (inPins[i].isConnected ? (Vector4)inPins[i].Value : Vector4.zero);
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    valOutPins[0].Value = (Vector4)valOutPins[0].Value - (valInPins[i].isConnected ? (Vector4)valInPins[i].Value : Vector4.zero);
             //                }
             //                break;
             //        }
             //        break;
             //    case OpType.Multiply:
-            //        if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
-            //        switch (outPins[0].varType) {
+            //        if (start < valInPins.Count) valOutPins[0].Value = valInPins[start].Value;
+            //        switch (valOutPins[0].varType) {
             //            case VarType.Integer:
             //            case VarType.Float:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    if (inPins[i].isConnected)
-            //                        outPins[0].Value = (float)outPins[0].Value * (float)inPins[i].Value;
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    if (valInPins[i].isConnected)
+            //                        valOutPins[0].Value = (float)valOutPins[0].Value * (float)valInPins[i].Value;
             //                }
             //                break;
             //            case VarType.Vector2:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    if (inPins[i].isConnected)
-            //                        outPins[0].Value = Vector2.Scale((Vector2)outPins[0].Value, (Vector2)inPins[i].Value);
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    if (valInPins[i].isConnected)
+            //                        valOutPins[0].Value = Vector2.Scale((Vector2)valOutPins[0].Value, (Vector2)valInPins[i].Value);
             //                }
             //                break;
             //            case VarType.Vector3:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    if (inPins[i].isConnected)
-            //                        outPins[0].Value = Vector2.Scale((Vector3)outPins[0].Value, (Vector3)inPins[i].Value);
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    if (valInPins[i].isConnected)
+            //                        valOutPins[0].Value = Vector2.Scale((Vector3)valOutPins[0].Value, (Vector3)valInPins[i].Value);
             //                }
             //                break;
             //            case VarType.Vector4:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    if (inPins[i].isConnected)
-            //                        outPins[0].Value = Vector4.Scale((Vector4)outPins[0].Value, (Vector4)inPins[i].Value);
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    if (valInPins[i].isConnected)
+            //                        valOutPins[0].Value = Vector4.Scale((Vector4)valOutPins[0].Value, (Vector4)valInPins[i].Value);
             //                }
             //                break;
             //        }
             //        break;
             //    case OpType.Divide:
-            //        if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
-            //        switch (outPins[0].varType) {
+            //        if (start < valInPins.Count) valOutPins[0].Value = valInPins[start].Value;
+            //        switch (valOutPins[0].varType) {
             //            case VarType.Integer:
             //            case VarType.Float:
-            //                for (int i = start + 1; i < inPins.Count; i++) {
-            //                    if (inPins[i].isConnected)
-            //                        if (!inPins[i].Equals(0))
-            //                            outPins[0].Value = (float)outPins[0].Value / (float)inPins[i].Value;
+            //                for (int i = start + 1; i < valInPins.Count; i++) {
+            //                    if (valInPins[i].isConnected)
+            //                        if (!valInPins[i].Equals(0))
+            //                            valOutPins[0].Value = (float)valOutPins[0].Value / (float)valInPins[i].Value;
             //                        else {
-            //                            outPins[0].Value = 0;
+            //                            valOutPins[0].Value = 0;
             //                            break;
             //                        }
             //                }
@@ -402,39 +402,39 @@ namespace ScriptEditor.Graph {
             //        }
             //        break;
             //    case OpType.SQRT:
-            //        outPins[0].Value = inPins[0].isConnected ?
-            //            (float)inPins[0].Value >= 0 ? Mathf.Sqrt((float)inPins[0].Value)
+            //        valOutPins[0].Value = valInPins[0].isConnected ?
+            //            (float)valInPins[0].Value >= 0 ? Mathf.Sqrt((float)valInPins[0].Value)
             //            : 0 : 0;
             //        break;
             //    case OpType.Not:
-            //        outPins[0].Value = inPins[0].isConnected ? !(bool)inPins[0].Value
+            //        valOutPins[0].Value = valInPins[0].isConnected ? !(bool)valInPins[0].Value
             //            : false;
             //        break;
             //    case OpType.And:
-            //        if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
-            //        for (int i = start + 1; i < inPins.Count; i++) {
-            //            if (inPins[i].isConnected)
-            //                outPins[0].Value = (bool)outPins[0].Value && (bool)inPins[i].Value;
+            //        if (start < valInPins.Count) valOutPins[0].Value = valInPins[start].Value;
+            //        for (int i = start + 1; i < valInPins.Count; i++) {
+            //            if (valInPins[i].isConnected)
+            //                valOutPins[0].Value = (bool)valOutPins[0].Value && (bool)valInPins[i].Value;
             //        }
             //        break;
             //    case OpType.Or:
-            //        if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
-            //        for (int i = start + 1; i < inPins.Count; i++) {
-            //            if (inPins[i].isConnected)
-            //                outPins[0].Value = (bool)outPins[0].Value || (bool)inPins[i].Value;
+            //        if (start < valInPins.Count) valOutPins[0].Value = valInPins[start].Value;
+            //        for (int i = start + 1; i < valInPins.Count; i++) {
+            //            if (valInPins[i].isConnected)
+            //                valOutPins[0].Value = (bool)valOutPins[0].Value || (bool)valInPins[i].Value;
             //        }
             //        break;
             //    case OpType.Xor:
-            //        if (start < inPins.Count) outPins[0].Value = inPins[start].Value;
-            //        for (int i = start + 1; i < inPins.Count; i++) {
-            //            if (inPins[i].isConnected)
-            //                outPins[0].Value = (bool)outPins[0].Value ^ (bool)inPins[i].Value;
+            //        if (start < valInPins.Count) valOutPins[0].Value = valInPins[start].Value;
+            //        for (int i = start + 1; i < valInPins.Count; i++) {
+            //            if (valInPins[i].isConnected)
+            //                valOutPins[0].Value = (bool)valOutPins[0].Value ^ (bool)valInPins[i].Value;
             //        }
             //        break;
             //    case OpType.POW:
-            //        float in1 = inPins[0].isConnected ? (float)inPins[0].Value : 0;
-            //        float in2 = inPins[1].isConnected ? (float)inPins[1].Value : 2;
-            //        outPins[0].Value = (in1 == 0 && in2 == 2) ? 0 : Mathf.Pow(in1, in2);
+            //        float in1 = valInPins[0].isConnected ? (float)valInPins[0].Value : 0;
+            //        float in2 = valInPins[1].isConnected ? (float)valInPins[1].Value : 2;
+            //        valOutPins[0].Value = (in1 == 0 && in2 == 2) ? 0 : Mathf.Pow(in1, in2);
             //        break;
             //}
         }

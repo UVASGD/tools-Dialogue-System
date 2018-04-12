@@ -299,13 +299,13 @@ namespace ScriptEditor.EditorScripts {
             // e.g. float to float
             if (pinToAttach != null) {
                 if (!pinToAttach.isInput) {
-                    foreach (InputPin ip in node.inPins)
+                    foreach (InputPin ip in node.InPins)
                         if (ip.varType == pinToAttach.varType) {
                             GraphObj.ConnectPins(ip, (OutputPin)pinToAttach);
                             break;
                         }
                 } else {
-                    foreach (OutputPin op in node.outPins)
+                    foreach (OutputPin op in node.OutPins)
                         if (op.varType == pinToAttach.varType) {
                             GraphObj.ConnectPins((InputPin)pinToAttach, op);
                             break;

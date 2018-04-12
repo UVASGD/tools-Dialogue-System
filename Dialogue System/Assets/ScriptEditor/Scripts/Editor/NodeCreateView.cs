@@ -131,8 +131,8 @@ namespace ScriptEditor.EditorScripts {
 
             // establish connection between selected pin and nodes pin
             if (pinToAttach != null) {
-                graph.ConnectPins(pinToAttach.isInput ? (InputPin)pinToAttach : node.inPins[0],
-                    pinToAttach.isInput ? node.outPins[0] : (OutputPin)pinToAttach);
+                graph.ConnectPins(pinToAttach.isInput ? (InputPin)pinToAttach : node.VIP[0],
+                    pinToAttach.isInput ? node.VOP[0] : (OutputPin)pinToAttach);
             }
 
 
@@ -298,13 +298,13 @@ namespace ScriptEditor.EditorScripts {
             // e.g. float to float
             if (pinToAttach != null) {
                 if (!pinToAttach.isInput) {
-                    foreach(InputPin ip in node.inPins)
+                    foreach(InputPin ip in node.InPins)
                         if (ip.varType == pinToAttach.varType) {
                             graph.ConnectPins(ip, (OutputPin)pinToAttach);
                             break;
                         }
                 } else {
-                    foreach (OutputPin op in node.outPins)
+                    foreach (OutputPin op in node.OutPins)
                         if (op.varType == pinToAttach.varType) {
                             graph.ConnectPins((InputPin)pinToAttach, op);
                             break;

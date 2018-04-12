@@ -266,7 +266,7 @@ namespace ScriptEditor.EditorScripts {
                             // must connect inputs to outputs
                             if (!SelectedPin.GetType().Equals(pin.GetType())) {
                                 if (pin.varType == SelectedPin.varType) {
-                                    if (pin.node != SelectedPin.node) {
+                                    if (pin.parentNode != SelectedPin.parentNode) {
                                         //if (pin.isConnected && pin.isInput && pin.varType==VarType.Exec)
                                         //    NodeBase.RemoveConnection(pin);
 
@@ -288,16 +288,16 @@ namespace ScriptEditor.EditorScripts {
                                                 //CN.outPins[0].ConnectedInputID = SelectedPin.node.inPins.IndexOf((InputPin)SelectedPin);
                                                 //((OutputPin)pin).ConnectedInputID = 0;
 
-                                                graph.ConnectPins((InputPin)SelectedPin, CN.outPins[0]);
-                                                graph.ConnectPins(CN.inPins[0], (OutputPin)pin);
+                                                graph.ConnectPins((InputPin)SelectedPin, CN.VOP[0]);
+                                                graph.ConnectPins(CN.VIP[0], (OutputPin)pin);
                                             } else {
                                                 CN = (ControlNode)NodeUtilities.CreateNode(graph, SelectedPin.varType,
                                                     pin.varType, e.mousePosition);
                                                 //CN.outPins[0].ConnectedInputID = pin.node.inPins.IndexOf((InputPin)pin);
                                                 //((OutputPin)SelectedPin).ConnectedInputID = 0;
 
-                                                graph.ConnectPins((InputPin)pin, CN.outPins[0]);
-                                                graph.ConnectPins(CN.inPins[0], (OutputPin)SelectedPin);
+                                                graph.ConnectPins((InputPin)pin, CN.VOP[0]);
+                                                graph.ConnectPins(CN.VIP[0], (OutputPin)SelectedPin);
                                             }
                                         }
                                     }

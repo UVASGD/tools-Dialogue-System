@@ -18,13 +18,16 @@ namespace ScriptEditor.Graph {
             
             if (isInput) {
                 description = "Sets the value of a variable";
-                inPins.Add(new ValueInputPin(this, variable.varType));
-                inPins[0].Description = "";
-                inPins[0].Default = null;
+                execInPins.Add(new ExecInputPin(this));
+                valInPins.Add(new ValueInputPin(this, variable.varType));
+                valInPins[0].Description = "";
+                valInPins[0].Default = null;
+
+                execOutPins.Add(new ExecOutputPin(this));
             } else {
                 description = "Gets the value of a variable";
-               outPins.Add(new ValueOutputPin(this, variable.varType));
-                outPins[0].Description = "";
+                valOutPins.Add(new ValueOutputPin(this, variable.varType));
+                valOutPins[0].Description = "";
             }
         }
 

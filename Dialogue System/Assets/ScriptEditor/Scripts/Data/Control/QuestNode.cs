@@ -16,9 +16,9 @@ namespace ScriptEditor.Graph
 		name = "Quest";
         description = "Defines a quest and shit";
 		// Create Pins
-		inPins.Add(new EventInputPin(this));
+		execInPins.Add(new ExecInputPin(this));
 
-        outPins.Add(new ExecOutputPin(this));
+        execOutPins.Add(new ExecOutputPin(this));
 		}
 	}
 }

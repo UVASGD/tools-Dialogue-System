@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ScriptEditor.EditorScripts.Inspector {
 
     static class PropertiesInspector {
-        public static bool defaultGUI = false;
+        public static bool defaultGUI = true;
 
         //public static void showTooltips(Type t) {
         //    foreach(FieldInfo f in t.GetFields()) {

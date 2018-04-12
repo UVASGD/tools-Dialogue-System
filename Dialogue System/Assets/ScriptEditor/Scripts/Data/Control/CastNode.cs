@@ -16,8 +16,8 @@ namespace ScriptEditor.Graph {
         public void Construct(VarType input, VarType output) {
             this.Construct();
             description = "Casts " + input.ToString() + " to " + output.ToString() + ".";
-            inPins.Add(new ValueInputPin(this, input));
-           outPins.Add(new ValueOutputPin(this, output));
+            valInPins.Add(new ValueInputPin(this, input));
+            valOutPins.Add(new ValueOutputPin(this, output));
         }
     }
 }

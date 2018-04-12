@@ -29,7 +29,7 @@ namespace ScriptEditor.Graph {
 
         public virtual void Construct() {
             base.SetName("Start");
-            outPins.Add(new ExecOutputPin(this));
+            execOutPins.Add(new ExecOutputPin(this));
             Resize();
         }
 
@@ -51,7 +51,7 @@ namespace ScriptEditor.Graph {
         /// </summary>
         public override void Resize() {
             body = new Rect(0, 0, Width, 77);
-            outPins[0].bounds.position = new Vector2(body.width - NodePin.margin.x -
+            execOutPins[0].bounds.position = new Vector2(body.width - NodePin.margin.x -
                 NodePin.pinSize.x, 30);
         }
 
@@ -71,7 +71,7 @@ namespace ScriptEditor.Graph {
     public class SubStartNode : StartNode {
         public override void Construct() {
             base.SetName("Sub Start");
-            outPins.Add(new ExecOutputPin(this));
+            execOutPins.Add(new ExecOutputPin(this));
             Resize();
         }
 

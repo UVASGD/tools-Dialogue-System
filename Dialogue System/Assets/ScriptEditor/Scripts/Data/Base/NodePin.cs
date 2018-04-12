@@ -9,7 +9,7 @@ namespace ScriptEditor.Graph {
     public abstract class NodePin {
 
         [SerializeField] public string Name, Description;
-        [SerializeField] public NodeBase node;
+        [SerializeField] public NodeBase parentNode;
         [SerializeField] public VarType varType;
         [SerializeField] public Rect bounds;
 
@@ -38,7 +38,7 @@ namespace ScriptEditor.Graph {
         public Rect TextBox {
             get {
                 Vector2 lblPos = bounds.position;
-                Vector2 lblSiz = node.skin.label.CalcSize(new GUIContent(Name + "  "));
+                Vector2 lblSiz = parentNode.skin.label.CalcSize(new GUIContent(Name + "  "));
                 lblPos.x += (isInput ? NodePin.margin.x : -lblSiz.x);
                 return new Rect(lblPos, lblSiz);
             }
@@ -52,7 +52,7 @@ namespace ScriptEditor.Graph {
 
         public NodePin(NodeBase n, VarType varType) {
             this.varType = varType;
-            node = n;
+            parentNode = n;
             bounds = new Rect(Vector2.zero, pinSize);
         }
 
@@ -96,21 +96,21 @@ namespace ScriptEditor.Graph {
 #if UNITY_EDITOR
         public bool Contains(Vector2 pos) {
             Rect b = new Rect(bounds);
-            b.position += node.GetBody().position;
+            b.position += parentNode.GetBody().position;
             return b.Contains(pos);
         }
 
         /// <summary> determine if mouse is inside textbox for name </summary>
         public bool TxtContains(Vector2 pos) {
             Rect b = new Rect(TextBox);
-            b.position += node.GetBody().position;
+            b.position += parentNode.GetBody().position;
             return b.Contains(pos);
         }
 
         public Vector2 Position {
             get {
                 if (bounds == Rect.zero) return Vector2.zero;
-                return bounds.position + node.GetBody().position;
+                return bounds.position + parentNode.GetBody().position;
             }
         }
 

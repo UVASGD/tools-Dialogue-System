@@ -75,73 +75,73 @@ namespace ScriptEditor.Graph {
             // set input and output pins
             switch (funcType) {
                 case FunctionType.Magnitude:
-                    inPins.Add(new ValueInputPin(this, nT));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, nT));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
                     break;
                 case FunctionType.Length:
-                    inPins.Add(new ValueInputPin(this, VarType.Object));
+                    valInPins.Add(new ValueInputPin(this, VarType.Object));
 
-                   outPins.Add(new ValueOutputPin(this, VarType.Integer));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Integer));
                     break;
                 case FunctionType.SplitVector2:
-                    inPins.Add(new ValueInputPin(this, VarType.Vector2));
+                    valInPins.Add(new ValueInputPin(this, VarType.Vector2));
 
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                    outPins[0].Name = "x";
-                    outPins[1].Name = "y";
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valOutPins[0].Name = "x";
+                    valOutPins[1].Name = "y";
                     break;
                 case FunctionType.SplitVector3:
-                    inPins.Add(new ValueInputPin(this, VarType.Vector3));
+                    valInPins.Add(new ValueInputPin(this, VarType.Vector3));
 
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                    outPins[0].Name = "x";
-                    outPins[1].Name = "y";
-                    outPins[2].Name = "z";
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valOutPins[0].Name = "x";
+                    valOutPins[1].Name = "y";
+                    valOutPins[2].Name = "z";
                     break;
                 case FunctionType.SplitColor:
-                    inPins.Add(new ValueInputPin(this, VarType.Color));
+                    valInPins.Add(new ValueInputPin(this, VarType.Color));
 
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                   outPins.Add(new ValueOutputPin(this, VarType.Float));
-                    outPins[0].Name = "r";
-                    outPins[1].Name = "g";
-                    outPins[2].Name = "b";
-                    outPins[3].Name = "a";
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Float));
+                    valOutPins[0].Name = "r";
+                    valOutPins[1].Name = "g";
+                    valOutPins[2].Name = "b";
+                    valOutPins[3].Name = "a";
                     break;
                 case FunctionType.BuildVector2:
-                   outPins.Add(new ValueOutputPin(this, VarType.Vector2));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Vector2));
 
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins[0].Name = "x";
-                    inPins[1].Name = "y";
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins[0].Name = "x";
+                    valInPins[1].Name = "y";
                     break;
                 case FunctionType.BuildVector3:
-                   outPins.Add(new ValueOutputPin(this, VarType.Vector3));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Vector3));
 
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins[0].Name = "x";
-                    inPins[1].Name = "y";
-                    inPins[2].Name = "z";
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins[0].Name = "x";
+                    valInPins[1].Name = "y";
+                    valInPins[2].Name = "z";
                     break;
                 case FunctionType.BuildColor:
-                   outPins.Add(new ValueOutputPin(this, VarType.Color));
+                   valOutPins.Add(new ValueOutputPin(this, VarType.Color));
 
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins.Add(new ValueInputPin(this, VarType.Float));
-                    inPins[0].Name = "r";
-                    inPins[1].Name = "g";
-                    inPins[2].Name = "b";
-                    inPins[3].Name = "a";
-                    inPins[3].Default = 1.0f;
-                    inPins[3].Description = "Color transparency";
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins[0].Name = "r";
+                    valInPins[1].Name = "g";
+                    valInPins[2].Name = "b";
+                    valInPins[3].Name = "a";
+                    valInPins[3].Default = 1.0f;
+                    valInPins[3].Description = "Color transparency";
                     break;
             }
             Resize();

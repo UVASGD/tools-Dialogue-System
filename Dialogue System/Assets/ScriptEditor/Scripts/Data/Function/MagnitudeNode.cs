@@ -11,8 +11,8 @@ namespace ScriptEditor.Graph {
             name = "Vector Magnitude";
 
             // set input and output pins
-            inPins.Add(new ValueInputPin(this, nT));
-           outPins.Add(new ValueOutputPin(this, VarType.Float));
+            valInPins.Add(new ValueInputPin(this, nT));
+            valOutPins.Add(new ValueOutputPin(this, VarType.Float));
         }
 
         public override void Execute() {

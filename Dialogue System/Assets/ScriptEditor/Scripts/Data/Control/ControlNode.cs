@@ -28,19 +28,19 @@ namespace ScriptEditor.Graph {
 
         /// <summary> If choice node, adds a choice to the control </summary>
         public override void AddInputPin() {
-            if (multiplePins && inPins.Count < 9) {
+            if (multiplePins && valInPins.Count < 8) {
                 switch (this.GetType().ToString()) {
                     case "ChoiceNode":
-                        inPins.Add(new ValueInputPin(this, VarType.Bool));
-                        inPins[inPins.Count - 1].Name = "Condition " + (inPins.Count - 1);
-                        inPins[inPins.Count - 1].Default = true;
+                        valInPins.Add(new ValueInputPin(this, VarType.Bool));
+                        valInPins[valInPins.Count - 1].Name = "Condition " + (valInPins.Count - 1);
+                        valInPins[valInPins.Count - 1].Default = true;
 
-                        outPins.Add(new ExecOutputPin(this));
-                        outPins[outPins.Count - 1].Name = "Choice " + (inPins.Count - 1);
+                        execOutPins.Add(new ExecOutputPin(this));
+                        execOutPins[execOutPins.Count - 1].Name = "Choice " + (execOutPins.Count - 1);
                         break;
                     case "SequenceNode":
-                        outPins.Add(new ExecOutputPin(this));
-                        outPins[outPins.Count - 1].Name = "Then " + (inPins.Count - 2);
+                        execOutPins.Add(new ExecOutputPin(this));
+                        execOutPins[execOutPins.Count - 1].Name = "Then " + (valInPins.Count - 2);
 
                         break;
                 }
@@ -48,14 +48,15 @@ namespace ScriptEditor.Graph {
             }
         }
 
-        /// <summary> If choice node, removes last choice from the control </summary>
+        /// <summary> If choice node, removes last choice from the control.
+        /// minimum of 3 value inputs </summary>
         public override void RemovePin() {
-            if(multiplePins&& inPins.Count > 3) {
-                InputPin iP = inPins[inPins.Count - 1];
-                inPins.Remove(iP);
+            if(multiplePins && valInPins.Count > 2) {
+                ValueInputPin iP = valInPins[valInPins.Count - 1];
+                valInPins.Remove(iP);
                 RemoveConnection(iP);
-                OutputPin oP = outPins[outPins.Count - 1];
-                outPins.Remove(oP);
+                ExecOutputPin oP = execOutPins[execOutPins.Count - 1];
+                execOutPins.Remove(oP);
                 RemoveConnection(oP);
                 Resize();
             }

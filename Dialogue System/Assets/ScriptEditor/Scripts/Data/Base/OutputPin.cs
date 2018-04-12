@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ScriptEditor.Graph {
     /// <summary> Output connection. Must always have a value, even if disconnected </summary>
     [Serializable]
-    public class OutputPin : NodePin {
+    public abstract class OutputPin : NodePin {
         //public int ConnectedInputID = -1;
         public virtual InputPin ConnectedInput  { get; set; }
         public override bool IsConnected { get { return ConnectedInput != null; } }
@@ -17,7 +17,7 @@ namespace ScriptEditor.Graph {
             return "???";
         }
         public override string ToString() {
-            return "(OUT) Node: " + (node == null ? "???" : node.STName) + " | " + varType;
+            return "(OUT) Node: " + (parentNode == null ? "???" : parentNode.STName) + " | " + varType;
         }
     }
 
@@ -29,11 +29,11 @@ namespace ScriptEditor.Graph {
     public class ValueOutputPin : OutputPin {
         public ValueOutputPin(NodeBase n, VarType t) : base(n, t) { }
 
-        private string cInput = null;
+        [SerializeField] private string cInput = null;
 
         public override InputPin ConnectedInput {
-            get { return this.node.parentGraph.InputFromID(cInput); }
-            set { cInput = this.node.parentGraph.IDFromInput(value); }
+            get { return this.parentNode.parentGraph.InputFromID(cInput); }
+            set { cInput = this.parentNode.parentGraph.IDFromInput(value); }
         }
     }
 
@@ -44,11 +44,13 @@ namespace ScriptEditor.Graph {
     public class ExecOutputPin : OutputPin {
         public ExecOutputPin(NodeBase n) : base(n, VarType.Exec) { }
 
-        private InputPin cInput = null;
+        [SerializeField] public ExecInputPin cInput = null;
 
         public override InputPin ConnectedInput {
             get { return cInput; }
-            set { cInput = value; }
+            set {
+                cInput = (ExecInputPin) value;
+            }
         }
     }
 }

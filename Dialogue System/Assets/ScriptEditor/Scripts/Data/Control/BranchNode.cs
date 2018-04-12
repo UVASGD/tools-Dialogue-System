@@ -22,15 +22,15 @@ namespace ScriptEditor.Graph
             description = "Splits execution based on the value of the condition.";
 
             // Create pins
-            inPins.Add(new EventInputPin(this));
-            inPins.Add(new ValueInputPin(this, VarType.Bool));
-            inPins[1].Name = "Condition";
-            inPins[1].Default = true;
+            execInPins.Add(new ExecInputPin(this));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins[0].Name = "Condition";
+            valInPins[0].Default = true;
 
-            outPins.Add(new ExecOutputPin(this));
-            outPins[0].Name = "True";
-            outPins.Add(new ExecOutputPin(this));
-            outPins[1].Name = "False";
+            execOutPins.Add(new ExecOutputPin(this));
+            execOutPins[0].Name = "True";
+            execOutPins.Add(new ExecOutputPin(this));
+            execOutPins[1].Name = "False";
         }
 
         // called everyframe
@@ -42,12 +42,12 @@ namespace ScriptEditor.Graph
         public override NodeBase GetNextNode()
         {
             // condition is based on default value or a lookup value
-            bool condition = (bool)inPins[0].Value;
+            bool condition = (bool)valInPins[0].Value;
 
             NodeBase output = null;
-            OutputPin pin = outPins[condition ? 0 : 1];
+            OutputPin pin = execOutPins[condition ? 0 : 1];
             if (pin.IsConnected)
-                output = pin.ConnectedInput.node;
+                output = pin.ConnectedInput.parentNode;
 
             return output;
         }

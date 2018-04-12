@@ -54,22 +54,22 @@ namespace ScriptEditor.Graph
             description = "Displays a conversation dialogue to a dialogue box based on the conversant.";
             
             // Create pins
-            inPins.Add(new EventInputPin(this));
-            inPins.Add(new ValueInputPin(this, VarType.Actor));
-            inPins[1].Name = "Speaker";
-            inPins[1].Description = "The Actor who speaks the text. Can be left empty";
-            inPins.Add(new ValueInputPin(this, VarType.Bool));
-            inPins[2].Name = "Focus on";
-            inPins[2].Description = "Whether or not the main camera should focus on the conversant";
-            inPins[2].Default = true;
-            inPins.Add(new ValueInputPin(this, VarType.Float));
-            inPins[3].Name = "Speed";
-            inPins[3].Description = "How fast the text is displayed";
-            inPins[3].Default = 1f;
-            inPins.Add(new ValueInputPin(this, VarType.Object));
-            inPins[4].Name = "User Data";
+            execInPins.Add(new ExecInputPin(this));
+            valInPins.Add(new ValueInputPin(this, VarType.Actor));
+            valInPins[0].Name = "Speaker";
+            valInPins[0].Description = "The Actor who speaks the text. Can be left empty";
+            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins[1].Name = "Focus on";
+            valInPins[1].Description = "Whether or not the main camera should focus on the conversant";
+            valInPins[1].Default = true;
+            valInPins.Add(new ValueInputPin(this, VarType.Float));
+            valInPins[2].Name = "Speed";
+            valInPins[2].Description = "How fast the text is displayed";
+            valInPins[2].Default = 1f;
+            valInPins.Add(new ValueInputPin(this, VarType.Object));
+            valInPins[3].Name = "User Data";
 
-            outPins.Add(new ExecOutputPin(this));
+            execOutPins.Add(new ExecOutputPin(this));
             nodeType = NodeType.Dialog;
         }
         
@@ -145,8 +145,8 @@ namespace ScriptEditor.Graph
             Index = Vector2.zero;
             Actor actor = null;
 
-            if (inPins[1].IsConnected) {
-                actor = (Actor)inPins[1].Value;
+            if (valInPins[0].IsConnected) {
+                actor = (Actor)valInPins[0].Value;
             }
             
             if (dc.outputHeader) {
@@ -168,13 +168,13 @@ namespace ScriptEditor.Graph
             }
 
             // set the speed from % to character per second (or frame?)
-            speed = (int)inPins[3].Value;
+            speed = (int)valInPins[2].Value;
 
             // focus on speaker
             if(actor != null) {
                 // change this to not be controlled by var?
-                if (inPins[2].IsConnected) {
-                    if ((bool)inPins[2].Value) {
+                if (valInPins[1].IsConnected) {
+                    if ((bool)valInPins[1].Value) {
                         Camera tmp = Camera.main;
                         if (tmp != null) {
                             camera = tmp.transform;
