@@ -132,7 +132,7 @@ namespace ScriptEditor.Graph
             dc = GameObject.FindObjectOfType<DialogueController>();
             GameObject TextAudio = new GameObject("Text Audio");
             TextAudio.transform.parent = dc.transform;
-            src = Miscellaneous.CopyComponent<AudioSource>(dc.GetAudioSrc(), TextAudio);
+            src = Misc.CopyComponent<AudioSource>(dc.GetAudioSrc(), TextAudio);
             src.clip = dc.TextSound;
 
             pages = new List<string>();

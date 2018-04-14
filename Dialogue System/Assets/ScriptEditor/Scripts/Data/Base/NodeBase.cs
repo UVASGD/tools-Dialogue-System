@@ -24,7 +24,7 @@ namespace ScriptEditor.Graph {
     /// either input or output pins, or a combination of both. See _____ for a list of child classes
     /// </summary>
     [Serializable]
-    public abstract class NodeBase : ScriptableObject {
+    public abstract class NodeBase : ScriptableObject, ISerializationCallbackReceiver {
         
         public string  description;
         public bool isSelected;
@@ -48,25 +48,33 @@ namespace ScriptEditor.Graph {
         protected bool _set = false;
         protected bool setupCompleted { get { return _set; } set { Debug.Log("djidjiedjijed"); _set = value; } }
         
-        public List<OutputPin> OutPins { get {
-                List<OutputPin> sol = execOutPins.Cast<OutputPin>()
-                    .Concat<OutputPin>(valOutPins.Cast<OutputPin>()).ToList();
-                //.Log("pomat: " + sol);
-                return sol;
-            } }
+        public IEnumerable<OutputPin> OutPins { get {
+                Debug.Log("NodeBase.OutPins: " + GetInstanceID() + ": execOutPins: " + Misc.NullToString(execOutPins));
+                return execOutPins.Cast<OutputPin>()
+                    .Concat(valOutPins.Cast<OutputPin>());
+        } }
         public List<ExecOutputPin> EOP { get { return execOutPins; } }
         public List<ValueOutputPin> VOP { get { return valOutPins; } }
         [SerializeField] protected List<ExecOutputPin> execOutPins;
         [SerializeField] protected List<ValueOutputPin> valOutPins;
 
-        public List<InputPin> InPins { get {
+        public IEnumerable<InputPin> InPins { get {
                 return execInPins.Cast<InputPin>()
-                    .Concat<InputPin>(valInPins.Cast<InputPin>()).ToList();
-            } }
+                    .Concat(valInPins.Cast<InputPin>());
+        } }
         public List<ExecInputPin> EIP { get { return execInPins; } }
         public List<ValueInputPin> VIP { get { return valInPins; } }
         [SerializeField] protected List<ExecInputPin> execInPins;
         [SerializeField] protected List<ValueInputPin> valInPins;
+
+        /// <summary> all input and output pins attached to node </summary>
+        public IEnumerable<NodePin> AllPins
+        {
+            get
+            {
+                return OutPins.Cast<NodePin>().Concat(InPins.Cast<NodePin>());
+            }
+        }
 
         public List<NodeError> errors;
         public int MaxNodes { get { return Mathf.Max(execInPins.Count+ valInPins.Count,
@@ -113,13 +121,6 @@ namespace ScriptEditor.Graph {
                 return res;
             }
         }
-
-        /// <summary> all input and output pins attached to node </summary>
-        public List<NodePin> AllPins { get {
-                List<NodePin> pins = new List<NodePin>(OutPins.ToArray());
-                pins.AddRange(InPins.ToArray());
-                return pins;
-            } }
 
         /// <summary> string evaluation of nodeType </summary>
         public string NTName { get { return Enum.GetName(typeof(NodeType), nodeType); } }
@@ -209,12 +210,12 @@ namespace ScriptEditor.Graph {
             body.size += inputWidths;
 
             // set pin visual information
-            List<InputPin> inPins = InPins;
-            List<OutputPin> outPins = OutPins;
-            foreach (NodePin pin in AllPins) {
-                  float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
-                float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) :
-                    inPins.IndexOf((InputPin)pin);
+            List<InputPin> inPins = InPins.ToList();
+            List<OutputPin> outPins = OutPins.ToList();
+            foreach (NodePin pin in AllPins)
+            {
+                float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
+                float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) : inPins.IndexOf((InputPin)pin);
 
                 //float x, y; x = y = 9;
                 pin.bounds.position = new Vector2(x, Top + NodePin.margin.y + y * NodePin.Top);
@@ -260,7 +261,7 @@ namespace ScriptEditor.Graph {
 
         /// <summary> add new pin with base variable type</summary>
         public virtual void AddInputPin() {
-            if (multiplePins && InPins.Count < 16) {
+            if (multiplePins && InPins.Count() < 16) {
                 //ScriptableObject.Instantiate<InputPin>();
                 valInPins.Add(new ValueInputPin(this, valInPins[0].varType));
                 Resize();
@@ -398,6 +399,13 @@ namespace ScriptEditor.Graph {
             skin = Resources.Load<GUISkin>("GUI Skins/Editor/" + skinName);
         }
 
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize()
+        {
+            Debug.Log("NodeBase.OnAfterDeserialize: " + GetInstanceID() + ": execOutPins: " + Misc.NullToString(execOutPins));
+        }
+
 #if UNITY_EDITOR
         public virtual void DrawNode(Event e, Rect viewRect) {
             this.viewRect = viewRect;
@@ -409,7 +417,7 @@ namespace ScriptEditor.Graph {
                 if (!String.IsNullOrEmpty(node.text)) {
                     // make sure this text simplification doesn't lag shit every draw call
                     if (String.IsNullOrEmpty(node.header)) {
-                        node.header = Miscellaneous.MinimalizeWidthFull(node.text,
+                        node.header = Misc.MinimalizeWidthFull(node.text,
                        body.width - 60, skin.label);
                     }
                     header = node.header;

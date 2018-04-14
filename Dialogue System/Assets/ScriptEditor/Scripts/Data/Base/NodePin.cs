@@ -91,7 +91,8 @@ namespace ScriptEditor.Graph {
                 }
             }
         }
-        
+
+        public abstract void OnAfterGraphDeserialize();
 
 #if UNITY_EDITOR
         public bool Contains(Vector2 pos) {
@@ -146,9 +147,5 @@ namespace ScriptEditor.Graph {
             }
         }
 #endif  
-    }
-
-
-
-    
+    }    
 }

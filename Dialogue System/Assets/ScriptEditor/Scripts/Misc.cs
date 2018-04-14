@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace ScriptEditor {
-    public static class Miscellaneous {
+    public static class Misc {
 
         /// <summary>
         /// Duplicate Component and add it to the destination GameObject
@@ -73,6 +73,29 @@ namespace ScriptEditor {
             } while (i < n.Length);
             
             return res+"...";
+        }
+
+        public static string NullToString(object o)
+        {
+            return o != null ? o.ToString() : "null";
+        }
+
+        public static string ListToString<T>(List<T> lst)
+        {
+            if (lst == null) return "null";
+            string s = "";
+            foreach (T t in lst)
+                s += NullToString(t);
+            return "{" + s + "}";
+        }
+
+        public static string ListToStringIDs<T>(List<T> lst) where T : UnityEngine.Object
+        {
+            if (lst == null) return "null";
+            string s = "";
+            foreach (T t in lst)
+                s += NullToString(t.GetInstanceID()) + ", ";
+            return "{" + s + "}";
         }
     }
 }

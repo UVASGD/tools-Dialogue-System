@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ScriptEditor.Graph {
-    public class NodeGraph : ScriptableObject{
+    public class NodeGraph : ScriptableObject, ISerializationCallbackReceiver {
         public string Name = "New Script";
         public List<NodeBase> nodes;
         public List<StartNode> starts;
@@ -33,11 +33,6 @@ namespace ScriptEditor.Graph {
 
         public void SetSubStartIndex(int index){
             subStartIndex = index;
-        }
-
-        public void OnEnable() {
-            //if (nodes == null) {
-            //}
         }
 
         public void Initialize() {
@@ -80,12 +75,12 @@ namespace ScriptEditor.Graph {
         public InputPin InputFromID(string ID) {
             if (String.IsNullOrEmpty(ID)) return null;
             string [] dat = ID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-            return nodes[int.Parse(dat[0])].InPins[int.Parse(dat[1])];
+            return nodes[int.Parse(dat[0])].InPins.ToList()[int.Parse(dat[1])];
         }
 
         public string IDFromInput(InputPin ip) {
             if(ip == null) return null;
-            return nodes.IndexOf(ip.parentNode)+":"+ip.parentNode.InPins.IndexOf(ip);
+            return nodes.IndexOf(ip.parentNode)+":"+ip.parentNode.InPins.ToList().IndexOf(ip);
         }
 
         public OutputPin OutputFromID(string ID) {
@@ -94,12 +89,12 @@ namespace ScriptEditor.Graph {
             //Debug.LogWarning("PDOP_ID: " + ID/*+"\nN: "+nodes[x]+"\nOP: " +(nodes[x]!=null?nodes[x].OutPins.ToString():"FAILURE")*/);
             int x = int.Parse(dat[0]), y = int.Parse(dat[1]);
 
-            return nodes[x].OutPins[y];
+            return nodes[x].OutPins.ToList()[y];
         }
 
         public string IDFromOutput(OutputPin op) {
             if (op == null) return null;
-            return nodes.IndexOf(op.parentNode) + ":" + op.parentNode.OutPins.IndexOf(op);
+            return nodes.IndexOf(op.parentNode) + ":" + op.parentNode.OutPins.ToList().IndexOf(op);
         }
 
 
@@ -142,6 +137,21 @@ namespace ScriptEditor.Graph {
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
+        }
+
+        public void OnEnable()
+        {
+            Debug.Log("NodeGraph.OnEnable");
+        }
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize()
+        {
+            Debug.Log("NodeGraph.OnAfterDeserialize: nodes: " + Misc.ListToStringIDs(nodes) + ", starts: " + Misc.ListToStringIDs(starts));
+            foreach (NodeBase node in nodes)
+                foreach (NodePin pin in node.AllPins)
+                    pin.OnAfterGraphDeserialize();
         }
 
 #if UNITY_EDITOR

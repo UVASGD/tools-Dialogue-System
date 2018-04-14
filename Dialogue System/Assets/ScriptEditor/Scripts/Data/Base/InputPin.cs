@@ -6,10 +6,13 @@ using UnityEngine;
 namespace ScriptEditor.Graph {
     /// <summary> Input pin. If disconnected, a constant can be provided </summary>
     [Serializable]
-    public class InputPin : NodePin {
+    public class InputPin : NodePin, ISerializationCallbackReceiver {
         [SerializeField] protected PinValue val;
 
-        public virtual OutputPin ConnectedOutput { get; set; }
+        [SerializeField]
+        private string cOutput;
+        [NonSerialized]
+        public OutputPin ConnectedOutput;
         public override bool IsConnected { get { return ConnectedOutput != null; } }
 
         public object Value {
@@ -37,6 +40,21 @@ namespace ScriptEditor.Graph {
         public override string ToString() {
             return "(IN) Node: " + parentNode.STName + " | " + varType + "\n" + parentNode.description;
         }
+
+        public void OnBeforeSerialize()
+        {
+            cOutput = this.parentNode.parentGraph.IDFromOutput(ConnectedOutput);
+        }
+
+        public void OnAfterDeserialize() {
+            Debug.Log("InputPin.OnAfterDeserialize");
+        }
+
+        public override void OnAfterGraphDeserialize()
+        {
+            Debug.Log("InputPin.OnAfterGraphDeserialize");
+            ConnectedOutput = this.parentNode.parentGraph.OutputFromID(cOutput);
+        }
     }
 
     /// <summary>
@@ -46,13 +64,6 @@ namespace ScriptEditor.Graph {
     [Serializable]
     public class ExecInputPin : InputPin {
         public ExecInputPin(NodeBase n) : base(n, VarType.Exec) { }
-
-        [SerializeField] private string cOutput = null;
-
-        public override OutputPin ConnectedOutput {
-            get { return this.parentNode.parentGraph.OutputFromID(cOutput); }
-            set { cOutput = this.parentNode.parentGraph.IDFromOutput(value); }
-        }
     }
 
     /// <summary>
@@ -62,16 +73,5 @@ namespace ScriptEditor.Graph {
     public class ValueInputPin : InputPin {
         public ValueInputPin(NodeBase n, VarType t, object val) : base(n, t, val) { }
         public ValueInputPin(NodeBase n, VarType t) : base(n, t) { }
-
-        [SerializeField] private ValueOutputPin cOutput = null;
-        [SerializeField] private int totalConnections = 0;
-
-        public override OutputPin ConnectedOutput {
-            get { return cOutput; }
-            set {
-                totalConnections += value == null ? -1 : 1;
-                cOutput = (ValueOutputPin) value;
-            }
-        }
     }
 }

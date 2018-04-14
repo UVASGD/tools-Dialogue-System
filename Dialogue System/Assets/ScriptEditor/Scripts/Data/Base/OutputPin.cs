@@ -6,9 +6,12 @@ using UnityEngine;
 namespace ScriptEditor.Graph {
     /// <summary> Output connection. Must always have a value, even if disconnected </summary>
     [Serializable]
-    public abstract class OutputPin : NodePin {
+    public abstract class OutputPin : NodePin, ISerializationCallbackReceiver {
         //public int ConnectedInputID = -1;
-        public virtual InputPin ConnectedInput  { get; set; }
+        [SerializeField]
+        private string cInput;
+        [NonSerialized]
+        public InputPin ConnectedInput;
         public override bool IsConnected { get { return ConnectedInput != null; } }
 
         public OutputPin(NodeBase n, VarType t) : base(n, t) { }
@@ -16,8 +19,24 @@ namespace ScriptEditor.Graph {
         public override string ConName() {
             return "???";
         }
+
         public override string ToString() {
             return "(OUT) Node: " + (parentNode == null ? "???" : parentNode.STName) + " | " + varType;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            cInput = this.parentNode.parentGraph.IDFromInput(ConnectedInput);
+        }
+
+        public void OnAfterDeserialize() {
+            Debug.Log("OutputPin.OnAfterDeserialize");
+        }
+
+        public override void OnAfterGraphDeserialize()
+        {
+            Debug.Log("OutputPin.OnAfterGraphDeserialize");
+            ConnectedInput = this.parentNode.parentGraph.InputFromID(cInput);
         }
     }
 
@@ -28,13 +47,6 @@ namespace ScriptEditor.Graph {
     [Serializable]
     public class ValueOutputPin : OutputPin {
         public ValueOutputPin(NodeBase n, VarType t) : base(n, t) { }
-
-        [SerializeField] private string cInput = null;
-
-        public override InputPin ConnectedInput {
-            get { return this.parentNode.parentGraph.InputFromID(cInput); }
-            set { cInput = this.parentNode.parentGraph.IDFromInput(value); }
-        }
     }
 
     /// <summary>
@@ -43,15 +55,5 @@ namespace ScriptEditor.Graph {
     [Serializable]
     public class ExecOutputPin : OutputPin {
         public ExecOutputPin(NodeBase n) : base(n, VarType.Exec) { }
-
-        [SerializeField] public ExecInputPin cInput = null;
-
-        public override InputPin ConnectedInput {
-            get { return cInput; }
-            set {
-                Debug.Log("cInput ef EOP is got set");
-                cInput = (ExecInputPin) value;
-            }
-        }
     }
 }
