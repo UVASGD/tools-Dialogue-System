@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace ScriptEditor.Graph {
-    public class NodeGraph : ScriptableObject, ISerializationCallbackReceiver {
+    public class NodeGraph : ScriptableObject {
         public string Name = "New Script";
         public List<NodeBase> nodes;
         public List<StartNode> starts;
@@ -26,13 +26,21 @@ namespace ScriptEditor.Graph {
         private int subStartIndex = 0;
         private bool errFound = false;
 
+        private SerializedObject serializedObject;
+
         public bool hasErrors { get { return errFound; } }
+
         public StartNode CurrentSubStart{
             get { return starts[subStartIndex]; }
         }
 
         public void SetSubStartIndex(int index){
             subStartIndex = index;
+        }
+
+        public void Start()
+        {
+            serializedObject = new SerializedObject(this);
         }
 
         public void Initialize() {
@@ -65,6 +73,7 @@ namespace ScriptEditor.Graph {
                 ip.ConnectedOutput.ConnectedInput = null;
             }
 
+            EditorUtility.SetDirty(this);
             ip.ConnectedOutput = op;
             //op.ConnectedInputID = ip.node.inPins.IndexOf(ip);
             op.ConnectedInput = ip;
@@ -141,18 +150,13 @@ namespace ScriptEditor.Graph {
 
         public void OnEnable()
         {
-            Debug.Log("NodeGraph.OnEnable");
-        }
-
-        public void OnBeforeSerialize() { }
-
-        public void OnAfterDeserialize()
-        {
-            Debug.Log("NodeGraph.OnAfterDeserialize: nodes: " + Misc.ListToStringIDs(nodes) + ", starts: " + Misc.ListToStringIDs(starts));
-            foreach (NodeBase node in nodes)
-                foreach (NodePin pin in node.AllPins)
+            foreach (NodeBase node in nodes) {
+                foreach (NodePin pin in node.AllPins) {
                     pin.OnAfterGraphDeserialize();
+                }
+            }
         }
+
 
 #if UNITY_EDITOR
         /// <summary>

@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ScriptEditor.EditorScripts.Inspector {
 
     static class PropertiesInspector {
-        public static bool defaultGUI = true;
+        public static bool defaultGUI = false;
 
         //public static void showTooltips(Type t) {
         //    foreach(FieldInfo f in t.GetFields()) {
@@ -81,42 +81,38 @@ namespace ScriptEditor.EditorScripts.Inspector {
                 return;
             }
 
-            serProp = serializedObject.GetIterator();
-            serProp.NextVisible(true);
-
             DialogueNode node = (DialogueNode)target;
             EditorStyles.textField.wordWrap = true;
-            TooltipAttribute tooltip;
 
-            EditorGUILayout.LabelField("Text Body", node.name, EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(node.name, EditorStyles.boldLabel);
             //scroll = EditorGUILayout.BeginScrollView(scroll);
-            tooltip = PropertiesInspector.GetTooltip(typeof(DialogueNode).GetField("text"), false);
-            string tmp = EditorGUILayout.TextField(new GUIContent("", tooltip.tooltip), node.text);
+            string oldText = node.text;
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("text"));
 
-            if (tmp != node.text)
+            if (node.text != oldText) {
                 node.header = null;
-            node.text = tmp;
+            }
+            //node.text = tmp;
             //EditorGUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-            node.showName = EditorGUILayout.Toggle("Show Name", node.showName);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("showName"));
             if (node.showName)
-                node.nickname = EditorGUILayout.TextField("Nickname", node.nickname);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("nickname"));
             GUILayout.EndHorizontal();
 
-            node.canSkip = EditorGUILayout.Toggle("Can Skip", node.canSkip);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("canSkip"));
             if (node.canSkip) {
                 GUILayout.BeginHorizontal();
-                node.autoSkip = EditorGUILayout.Toggle("Auto Skip", node.autoSkip);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("autoSkip"));
                 if (node.autoSkip)
-                    node.autoSkipDelay = EditorGUILayout.FloatField("Auto Skip Delay", 
-                        node.autoSkipDelay);
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty("autoSkipDelay"));
                 GUILayout.EndHorizontal();
             } else {
                 node.autoSkip = false;
             }
 
-            node.hideOnExit = EditorGUILayout.Toggle("Hide On Exit", node.hideOnExit);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("hideOnExit"));
             //PropertiesInspector.showTooltips(typeof(DialogueNode));
             serializedObject.ApplyModifiedProperties();
         }

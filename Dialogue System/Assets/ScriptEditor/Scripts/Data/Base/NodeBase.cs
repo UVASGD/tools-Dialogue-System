@@ -24,7 +24,7 @@ namespace ScriptEditor.Graph {
     /// either input or output pins, or a combination of both. See _____ for a list of child classes
     /// </summary>
     [Serializable]
-    public abstract class NodeBase : ScriptableObject, ISerializationCallbackReceiver {
+    public abstract class NodeBase : ScriptableObject {
         
         public string  description;
         public bool isSelected;
@@ -49,7 +49,6 @@ namespace ScriptEditor.Graph {
         protected bool setupCompleted { get { return _set; } set { Debug.Log("djidjiedjijed"); _set = value; } }
         
         public IEnumerable<OutputPin> OutPins { get {
-                Debug.Log("NodeBase.OutPins: " + GetInstanceID() + ": execOutPins: " + Misc.NullToString(execOutPins));
                 return execOutPins.Cast<OutputPin>()
                     .Concat(valOutPins.Cast<OutputPin>());
         } }
@@ -399,12 +398,6 @@ namespace ScriptEditor.Graph {
             skin = Resources.Load<GUISkin>("GUI Skins/Editor/" + skinName);
         }
 
-        public void OnBeforeSerialize() { }
-
-        public void OnAfterDeserialize()
-        {
-            Debug.Log("NodeBase.OnAfterDeserialize: " + GetInstanceID() + ": execOutPins: " + Misc.NullToString(execOutPins));
-        }
 
 #if UNITY_EDITOR
         public virtual void DrawNode(Event e, Rect viewRect) {
@@ -532,7 +525,8 @@ namespace ScriptEditor.Graph {
                     ((InputPin)pin).ConnectedOutput.ConnectedInput = null;
                     ((InputPin)pin).ConnectedOutput = null;
                 }
-            }   
+            }
+            EditorUtility.SetDirty(pin.parentNode.parentGraph);
         }
 
         public void DrawNodeStatus() {

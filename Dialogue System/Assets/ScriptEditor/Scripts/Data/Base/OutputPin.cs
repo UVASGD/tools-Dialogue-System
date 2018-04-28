@@ -21,7 +21,7 @@ namespace ScriptEditor.Graph {
         }
 
         public override string ToString() {
-            return "(OUT) Node: " + (parentNode == null ? "???" : parentNode.STName) + " | " + varType;
+            return "(OUT) Node: " + (parentNode == null ? "null" : parentNode.name) + " | " + varType;
         }
 
         public void OnBeforeSerialize()
@@ -29,13 +29,10 @@ namespace ScriptEditor.Graph {
             cInput = this.parentNode.parentGraph.IDFromInput(ConnectedInput);
         }
 
-        public void OnAfterDeserialize() {
-            Debug.Log("OutputPin.OnAfterDeserialize");
-        }
+        public void OnAfterDeserialize() { }
 
         public override void OnAfterGraphDeserialize()
         {
-            Debug.Log("OutputPin.OnAfterGraphDeserialize");
             ConnectedInput = this.parentNode.parentGraph.InputFromID(cInput);
         }
     }

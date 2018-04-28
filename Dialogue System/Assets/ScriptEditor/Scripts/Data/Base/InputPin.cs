@@ -37,8 +37,9 @@ namespace ScriptEditor.Graph {
         public override string ConName() {
             return ConnectedOutput.parentNode.name;
         }
+
         public override string ToString() {
-            return "(IN) Node: " + parentNode.STName + " | " + varType + "\n" + parentNode.description;
+            return "(IN) Node: " + parentNode.name + " | " + varType + "\n" + parentNode.description;
         }
 
         public void OnBeforeSerialize()
@@ -46,13 +47,10 @@ namespace ScriptEditor.Graph {
             cOutput = this.parentNode.parentGraph.IDFromOutput(ConnectedOutput);
         }
 
-        public void OnAfterDeserialize() {
-            Debug.Log("InputPin.OnAfterDeserialize");
-        }
+        public void OnAfterDeserialize() { }
 
         public override void OnAfterGraphDeserialize()
         {
-            Debug.Log("InputPin.OnAfterGraphDeserialize");
             ConnectedOutput = this.parentNode.parentGraph.OutputFromID(cOutput);
         }
     }
