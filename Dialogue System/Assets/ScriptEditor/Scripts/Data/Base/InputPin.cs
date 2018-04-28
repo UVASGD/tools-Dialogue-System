@@ -16,7 +16,7 @@ namespace ScriptEditor.Graph {
         public override bool IsConnected { get { return ConnectedOutput != null; } }
 
         public object Value {
-            get { return val.Value; }
+            get { Debug.Log("IP.VAL:"); return val.Value; }
             set { val.Value = value; }
         }
 

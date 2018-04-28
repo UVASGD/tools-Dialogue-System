@@ -22,9 +22,12 @@ namespace ScriptEditor.Graph
 
         public object Value {
             get {
+                Debug.Log("VarT: " + Type);
                 switch (Type) {
                     case VarType.Bool: return boolVal;
-                    case VarType.Integer:  return intVal;
+                    case VarType.Integer:
+                        Debug.Log("VarType.Integer");
+                        return intVal;
                     case VarType.Float: return floatVal;
                     case VarType.String: return stringVal;
                     case VarType.Vector2:  return vector2Val;

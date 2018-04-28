@@ -410,7 +410,7 @@ namespace ScriptEditor.Graph {
                 if (!String.IsNullOrEmpty(node.text)) {
                     // make sure this text simplification doesn't lag shit every draw call
                     if (String.IsNullOrEmpty(node.header)) {
-                        node.header = Misc.MinimalizeWidthFull(node.text,
+                            node.header = Misc.MinimalizeWidthFull(node.text,
                        body.width - 60, skin.label);
                     }
                     header = node.header;
