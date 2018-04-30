@@ -15,14 +15,14 @@ MonoBehaviour:
   nodes:
   - {fileID: 114259752675046530}
   - {fileID: 114003042539431598}
-  - {fileID: 114577419679036566}
+  - {fileID: 114383487808722286}
   starts:
   - {fileID: 114259752675046530}
-  compiled: 0
+  compiled: 1
   SelectedNode: {fileID: 0}
   wantsConnection: 0
   showProperties: 0
-  foundEnd: 0
+  foundEnd: 1
 --- !u!114 &114003042539431598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
   isSelected: 0
   nodeType: 5
   multiplePins: 0
-  compiled: 0
+  compiled: 1
   parentGraph: {fileID: 11400000}
   execOutPins: []
   valOutPins: []
@@ -67,8 +67,8 @@ MonoBehaviour:
   valInPins: []
   body:
     serializedVersion: 2
-    x: 885.5
-    y: 168.5
+    x: 944.5
+    y: 247.5
     width: 175
     height: 77
   viewRect:
@@ -76,7 +76,7 @@ MonoBehaviour:
     x: 0
     y: 17.5
     width: 1323
-    height: 414
+    height: 500
   skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
 --- !u!114 &114259752675046530
 MonoBehaviour:
@@ -93,7 +93,7 @@ MonoBehaviour:
   isSelected: 0
   nodeType: 5
   multiplePins: 0
-  compiled: 0
+  compiled: 1
   parentGraph: {fileID: 11400000}
   execOutPins:
   - Name: 
@@ -112,8 +112,8 @@ MonoBehaviour:
   valInPins: []
   body:
     serializedVersion: 2
-    x: 130.5
-    y: 139.5
+    x: 189.5
+    y: 218.5
     width: 175
     height: 77
   viewRect:
@@ -121,10 +121,10 @@ MonoBehaviour:
     x: 0
     y: 17.5
     width: 1323
-    height: 414
+    height: 500
   skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
   LockPlayer: 1
---- !u!114 &114577419679036566
+--- !u!114 &114383487808722286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -139,12 +139,12 @@ MonoBehaviour:
   isSelected: 0
   nodeType: 3
   multiplePins: 0
-  compiled: 0
+  compiled: 1
   parentGraph: {fileID: 11400000}
   execOutPins:
   - Name: 
     Description: 
-    parentNode: {fileID: 114577419679036566}
+    parentNode: {fileID: 114383487808722286}
     varType: 0
     bounds:
       serializedVersion: 2
@@ -157,7 +157,7 @@ MonoBehaviour:
   execInPins:
   - Name: 
     Description: 
-    parentNode: {fileID: 114577419679036566}
+    parentNode: {fileID: 114383487808722286}
     varType: 0
     bounds:
       serializedVersion: 2
@@ -179,7 +179,7 @@ MonoBehaviour:
   valInPins:
   - Name: Speaker
     Description: The Actor who speaks the text. Can be left empty
-    parentNode: {fileID: 114577419679036566}
+    parentNode: {fileID: 114383487808722286}
     varType: 10
     bounds:
       serializedVersion: 2
@@ -200,7 +200,7 @@ MonoBehaviour:
     cOutput: 
   - Name: Focus on
     Description: Whether or not the main camera should focus on the conversant
-    parentNode: {fileID: 114577419679036566}
+    parentNode: {fileID: 114383487808722286}
     varType: 1
     bounds:
       serializedVersion: 2
@@ -221,7 +221,7 @@ MonoBehaviour:
     cOutput: 
   - Name: Speed
     Description: How fast the text is displayed
-    parentNode: {fileID: 114577419679036566}
+    parentNode: {fileID: 114383487808722286}
     varType: 3
     bounds:
       serializedVersion: 2
@@ -232,7 +232,7 @@ MonoBehaviour:
     val:
       boolVal: 0
       intVal: 0
-      floatVal: 1
+      floatVal: 0
       stringVal: 
       vector2Val: {x: 0, y: 0}
       vector3Val: {x: 0, y: 0, z: 0}
@@ -242,7 +242,7 @@ MonoBehaviour:
     cOutput: 
   - Name: User Data
     Description: 
-    parentNode: {fileID: 114577419679036566}
+    parentNode: {fileID: 114383487808722286}
     varType: 9
     bounds:
       serializedVersion: 2
@@ -263,8 +263,8 @@ MonoBehaviour:
     cOutput: 
   body:
     serializedVersion: 2
-    x: 437
-    y: 84
+    x: 522
+    y: 180
     width: 211
     height: 240
   viewRect:

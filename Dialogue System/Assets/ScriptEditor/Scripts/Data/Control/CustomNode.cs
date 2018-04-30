@@ -1,14 +1,12 @@
 ﻿using System;
+using UnityEngine;
 
-namespace ScriptEditor.Graph
-{
-	public class CustomNode : ControlNode
-	{
-		public CustomNode ()
-		{
-		}
+namespace ScriptEditor.Graph {
+    public class CustomNode : ControlNode {
+        public CustomNode() {
+        }
 
-		public override void Execute() {
+        public override void Execute() {
             finished = true;
 
         }
@@ -18,9 +16,9 @@ namespace ScriptEditor.Graph
             name = "Custom";
             description = "Calls a custom function";
             // Create pins
-			execInPins.Add(new ExecInputPin(this));
+            execInPins.Add(new ExecInputPin(this));
             execOutPins.Add(new ExecOutputPin(this));
-          }
-	}
+        }
+    }
 }
 

@@ -90,7 +90,8 @@ namespace ScriptEditor.EditorScripts {
                     new Rect(1,1,1,1), e, graph);
 
             ProcessEvents(e);
-            if (workView.SelectedPin != null) Repaint();
+            if (workView.SelectedPin != null || nodeCreateView!=null ||
+                 (e.type == EventType.MouseDrag && e.button == 2)) Repaint();
         }
 
         static void CreateViews() {

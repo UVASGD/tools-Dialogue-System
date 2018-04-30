@@ -28,7 +28,7 @@ namespace ScriptEditor.Graph {
 
         private SerializedObject serializedObject;
 
-        public bool hasErrors { get { return errFound; } }
+        public bool HasErrors { get { return errFound; } }
 
         public StartNode CurrentSubStart{
             get { return starts[subStartIndex]; }
@@ -75,7 +75,6 @@ namespace ScriptEditor.Graph {
 
             EditorUtility.SetDirty(this);
             ip.ConnectedOutput = op;
-            //op.ConnectedInputID = ip.node.inPins.IndexOf(ip);
             op.ConnectedInput = ip;
         }
 
@@ -143,6 +142,7 @@ namespace ScriptEditor.Graph {
 
             if(!errFound) {
                 compiled = true;
+                EditorUtility.SetDirty(this);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }

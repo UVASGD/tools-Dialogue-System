@@ -1,18 +1,14 @@
 ﻿using System;
 using UnityEngine;
 
-namespace ScriptEditor.Graph
-{
-    public class SetDialogueScriptNode : ControlNode
-    {
+namespace ScriptEditor.Graph {
+    public class SetDialogueScriptNode : ControlNode {
         public NodeGraph newScript;
 
-        public SetDialogueScriptNode()
-        {
+        public SetDialogueScriptNode() {
         }
 
-        public override void Construct()
-        {
+        public override void Construct() {
             // set information
             name = "Set Dialogue Script";
             description = "Sets the indicated dialogue script attached to the given actor.";
@@ -31,4 +27,3 @@ namespace ScriptEditor.Graph
         }
     }
 }
-

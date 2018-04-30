@@ -25,8 +25,8 @@ namespace ScriptEditor.Graph {
     /// </summary>
     [Serializable]
     public abstract class NodeBase : ScriptableObject {
-        
-        public string  description;
+
+        public string description;
         public bool isSelected;
 
         /// <summary> is the node finished executing </summary>
@@ -47,37 +47,43 @@ namespace ScriptEditor.Graph {
         protected const float Width = 175;
         protected bool _set = false;
         protected bool setupCompleted { get { return _set; } set { Debug.Log("djidjiedjijed"); _set = value; } }
-        
-        public IEnumerable<OutputPin> OutPins { get {
+
+        public IEnumerable<OutputPin> OutPins {
+            get {
                 return execOutPins.Cast<OutputPin>()
                     .Concat(valOutPins.Cast<OutputPin>());
-        } }
+            }
+        }
         public List<ExecOutputPin> EOP { get { return execOutPins; } }
         public List<ValueOutputPin> VOP { get { return valOutPins; } }
         [SerializeField] protected List<ExecOutputPin> execOutPins;
         [SerializeField] protected List<ValueOutputPin> valOutPins;
 
-        public IEnumerable<InputPin> InPins { get {
+        public IEnumerable<InputPin> InPins {
+            get {
                 return execInPins.Cast<InputPin>()
                     .Concat(valInPins.Cast<InputPin>());
-        } }
+            }
+        }
         public List<ExecInputPin> EIP { get { return execInPins; } }
         public List<ValueInputPin> VIP { get { return valInPins; } }
         [SerializeField] protected List<ExecInputPin> execInPins;
         [SerializeField] protected List<ValueInputPin> valInPins;
 
         /// <summary> all input and output pins attached to node </summary>
-        public IEnumerable<NodePin> AllPins
-        {
-            get
-            {
+        public IEnumerable<NodePin> AllPins {
+            get {
                 return OutPins.Cast<NodePin>().Concat(InPins.Cast<NodePin>());
             }
         }
 
         public List<NodeError> errors;
-        public int MaxNodes { get { return Mathf.Max(execInPins.Count+ valInPins.Count,
-            execOutPins.Count + valOutPins.Count); } }
+        public int MaxNodes {
+            get {
+                return Mathf.Max(execInPins.Count + valInPins.Count,
+execOutPins.Count + valOutPins.Count);
+            }
+        }
         public NodeType Node_Type { get { return nodeType; } }
 
         /// <summary>
@@ -86,15 +92,17 @@ namespace ScriptEditor.Graph {
         public bool IsFinished { get { return finished; } }
 
         /// <summary>[unused] whether or not the node can be logically executed </summary>
-        public bool IsExecutable { get {
+        public bool IsExecutable {
+            get {
                 return (execInPins.Count == 0 && execOutPins.Count == 0);
-            } }
+            }
+        }
 
         ///<summary> whether or not the executable pin's output can be ignored; true only when exec input is disconnected </summary>
         public bool Ignorable {
             get {
                 foreach (InputPin ip in execInPins)
-                        return !ip.IsConnected;
+                    return !ip.IsConnected;
                 return false;
             }
         }
@@ -150,13 +158,13 @@ namespace ScriptEditor.Graph {
         public Rect GetBody() { return body; }
         public void SetPos(Vector2 pos) { body.position = pos; }
         public void Pan(Vector2 pan) { body.position += pan; this.pan += pan; }
-        protected Vector2 pan=Vector2.zero;
+        protected Vector2 pan = Vector2.zero;
 
         public void OnEnable() {
             errors = new List<NodeError>();
             GetEditorSkin();
         }
-        protected void SetName (string title) {
+        protected void SetName(string title) {
             this.name = title;
         }
 
@@ -211,8 +219,7 @@ namespace ScriptEditor.Graph {
             // set pin visual information
             List<InputPin> inPins = InPins.ToList();
             List<OutputPin> outPins = OutPins.ToList();
-            foreach (NodePin pin in AllPins)
-            {
+            foreach (NodePin pin in AllPins) {
                 float x = !pin.isInput ? body.width - NodePin.margin.x - NodePin.pinSize.x : NodePin.margin.x;
                 float y = !pin.isInput ? outPins.IndexOf((OutputPin)pin) : inPins.IndexOf((InputPin)pin);
 
@@ -231,6 +238,13 @@ namespace ScriptEditor.Graph {
 
             errors = new List<NodeError>();
             //hideFlags = HideFlags.HideInHierarchy;
+        }
+
+        private object result;
+
+        /// <summary> value of node's output. Can be based off math/logic/data retrieval </summary>
+        public object Result() {
+            return result;
         }
 
         /// <summary> logical execution of node </summary>
@@ -252,7 +266,7 @@ namespace ScriptEditor.Graph {
         /// <summary> Return the next executable node </summary>
         public virtual NodeBase GetNextNode() {
             if (execOutPins.Count > 0) {
-                    return execOutPins[0].ConnectedInput.parentNode;
+                return execOutPins[0].ConnectedInput.parentNode;
             }
 
             return null;
@@ -281,7 +295,7 @@ namespace ScriptEditor.Graph {
             compiled = true;
             //errors.RemoveAt(errors.IndexOf(new NodeError(NodeError.ErrorType.NotConnected)));
         }
-        
+
         /// <summary> Update flow of values through connected pins  </summary>
         public virtual void Lookup(bool compileTime) {
             if (compileTime && parentGraph.lookupStack.Contains(this)) {
@@ -292,8 +306,8 @@ namespace ScriptEditor.Graph {
             setCompiled();
             //Debug.Log("Look up "+this);
             parentGraph.lookupStack.Push(this);
-            foreach(InputPin ip in InPins) {
-                if (ip.varType!=VarType.Exec && ip.IsConnected) {
+            foreach (InputPin ip in InPins) {
+                if (ip.varType != VarType.Exec && ip.IsConnected) {
                     // recurse
                     ip.ConnectedOutput.parentNode.Lookup(compileTime);
                 }
@@ -328,7 +342,7 @@ namespace ScriptEditor.Graph {
             }
 
             // check for default connection
-            if(this is ChoiceNode) {
+            if (this is ChoiceNode) {
                 ChoiceNode c = ((ChoiceNode)this);
                 if (!c.execOutPins[c.defaultChoice].IsConnected)
                     errors.Add(new NodeError(NodeError.ErrorType.NoDefault));
@@ -336,18 +350,17 @@ namespace ScriptEditor.Graph {
 
             setCompiled();
             if (this as EndNode != null) parentGraph.foundEnd = true;
-            Debug.Log("Compiling: " + this);
             parentGraph.compileStack.Push(this);
-            foreach(OutputPin op in execOutPins) {
+            foreach (OutputPin op in execOutPins) {
                 if (op.IsConnected) {
                     //Debug.Log("OP.CO.NO: " + op.ConnectedInput.node);
                     op.ConnectedInput.parentNode.Compile();
                 }
             }
 
-            foreach(InputPin ip in valInPins) {
+            foreach (InputPin ip in valInPins) {
                 if (ip.IsConnected && !ip.ConnectedOutput.parentNode.Ignorable)
-                        ip.ConnectedOutput.parentNode.Lookup(true);
+                    ip.ConnectedOutput.parentNode.Lookup(true);
             }
             parentGraph.compileStack.Pop();
         }
@@ -367,7 +380,7 @@ namespace ScriptEditor.Graph {
         /// <param name="mousePos"></param>
         /// <returns></returns>
         public NodePin InsidePin(Vector2 mousePos) {
-            foreach(NodePin pin in AllPins) {
+            foreach (NodePin pin in AllPins) {
                 if (pin.Contains(mousePos)) return pin;
             }
             return null;
@@ -379,7 +392,7 @@ namespace ScriptEditor.Graph {
         /// <param name="mousePos"></param>
         /// <returns> the pin in which the mouse collides</returns>
         public NodePin InsidePinText(Vector2 mousePos) {
-            foreach(NodePin pin in AllPins) {
+            foreach (NodePin pin in AllPins) {
                 if (pin.TxtContains(mousePos)) return pin;
             }
             return null;
@@ -406,18 +419,18 @@ namespace ScriptEditor.Graph {
 
             string header = name;
             if (this is DialogueNode) {
-                DialogueNode node = (DialogueNode) this;
+                DialogueNode node = (DialogueNode)this;
                 if (!String.IsNullOrEmpty(node.text)) {
                     // make sure this text simplification doesn't lag shit every draw call
                     if (String.IsNullOrEmpty(node.header)) {
-                            node.header = Misc.MinimalizeWidthFull(node.text,
-                       body.width - 60, skin.label);
+                        node.header = Misc.MinimalizeWidthFull(node.text,
+                   body.width - 60, skin.label);
                     }
                     header = node.header;
                 }
             }
-                   
-            GUI.Box(body, 
+
+            GUI.Box(body,
                 header,
                 isSelected ? skin.GetStyle("Node" + NTName + "Selected") :
                 skin.GetStyle("Node" + NTName + "Background"));
@@ -428,57 +441,60 @@ namespace ScriptEditor.Graph {
         /// Draws the pins for the Node; 
         /// Each NodeType is drawn with a different color
         /// </summary>
-        public  void DrawPins() {
-            //try {
-                GUILayout.BeginArea(body);
-                foreach (NodePin pin in AllPins) {
-                    Rect txt = pin.TextBox;
-                    GUI.Box(pin.bounds, "", skin.GetStyle(pin.StyleName));
-                    GUI.Label(txt, pin.Name);
+        public void DrawPins() {
+            GUILayout.BeginArea(body);
+            foreach (NodePin pin in AllPins) {
+                Rect txt = pin.TextBox;
+                GUI.Box(pin.bounds, "", skin.GetStyle(pin.StyleName));
+                GUI.Label(txt, pin.Name);
 
                 // casting error? wtf, C#
-                Vector2 offset = new Vector2(txt.size.x-15, 0);
-                    if (!pin.IsConnected && pin.isInput) {
+                Vector2 offset = new Vector2(txt.size.x - 15, 0);
+                if (!pin.IsConnected && pin is InputPin) {
+                    InputPin ip = (InputPin)pin;
                     //Debug.Log("Pin: " + pin + "\nVal: " + pin.Value);
-                        switch (pin.varType) {
-                            case VarType.Bool: // checkbox
-                                //pin.Value = (bool)EditorGUI.Toggle(new Rect(txt.position + offset, new Vector2(15, 15)),
-                                //    (bool)pin.Value);
-                                break;
-                            case VarType.Integer: // int field
-                            //pin.Value = (int)EditorGUI.IntField(new Rect(txt.position + offset, new Vector2(35, 20)),
-                            //    (int)pin.Value);
+                    switch (pin.varType) {
+                        case VarType.Bool: // checkbox
+                            ip.SetBool(EditorGUI.Toggle(new Rect(txt.position + offset, new Vector2(15, 15)),
+                                ip.GetBool()));
                             break;
-                            case VarType.Float: // float field
-                            //pin.Value = (float)EditorGUI.FloatField(new Rect(txt.position + offset, new Vector2(45, 20)),
-                            //    (float)pin.Value);
+                        case VarType.Integer: // int field
+                            ip.SetInt(EditorGUI.IntField(new Rect(txt.position + offset, new Vector2(35, 20)),
+                                ip.GetInt()));
                             break;
-                            case VarType.String: // text field
-                            //pin.Value = (string)EditorGUI.TextField(new Rect(txt.position + offset, new Vector2(75, 20)),
-                            //    (string)pin.Value);
+                        case VarType.Float: // float field
+                            ip.SetFloat(EditorGUI.FloatField(new Rect(txt.position + offset, new Vector2(45, 20)),
+                                ip.GetFloat()));
                             break;
-                            case VarType.Vector2: // 2 float fields
-                                //pin.Value = (Vector2)EditorGUI.Vector2Field(new Rect(txt.position + offset, new Vector2(65, 20)),
-                                //    "", (Vector2)pin.Value);
-                                break;
-                            case VarType.Vector3: // 3 float fields
-                                //pin.Value = (Vector3)EditorGUI.Vector3Field(new Rect(txt.position + offset, new Vector2(85, 20)),
-                                //    "", (Vector3)pin.Value);
-                                break;
-                            case VarType.Color: // box showing color
-                                //pin.Value = (Color) EditorGUI.ColorField(new Rect(txt.position + offset, new Vector2(65, 20)),
-                                //    (Color)pin.Value);
-                                break;
-                        }
+                        case VarType.String: // text field
+                            ip.SetString(EditorGUI.TextField(new Rect(txt.position + offset, new Vector2(75, 20)),
+                               ip.GetString()));
+                            break;
+                        case VarType.Vector2: // 2 float fields
+                            ip.SetVector2(EditorGUI.Vector2Field(new Rect(txt.position + offset, new Vector2(65, 20)),
+                                "", ip.GetVector2()));
+                            break;
+                        case VarType.Vector3: // 3 float fields
+                            ip.SetVector3(EditorGUI.Vector3Field(new Rect(txt.position + offset, new Vector2(85, 20)),
+                                "", ip.GetVector3()));
+                            break;
+                        case VarType.Color: // box showing color
+                            ip.SetColor(EditorGUI.ColorField(new Rect(txt.position + offset, new Vector2(65, 20)),
+                               ip.GetColor()));
+                            break;
+                        case VarType.Actor: // text field
+                            ip.SetActor((Actor)EditorGUI.ObjectField(new Rect(txt.position + offset, new Vector2(75, 20)),
+                               ip.GetActor(), typeof(Actor), true));
+                            break;
                     }
                 }
-                GUILayout.EndArea();
-            //} catch { }
+            }
+            GUILayout.EndArea();
         }
 
         public void DrawConnections() {
             foreach (NodePin pin in AllPins)
-                if((!pin.isInput && pin.varType==VarType.Exec) || 
+                if ((!pin.isInput && pin.varType == VarType.Exec) ||
                     (pin.isInput && pin.varType != VarType.Exec))
                     pin.DrawConnection();
         }
@@ -502,7 +518,7 @@ namespace ScriptEditor.Graph {
         /// completely disconnect node. NOTE: this function does not work as intended!
         /// </summary>
         /// <param name="pin"></param>
-        public void RemoveAllPins () {
+        public void RemoveAllPins() {
             execInPins = new List<ExecInputPin>();
             valInPins = new List<ValueInputPin>();
             execOutPins = new List<ExecOutputPin>();

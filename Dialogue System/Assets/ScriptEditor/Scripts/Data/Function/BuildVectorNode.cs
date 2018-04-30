@@ -31,12 +31,11 @@ namespace ScriptEditor.Graph {
                     valInPins.Add(new ValueInputPin(this, VarType.Float));
                     valInPins.Add(new ValueInputPin(this, VarType.Float));
                     valInPins.Add(new ValueInputPin(this, VarType.Float));
-                    valInPins.Add(new ValueInputPin(this, VarType.Float));
+                    valInPins.Add(new ValueInputPin(this, VarType.Float, 1.0f));
                     valInPins[0].Name = "r";
                     valInPins[1].Name = "g";
                     valInPins[2].Name = "b";
                     valInPins[3].Name = "a";
-                    valInPins[3].Default = 1.0f;
                     valInPins[3].Description = "Color transparency";
                     break;
             }
