@@ -85,7 +85,7 @@ namespace ScriptEditor {
             if (lst == null) return "null";
             string s = "";
             foreach (T t in lst)
-                s += NullToString(t);
+                s += NullToString(t) + ", ";
             return "{" + s + "}";
         }
 
@@ -94,7 +94,7 @@ namespace ScriptEditor {
             if (lst == null) return "null";
             string s = "";
             foreach (T t in lst)
-                s += NullToString(t.GetInstanceID()) + ", ";
+                s += t.GetInstanceID() + ", ";
             return "{" + s + "}";
         }
     }
