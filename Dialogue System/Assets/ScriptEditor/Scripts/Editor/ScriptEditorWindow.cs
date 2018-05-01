@@ -5,6 +5,7 @@ using UnityEditor;
 using System;
 using ScriptEditor.Graph;
 using System.IO;
+using ScriptEditor.EditorScripts.Inspector;
 
 namespace ScriptEditor.EditorScripts {
     public class ScriptEditorWindow : EditorWindow {
@@ -23,7 +24,8 @@ namespace ScriptEditor.EditorScripts {
 
         [MenuItem("Dope Dialogue/Script Editor")]
         private static void OpenScriptEditor() {
-            EditorWindow.GetWindow(typeof(ScriptEditorWindow));
+            ScriptEditorWindow winso = (ScriptEditorWindow)EditorWindow.GetWindow(typeof(ScriptEditorWindow));
+            PropertiesInspector.window = winso;
             Initialize();
         }
 
@@ -43,7 +45,7 @@ namespace ScriptEditor.EditorScripts {
         }
 
         //Vector3 vanishingPoint = new Vector2(0, 19.12f); public float zoomScale = 1;
-
+        
         void OnGUI() {
             if (workView == null || headerView == null || statusView == null) {
                 CreateViews();
@@ -51,14 +53,15 @@ namespace ScriptEditor.EditorScripts {
             }
 
             Event e = Event.current;
+            //Debug.Log(e);
             Rect headerBox = new Rect(0, 0, position.width, 17.5f);Matrix4x4 oldMatrix = GUI.matrix;
 
             //Scale  gui matrix
             //Matrix4x4 Translation = Matrix4x4.TRS(vanishingPoint, Quaternion.identity, Vector3.one);
             //Matrix4x4 Scale = Matrix4x4.Scale(new Vector3(zoomScale, zoomScale, 1.0f));
             //GUI.matrix = Translation * Scale * Translation.inverse;
-            workView.DrawView(new Rect(0,headerBox.height, position.width, position.height-2*headerBox.height), 
-                            new Rect(/*zoomScale, zoomScale,  1/zoomScale, 1/zoomScale*/ 1,1,1,1),
+            workView.DrawView(new Rect(0, headerBox.height, position.width, position.height - 2 * headerBox.height),
+                            new Rect(/*zoomScale, zoomScale,  1/zoomScale, 1/zoomScale*/ 1, 1, 1, 1),
                             e, graph);
             //reset the matrix
             //GUI.matrix = oldMatrix;
@@ -87,7 +90,8 @@ namespace ScriptEditor.EditorScripts {
                     new Rect(1,1,1,1), e, graph);
 
             ProcessEvents(e);
-            Repaint();
+            if (workView.SelectedPin != null || nodeCreateView!=null ||
+                 (e.type == EventType.MouseDrag && e.button == 2)) Repaint();
         }
 
         static void CreateViews() {
@@ -116,8 +120,10 @@ namespace ScriptEditor.EditorScripts {
         #region data
         void OnSelectionChange() {
             if (Selection.activeObject != null) {
-                if (Selection.activeObject.GetType().Equals(typeof(NodeGraph)))
+                if (Selection.activeObject is NodeGraph) {
                     graph = (NodeGraph)Selection.activeObject;
+                    Repaint();
+                }
             }
             
         }

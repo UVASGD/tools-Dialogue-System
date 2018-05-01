@@ -1,0 +1,287 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3edf3ff32b1e2a64a95b564eed772c93, type: 3}
+  m_Name: Conversationalist
+  m_EditorClassIdentifier: 
+  Name: Conversationalist
+  nodes:
+  - {fileID: 114259752675046530}
+  - {fileID: 114003042539431598}
+  - {fileID: 114383487808722286}
+  starts:
+  - {fileID: 114259752675046530}
+  compiled: 1
+  SelectedNode: {fileID: 0}
+  wantsConnection: 0
+  showProperties: 0
+  foundEnd: 1
+--- !u!114 &114003042539431598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a759c92f96d003348b0fe25b75009a7e, type: 3}
+  m_Name: End
+  m_EditorClassIdentifier: 
+  description: Finalizes script execution
+  isSelected: 0
+  nodeType: 5
+  multiplePins: 0
+  compiled: 1
+  parentGraph: {fileID: 11400000}
+  execOutPins: []
+  valOutPins: []
+  execInPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114003042539431598}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 30
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 0
+    cOutput: 2:0
+  valInPins: []
+  body:
+    serializedVersion: 2
+    x: 944.5
+    y: 247.5
+    width: 175
+    height: 77
+  viewRect:
+    serializedVersion: 2
+    x: 0
+    y: 17.5
+    width: 1323
+    height: 500
+  skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
+--- !u!114 &114259752675046530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce8e7bbb27beaff489d04f0b42f0f7c5, type: 3}
+  m_Name: Start
+  m_EditorClassIdentifier: 
+  description: Begins root script execution
+  isSelected: 0
+  nodeType: 5
+  multiplePins: 0
+  compiled: 1
+  parentGraph: {fileID: 11400000}
+  execOutPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114259752675046530}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 127
+      y: 30
+      width: 23
+      height: 17
+    cInput: 2:0
+  valOutPins: []
+  execInPins: []
+  valInPins: []
+  body:
+    serializedVersion: 2
+    x: 189.5
+    y: 218.5
+    width: 175
+    height: 77
+  viewRect:
+    serializedVersion: 2
+    x: 0
+    y: 17.5
+    width: 1323
+    height: 500
+  skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
+  LockPlayer: 1
+--- !u!114 &114383487808722286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3af2d81f277850f48bd2e63f4c266d6c, type: 3}
+  m_Name: Show Dialogue
+  m_EditorClassIdentifier: 
+  description: Displays a conversation dialogue to a dialogue box based on the conversant.
+  isSelected: 0
+  nodeType: 3
+  multiplePins: 0
+  compiled: 1
+  parentGraph: {fileID: 11400000}
+  execOutPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114383487808722286}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 163
+      y: 69
+      width: 23
+      height: 17
+    cInput: 1:0
+  valOutPins: []
+  execInPins:
+  - Name: 
+    Description: 
+    parentNode: {fileID: 114383487808722286}
+    varType: 0
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 69
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 0
+    cOutput: 0:0
+  valInPins:
+  - Name: Speaker
+    Description: The Actor who speaks the text. Can be left empty
+    parentNode: {fileID: 114383487808722286}
+    varType: 10
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 98
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 10
+    cOutput: 
+  - Name: Focus on
+    Description: Whether or not the main camera should focus on the conversant
+    parentNode: {fileID: 114383487808722286}
+    varType: 1
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 127
+      width: 23
+      height: 17
+    val:
+      boolVal: 1
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 1
+    cOutput: 
+  - Name: Speed
+    Description: How fast the text is displayed
+    parentNode: {fileID: 114383487808722286}
+    varType: 3
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 156
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 3
+    cOutput: 
+  - Name: User Data
+    Description: 
+    parentNode: {fileID: 114383487808722286}
+    varType: 9
+    bounds:
+      serializedVersion: 2
+      x: 25
+      y: 185
+      width: 23
+      height: 17
+    val:
+      boolVal: 0
+      intVal: 0
+      floatVal: 0
+      stringVal: 
+      vector2Val: {x: 0, y: 0}
+      vector3Val: {x: 0, y: 0, z: 0}
+      colorVal: {r: 1, g: 1, b: 1, a: 1}
+      actorVal: {fileID: 0}
+      Type: 9
+    cOutput: 
+  body:
+    serializedVersion: 2
+    x: 522
+    y: 180
+    width: 211
+    height: 240
+  viewRect:
+    serializedVersion: 2
+    x: 0
+    y: 17.5
+    width: 1323
+    height: 414
+  skin: {fileID: 11400000, guid: 74af372bb2bebc44c882983ddcb52058, type: 2}
+  text: This cosmic dance of bursting decadence and withheld permissions twists all
+    our arms collectively, but if sweetness can win, and it can, then I'll still be
+    here tomorrow to high-five you yesterday, my friend. Peace.
+  nickname: 
+  showName: 1
+  autoSkip: 0
+  autoSkipDelay: 6
+  canSkip: 1
+  hideOnExit: 0
+  icon: {fileID: 0}
+  header: This cosmic dance of ...

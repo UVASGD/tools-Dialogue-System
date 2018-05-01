@@ -21,7 +21,6 @@ namespace ScriptEditor.Graph {
                 execInPins.Add(new ExecInputPin(this));
                 valInPins.Add(new ValueInputPin(this, variable.varType));
                 valInPins[0].Description = "";
-                valInPins[0].Default = null;
 
                 execOutPins.Add(new ExecOutputPin(this));
             } else {

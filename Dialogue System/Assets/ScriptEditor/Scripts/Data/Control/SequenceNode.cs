@@ -1,22 +1,22 @@
 ﻿using System;
+using UnityEngine;
 
-namespace ScriptEditor.Graph
-{
-	public class SequenceNode : ControlNode
-	{
-		public SequenceNode ()
-		{
-		}
-		public override void Execute() {
+namespace ScriptEditor.Graph {
+    public class SequenceNode : ControlNode {
+
+        public SequenceNode() {
+        }
+
+        public override void Execute() {
             finished = true;
         }
 
-		public override void Construct() {
-		    //set information
-		    name = "Sequence";
+        public override void Construct() {
+            //set information
+            name = "Sequence";
             description = "Splits execution based on index";
-		    // Create Pins
-		    multiplePins = true;
+            // Create Pins
+            multiplePins = true;
             execInPins.Add(new ExecInputPin(this));
             valInPins.Add(new ValueInputPin(this, VarType.Integer));
             valInPins[0].Name = "Index";
@@ -26,7 +26,6 @@ namespace ScriptEditor.Graph
             execOutPins.Add(new ExecOutputPin(this));
             execOutPins[1].Name = "Then 1";
             execOutPins[1].Name = "Then 2";
-		}
-	}
+        }
+    }
 }
-

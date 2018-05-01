@@ -9,6 +9,7 @@ namespace ScriptEditor.EditorScripts.Inspector {
 
     static class PropertiesInspector {
         public static bool defaultGUI = false;
+        public static ScriptEditorWindow window;
 
         //public static void showTooltips(Type t) {
         //    foreach(FieldInfo f in t.GetFields()) {
@@ -89,12 +90,6 @@ namespace ScriptEditor.EditorScripts.Inspector {
             string oldText = node.text;
             EditorGUILayout.PropertyField(serializedObject.FindProperty("text"));
 
-            if (node.text != oldText) {
-                node.header = null;
-            }
-            //node.text = tmp;
-            //EditorGUILayout.EndScrollView();
-
             GUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("showName"));
             if (node.showName)
@@ -113,8 +108,12 @@ namespace ScriptEditor.EditorScripts.Inspector {
             }
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("hideOnExit"));
-            //PropertiesInspector.showTooltips(typeof(DialogueNode));
             serializedObject.ApplyModifiedProperties();
+            
+            if (node.text != oldText) {
+                node.header = null;
+                PropertiesInspector.window.Repaint();
+            }
         }
     }
 #endregion

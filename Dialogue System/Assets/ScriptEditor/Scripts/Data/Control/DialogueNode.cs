@@ -30,6 +30,7 @@ namespace ScriptEditor.Graph
         private Transform previousFocus, camera;
         private List<String> pages;
         private AudioSource src;
+        private GameObject TextAudio;
 
         /// <summary> speed of text display in character per frame </summary>
         private float speed;
@@ -58,14 +59,13 @@ namespace ScriptEditor.Graph
             valInPins.Add(new ValueInputPin(this, VarType.Actor));
             valInPins[0].Name = "Speaker";
             valInPins[0].Description = "The Actor who speaks the text. Can be left empty";
-            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool, true));
             valInPins[1].Name = "Focus on";
             valInPins[1].Description = "Whether or not the main camera should focus on the conversant";
-            valInPins[1].Default = true;
-            valInPins.Add(new ValueInputPin(this, VarType.Float));
+            valInPins.Add(new ValueInputPin(this, VarType.Float, 1f));
             valInPins[2].Name = "Speed";
             valInPins[2].Description = "How fast the text is displayed";
-            valInPins[2].Default = 1f;
+            //valInPins[2].Default = 1f;
             valInPins.Add(new ValueInputPin(this, VarType.Object));
             valInPins[3].Name = "User Data";
 
@@ -130,7 +130,7 @@ namespace ScriptEditor.Graph
         /// </summary>
         protected override void Setup() {
             dc = GameObject.FindObjectOfType<DialogueController>();
-            GameObject TextAudio = new GameObject("Text Audio");
+            TextAudio = new GameObject("Text Audio");
             TextAudio.transform.parent = dc.transform;
             src = Misc.CopyComponent<AudioSource>(dc.GetAudioSrc(), TextAudio);
             src.clip = dc.TextSound;
@@ -146,7 +146,7 @@ namespace ScriptEditor.Graph
             Actor actor = null;
 
             if (valInPins[0].IsConnected) {
-                actor = (Actor)valInPins[0].Value;
+                actor = valInPins[0].GetActor();
             }
             
             if (dc.outputHeader) {
@@ -168,13 +168,14 @@ namespace ScriptEditor.Graph
             }
 
             // set the speed from % to character per second (or frame?)
-            speed = (int)valInPins[2].Value;
+            speed = valInPins[2].GetInt();
+            if (speed <= 0) speed = 5;
 
             // focus on speaker
             if(actor != null) {
                 // change this to not be controlled by var?
                 if (valInPins[1].IsConnected) {
-                    if ((bool)valInPins[1].Value) {
+                    if (valInPins[1].GetBool()) {
                         Camera tmp = Camera.main;
                         if (tmp != null) {
                             camera = tmp.transform;
@@ -194,6 +195,9 @@ namespace ScriptEditor.Graph
                 camera.parent = previousFocus;
                 previousFocus = null;
             }
+
+            Destroy(TextAudio);
+            TextAudio = null;
 
             finished = true;
         }

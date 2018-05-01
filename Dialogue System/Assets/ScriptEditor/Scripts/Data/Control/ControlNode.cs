@@ -31,9 +31,8 @@ namespace ScriptEditor.Graph {
             if (multiplePins && valInPins.Count < 8) {
                 switch (this.GetType().ToString()) {
                     case "ChoiceNode":
-                        valInPins.Add(new ValueInputPin(this, VarType.Bool));
+                        valInPins.Add(new ValueInputPin(this, VarType.Bool, true));
                         valInPins[valInPins.Count - 1].Name = "Condition " + (valInPins.Count - 1);
-                        valInPins[valInPins.Count - 1].Default = true;
 
                         execOutPins.Add(new ExecOutputPin(this));
                         execOutPins[execOutPins.Count - 1].Name = "Choice " + (execOutPins.Count - 1);

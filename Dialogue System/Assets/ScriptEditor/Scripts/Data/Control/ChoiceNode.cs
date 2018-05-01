@@ -38,12 +38,10 @@ namespace ScriptEditor.Graph
             // Create pins
 			multiplePins = true;
             execInPins.Add(new ExecInputPin(this));
-            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool, true));
             valInPins[0].Name = "Condition 2";
-            valInPins[0].Default = true;
-            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool, true));
             valInPins[1].Name = "Condition 3";
-            valInPins[1].Default = true;
 
             execOutPins.Add(new ExecOutputPin(this));
             execOutPins[0].Name = "Default Choice";
@@ -90,7 +88,7 @@ namespace ScriptEditor.Graph
             for (int i = 1; i<valInPins.Count; i++) {
                 // only add the choice if the output has been connected
                 if(execOutPins[i-1].IsConnected)
-                    dc.AddChoice(choiceTexts[i], (bool)valInPins[i].Value);
+                    dc.AddChoice(choiceTexts[i], valInPins[i].GetBool());
             }
 
             choice = -1;

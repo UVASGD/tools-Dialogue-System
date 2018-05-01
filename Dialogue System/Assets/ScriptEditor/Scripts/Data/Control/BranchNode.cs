@@ -23,9 +23,8 @@ namespace ScriptEditor.Graph
 
             // Create pins
             execInPins.Add(new ExecInputPin(this));
-            valInPins.Add(new ValueInputPin(this, VarType.Bool));
+            valInPins.Add(new ValueInputPin(this, VarType.Bool, true));
             valInPins[0].Name = "Condition";
-            valInPins[0].Default = true;
 
             execOutPins.Add(new ExecOutputPin(this));
             execOutPins[0].Name = "True";
@@ -42,7 +41,7 @@ namespace ScriptEditor.Graph
         public override NodeBase GetNextNode()
         {
             // condition is based on default value or a lookup value
-            bool condition = (bool)valInPins[0].Value;
+            bool condition = valInPins[0].GetBool();
 
             NodeBase output = null;
             OutputPin pin = execOutPins[condition ? 0 : 1];
